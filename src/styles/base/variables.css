@@ -1,0 +1,8 @@
+/* Variáveis globais do projeto LuzForte. */
+:root {
+    --color-primary: #f2b705;
+    --color-secondary: #1f2933;
+    --color-background: #f7f7f7;
+    --color-text: #222222;
+    --container-width: 1180px;
+}
