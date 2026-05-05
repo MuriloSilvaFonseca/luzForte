@@ -1,1 +1,198 @@
+/* Header Styles */
 /* Home Styles */
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+}
+
+/* ===== TOP BAR ===== */
+.top-bar {
+    background: #071f37;
+    color: white;
+    padding: 8px 20px;
+    display: flex;
+    gap: 30px;
+    font-size: 14px;
+}
+
+.top-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.top-item img {
+    width: 15px;
+    height: 15px;
+}
+
+/* ===== HEADER ===== */
+.header {
+    background: #122848;
+    color: white;
+    display: flex;
+    justify-content: space-around;
+    height: 85px;
+    padding: 20px;
+}
+
+/* linha principal */
+.header-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+}
+
+/* ===== LOGO ===== */
+.logo {
+    font-size: 28px;
+    font-weight: bold;
+    width: 200px;
+    display: flex;
+    justify-content: center;
+   
+    align-items: center;
+}
+
+.logo-highlight {
+     
+ width: 200px;
+ height: 50px;
+
+}
+
+/* ===== BUSCA ===== */
+.search {
+    display: flex;
+    width: 50%;
+    justify-content: center;
+}
+
+.search-input {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 6px 0 0 6px;
+    height: 40px;
+}
+
+.search-button {
+    background: #ff3b3b;
+    border: none;
+    padding: 10px 15px;
+    color: white;
+    border-radius: 0 6px 6px 0;
+    cursor: pointer;
+    height: 40px;
+}
+
+/* ===== USUÁRIO ===== */
+.user {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    width: 200px;
+    justify-content: center;
+}
+.user img {
+   width: 30px;
+   height: 30px;
+
+}
+
+/* ===== CARRINHO ===== */
+.cart {
+      position: relative;
+    font-size: 20px;
+    width: 30px;
+    display: flex;
+    justify-content: end;
+    padding-right: 12px;
+    margin-right: 100px;
+   align-items: center;
+  height: 40px;
+}
+.cart img{
+    width: 30px;
+    height: 30px;
+    
+}
+.cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: red;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    font-size: 12px;
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+}
+
+/* ===== NAV / MENU ===== */
+.nav {
+    background: #1a365a;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    padding: 12px 20px;
+    justify-content: center;
+}
+
+/* botão categorias */
+.nav-categories {
+    background: #122848;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* links */
+.nav-links {
+    display: flex;
+    gap: 30px;
+}
+
+.nav-link {
+    color: white;
+    position: relative;
+}
+
+/* efeito hover */
+.nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    width: 0%;
+    height: 2px;
+    background-color: #ef4444;
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+/* destaque promoção */
+.nav-link-highlight {
+    color: #ff3b3b;
+}
+
+/* ===== ÍCONES ===== */
+.icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
