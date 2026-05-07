@@ -4,11 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LuzForte | Home</title>
-    <link rel="stylesheet" href="../../styles/pages/home.css">
+    <link rel="stylesheet" href="../../styles/components/header.css">
 
 
 </head>
-<body>
+
+
+<!-- Cabeçalho -->
+<header >
+    
 
 <div class="top-bar">
     <div class="top-item">
@@ -17,10 +21,7 @@
     </div>
 
 </div>
-
-<!-- Cabeçalho -->
-<header class="header">
-    
+<div class="header">
     <!-- Logo -->
     <div class="logo">
         <img  class="logo-highlight" src="/src/assets/images/logos/image.png" alt=""> 
@@ -28,7 +29,7 @@
 
     <!-- Busca -->
     <div class="search">
-        <input type="text" placeholder="Buscar produtos..." class="search-input">
+        <input type="text" placeholder="    Buscar produtos..." class="search-input">
         <button class="search-button">
             <img src="/src/assets/images/icons/icons8-pesquisar-50.png" alt="Buscar" class="icon">
         </button>
@@ -45,8 +46,8 @@
         <img src="/src/assets/images/icons/icons8-carrinho-de-compras-30.png" alt="Carrinho" class="icon">
         <span class="cart-badge"></span>
     </div>
+</div>
 
-</header>
 <!-- Menu de navegação -->
 <nav class="nav">
 
@@ -58,16 +59,20 @@
 
     <!-- Links do menu -->
     <div class="nav-links">
-        <a href="#" class="nav-link">Fios e Cabos</a>
-        <a href="#" class="nav-link">Disjuntores</a>
-        <a href="#" class="nav-link">Iluminação</a>
-        <a href="#" class="nav-link">Tomadas</a>
-        <a href="#" class="nav-link">Ferramentas</a>
+        <a href="#" class="nav-link"><span class="header-link-texto">Fios e Cabos</span></a>
+        <a href="#" class="nav-link"><span class="header-link-texto">Disjuntores</span></a>
+        <a href="#" class="nav-link"><span class="header-link-texto">Iluminação</span></a>
+        <a href="#" class="nav-link"><span class="header-link-texto">Tomadas</span></a>
+        <a href="#" class="nav-link"><span class="header-link-texto">Ferramentas</span></a>
+        <a href="#" class="nav-link"><span class="header-link-texto">Ferramentas</span></a>
+        <a href="#" class="nav-link"><span></span>Ferramentas</span></a>
+        
         <a href="#" class="nav-link nav-link-highlight">Promoção</a>
     </div>
 
 </nav>
-
+</header>
     <script src="../../scripts/pages/home.js"></script>
+    <body>
 </body>
 </html>
