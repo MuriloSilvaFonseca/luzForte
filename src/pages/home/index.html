@@ -1,78 +1,317 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LuzForte | Home</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Loja Elétrica</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/src/styles/pages/home.css">
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="../../styles/components/header.css">
-
-
 </head>
 
+<body>
 
-<!-- Cabeçalho -->
-<header >
-    
+    <!-- Cabeçalho -->
+    <header>
 
-<div class="top-bar">
-    <div class="top-item">
-        <img src="/src/assets/images/icons/icons8-localização-50.png" alt="Localização" class="icon">
-        <span>Entrega para São João da Boa Vista</span>
+
+        <div class="top-bar">
+            <div class="top-item">
+                <img src="/src/assets/images/icons/icons8-localização-50.png" alt="Localização" class="icon">
+                <span>Entrega para São João da Boa Vista</span>
+            </div>
+
+        </div>
+        <div class="header">
+            <!-- Logo -->
+            <div class="logo">
+                <img class="logo-highlight" src="/src/assets/images/logos/image.png" alt="">
+            </div>
+
+            <!-- Busca -->
+            <div class="search">
+                <input type="text" placeholder="    Buscar produtos..." class="search-input">
+                <button class="search-button">
+                    <img src="/src/assets/images/icons/icons8-pesquisar-50.png" alt="Buscar" class="icon">
+                </button>
+            </div>
+
+            <!-- Usuário -->
+            <div class="user">
+                <img classe ="it"src="/src/assets/images/icons/icons8-usuário-homem-com-círculo-48.png" alt="Usuário" class="icon">
+                <span>Olá, Rogério</span>
+            </div>
+
+            <!-- Carrinho -->
+            <div class="cart">
+                <img src="/src/assets/images/icons/icons8-carrinho-de-compras-30.png" alt="Carrinho" class="icon">
+                <span class="cart-badge"></span>
+            </div>
+        </div>
+
+        <!-- Menu de navegação -->
+        <nav class="nav">
+
+            <!-- Botão de categorias -->
+            <button class="nav-categories">
+                <span class="menu-icon">☰</span>
+                <span>Categorias</span>
+            </button>
+
+            <!-- Links do menu -->
+            <div class="nav-links">
+                <a href="#" class="nav-link"><span class="header-link-texto">Fios e Cabos</span></a>
+                <a href="#" class="nav-link"><span class="header-link-texto">Disjuntores</span></a>
+                <a href="#" class="nav-link"><span class="header-link-texto">Iluminação</span></a>
+                <a href="#" class="nav-link"><span class="header-link-texto">Tomadas</span></a>
+                <a href="#" class="nav-link"><span class="header-link-texto">Ferramentas</span></a>
+                <a href="#" class="nav-link"><span class="header-link-texto">Ferramentas</span></a>
+
+                <a href="#" class="nav-link nav-link-highlight">Promoção</a>
+            </div>
+
+        </nav>
+    </header>
+
+
+        <!-- HERO -->
+        <section class="hero">
+            <!-- SLIDES -->
+            <div class="slide active">
+                <img src="/src/assets/images/banners/image.png" alt="Banner 1">
+
+                <div class="hero-content">
+                    <h1>Promoção de<br>Cabos Elétricos</h1>
+
+                    <p>Alta qualidade para<br>instalações seguras</p>
+
+                    <button>Ver produtos</button>
+                </div>
+            </div>
+
+            <div class="slide">
+                <img src="/src/assets/images/banners/Banner2.png" alt="Banner 2">
+
+                <div class="hero-content">
+                    <h1>Ferramentas<br>Profissionais</h1>
+
+                    <p>Os melhores preços<br>para sua obra</p>
+
+                    <button>Comprar agora</button>
+                </div>
+            </div>
+
+            <div class="slide">
+                <img src="/src/assets/images/banners/Banner3.png" alt="Banner 3">
+
+                <div class="hero-content">
+                    <h1>Iluminação<br>Residencial</h1>
+
+                    <p>Modernidade e economia</p>
+
+                    <button>Explorar</button>
+                </div>
+            </div>
+
+            <!-- BOLINHAS -->
+            <div class="dots">
+                <span class="dot active"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        </section>
+
+    <div class="container">
+
+
+        <!-- BENEFÍCIOS -->
+        <section class="benefits">
+
+            <div class="benefit-card">
+                <div class="icons"><img src="/src/assets/images/icons/Cartao.png" alt=""></div>
+
+                <div>
+                    <h4>Parcelamento</h4>
+                    <p>Até 12x Cartão</p>
+                </div>
+            </div>
+
+            <div class="benefit-card">
+                <div class="icons"><img src="/src/assets/images/icons/Caixa.png" alt=""></div>
+
+                <div>
+                    <h4>Retirada na loja</h4>
+                    <p>Estoque imediato</p>
+                </div>
+            </div>
+
+            <div class="benefit-card">
+                <div class="icons"><img src="/src/assets/images/icons/dinheiro.png" alt=""></div>
+
+                <div>
+                    <h4>Descontos Especiais</h4>
+                    <p>Para pagamentos via Pix</p>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- CATEGORIAS -->
+        <section class="section">
+
+            <div class="section-title">
+                <h2>Principais <span>Categorias</span></h2>
+            </div>
+
+            <div class="categories">
+
+                <div class="category-card">
+                    <img src="" alt="">
+                    <p>Fios e Cabos</p>
+                </div>
+
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1504148455328-c376907d081c?q=80&w=400" alt="">
+                    <p>Ferramentas</p>
+                </div>
+
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=400" alt="">
+                    <p>Iluminação</p>
+                </div>
+
+                <div class="category-card">
+                    <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=400" alt="">
+                    <p>Disjuntores</p>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- PRODUTOS -->
+        <section class="section">
+
+            <div class="section-header">
+                <h2>Mais <span>Vendidos</span></h2>
+
+                <a href="#">Ver mais</a>
+            </div>
+
+            <div class="products">
+
+                <div class="product-card">
+
+                    <img src="/src/assets/images/products/fios.png" alt="">
+
+                    <div class="product-info">
+                        <p class="product-name">
+                            Fio Elétrico Cabo Flexível 1 via 1,50mm Azul
+                        </p>
+
+                        <span class="old-price">R$ 69,90</span>
+
+                        <h3>R$ 49<span>,99</span></h3>
+
+                        <button>Adicionar ao carrinho</button>
+                    </div>
+
+                </div>
+
+                <div class="product-card">
+
+                    <img src="/src/assets/images/products/fios.png" alt="">
+
+                    <div class="product-info">
+                        <p class="product-name">
+                            Fio Elétrico Cabo Flexível 1 via 1,50mm Azul
+                        </p>
+
+                        <span class="old-price">R$ 69,90</span>
+
+                        <h3>R$ 49<span>,99</span></h3>
+
+                        <button>Adicionar ao carrinho</button>
+                    </div>
+
+                </div>
+
+                <div class="product-card">
+
+                    <img src="/src/assets/images/products/fios.png" alt="">
+
+                    <div class="product-info">
+                        <p class="product-name">
+                            Fio Elétrico Cabo Flexível 1 via 1,50mm Azul
+                        </p>
+
+                        <span class="old-price">R$ 69,90</span>
+
+                        <h3>R$ 49<span>,99</span></h3>
+
+                        <button>Adicionar ao carrinho</button>
+                    </div>
+
+                </div>
+
+                <div class="product-card">
+
+                    <img src="/src/assets/images/products/fios.png" alt="">
+
+                    <div class="product-info">
+                        <p class="product-name">
+                            Fio Elétrico Cabo Flexível 1 via 1,50mm Azul
+                        </p>
+
+                        <span class="old-price">R$ 69,90</span>
+
+                        <h3>R$ 49<span>,99</span></h3>
+
+                        <button>Adicionar ao carrinho</button>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="anuncio">
+
+            <div class="propaganda">
+             <img src="/src/assets/images/banners/banner4.png" alt="">
+            </div>
+
+        </section>
+
+        <section class="avaliacoes">
+            <div class="cards-avaliacao-principal">
+                <div class="cards-avaliacao"></div>
+                <div class="cards-avaliacao"></div>
+                <div class="cards-avaliacao"></div>
+            </div>
+        </section>
+
+
+
+
     </div>
 
-</div>
-<div class="header">
-    <!-- Logo -->
-    <div class="logo">
-        <img  class="logo-highlight" src="/src/assets/images/logos/image.png" alt=""> 
-    </div>
-
-    <!-- Busca -->
-    <div class="search">
-        <input type="text" placeholder="    Buscar produtos..." class="search-input">
-        <button class="search-button">
-            <img src="/src/assets/images/icons/icons8-pesquisar-50.png" alt="Buscar" class="icon">
-        </button>
-    </div>
-
-    <!-- Usuário -->
-    <div class="user">
-        <img src="/src/assets/images/icons/icons8-usuário-homem-com-círculo-48.png" alt="Usuário" class="icon">
-        <span>Olá, Rogério</span>
-    </div>
-
-    <!-- Carrinho -->
-    <div class="cart">
-        <img src="/src/assets/images/icons/icons8-carrinho-de-compras-30.png" alt="Carrinho" class="icon">
-        <span class="cart-badge"></span>
-    </div>
-</div>
-
-<!-- Menu de navegação -->
-<nav class="nav">
-
-    <!-- Botão de categorias -->
-    <button class="nav-categories">
-        <span class="menu-icon">☰</span>
-        <span>Categorias</span>
-    </button>
-
-    <!-- Links do menu -->
-    <div class="nav-links">
-        <a href="#" class="nav-link"><span class="header-link-texto">Fios e Cabos</span></a>
-        <a href="#" class="nav-link"><span class="header-link-texto">Disjuntores</span></a>
-        <a href="#" class="nav-link"><span class="header-link-texto">Iluminação</span></a>
-        <a href="#" class="nav-link"><span class="header-link-texto">Tomadas</span></a>
-        <a href="#" class="nav-link"><span class="header-link-texto">Ferramentas</span></a>
-        <a href="#" class="nav-link"><span class="header-link-texto">Ferramentas</span></a>
-        <a href="#" class="nav-link"><span></span>Ferramentas</span></a>
-        
-        <a href="#" class="nav-link nav-link-highlight">Promoção</a>
-    </div>
-
-</nav>
-</header>
-    <script src="../../scripts/pages/home.js"></script>
-    <body>
 </body>
+
 </html>
+
+
+
+
+
+<script src="../../scripts/pages/home.js"></script>
+
+<body>
+</body>
