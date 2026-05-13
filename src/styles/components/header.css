@@ -8,6 +8,18 @@
     text-decoration: none;
 }
 
+
+header {
+    background-color: #122848;
+}
+
+.align-content {
+    max-width: 1440px;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+}
+
 /* ===== TOP BAR ===== */
 .top-bar {
     background: #071f37;
