@@ -53,6 +53,7 @@ height: 57px;
     display: flex;
     gap: 30px;
     font-size: 14px;
+    height: 30px;
 }
 
 .top-item {
@@ -194,6 +195,7 @@ height: 57px;
     gap: 30px;
     padding: 12px 20px;
     justify-content: center;
+    height: 58px;
 }
 
 /* botão categorias */

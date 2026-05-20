@@ -11,9 +11,9 @@ body {
 
 .container {
   width: 100%;
-  max-width: 1440px;
+  max-width: 1240px;
   margin: auto;
-  background: #f5f5f5;
+
 }
 
 /* HERO */
@@ -34,17 +34,18 @@ body {
 
   padding: 60px;
 }
-.hero{
-     position: relative;
 
-    width: 100%;
-    max-width: 1440px;
+.hero {
+  position: relative;
 
-    height: 500px;
+  width: 100%;
+  max-width: 1440px;
 
-    margin: 0 auto;
+  height: 500px;
 
-    overflow: hidden;
+  margin: 0 auto;
+
+  overflow: hidden;
 }
 
 /* SLIDES */
@@ -181,7 +182,7 @@ body {
 .benefits {
   background: white;
   padding: 25px 40px;
-  width: 1440px;
+  width: 1240px;
   display: flex;
   justify-content: space-between;
   gap: 20px;
@@ -228,8 +229,8 @@ body {
 /* SECTION */
 
 .section {
-  padding: 50px 40px;
-  
+  padding: 50px 0px;
+
 }
 
 .section-title h2,
@@ -300,7 +301,7 @@ body {
 .products {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  gap: 40px;
 }
 
 .product-card {
@@ -321,7 +322,7 @@ body {
   width: 100%;
   height: 180px;
   object-fit: contain;
-  padding: 15px;
+
 }
 
 .product-info {
@@ -369,50 +370,41 @@ body {
 .product-info button:hover {
   background: #102a4c;
 }
-.anuncio{
-    margin:50px;
-    color: white;
-    height: auto;
-    margin: auto;
-    padding: 12px;
-   
+
+.anuncio {
+  margin: 50px;
+  color: white;
+  height: auto;
+  margin: auto;
+  padding: 12px;
+
 }
 
-.cards-avaliacao1{
-background-color: #f5f5f5;
-height: 200px;
-width: 200px;
+.cards-avaliacao1 {
+  background-color: #f5f5f5;
+  height: 200px;
+  width: 200px;
 }
-.cards-avaliacao{
-display: grid;
-grid-template-columns: repeat(3, 1fr);
-gap: 20px;
-width: 100%;
-height: auto;
+
+.cards-avaliacao {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+  height: auto;
 }
-.avaliacoes{
-    background: #122848;
-    color: white;
-    height: 800px;
-    padding: 12px;
+
+.avaliacoes {
+
+  color: white;
+  padding: 12px;
+  margin-bottom:50px ;
 }
-/* RESPONSIVO */
 
-@media(max-width: 992px){
-
-  .products,
-  .categories{
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .benefits{
-    flex-direction: column;
-  }
-
-  .hero h1{
-    font-size: 2.3rem;
-  }
+.avaliacoes h2 {
+  padding-bottom: 20px;
 }
+
 
 .propaganda img {
 
@@ -423,15 +415,18 @@ height: auto;
 .propaganda {
   margin: 50px;
 }
-.cards-avaliacao{
-  background-color: #d8d8d8;
-  width: 300px;
-  height: 500px;
+
+.cards-avaliacao1 {
+  background-color: #fcfcfc;
+  width: 374px;
+  height: 263px;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
 }
-.cards-avaliacao-principal{
-  background-color: #e92f24;
-   width: auto;
- height: 500px;
-margin: 20px;
-grid-template-columns: repeat(3,1);
+
+.cards-avaliacao-principal {
+  width: auto;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  display:grid ;
 }
