@@ -7,14 +7,63 @@
     <link rel="stylesheet" href="../../styles/pages/registro.css">
 </head>
 <body>
-    <div id="header"></div>
 
-    <h1>Registro</h1>
+    <header class="registro-header">
+        <img class="registro-logo" src="../../assets/images/logos/logo.png" alt="LuzForte Logo">
+    </header>
 
-    <div id="footer"></div>
+    <main class="registro-page">
+        <div class="cadastro-container">
+            <a class="cadastro-voltar" href="#" aria-label="Voltar">←</a>
+            <h1>Criar nova conta</h1>
 
-    <!-- Carrega o header e footer -->
-    <script src="../../scripts/modules/header.js"></script> 
+            <div class="divider"><span>OU</span></div>
+
+            <form class="cadastro-form" action="#" method="post" novalidate>
+                <label class="field">
+                    <span class="field-label">Nome completo*</span>
+                    <input type="text" name="nome" placeholder="Digite seu nome completo..." required>
+                </label>
+
+                <label class="field">
+                    <span class="field-label">E-mail *</span>
+                    <input type="email" name="email" placeholder="Digite seu e-mail..." required>
+                </label>
+
+                <label class="field">
+                    <span class="field-label">Telefone*</span>
+                    <input type="tel" name="telefone" placeholder="+55 (00) 00000-0000" required>
+                </label>
+
+                <label class="field">
+                    <span class="field-label">CPF</span>
+                    <input type="text" name="cpf" placeholder="000.000.000-00">
+                </label>
+
+                <label class="field password-field">
+                    <span class="field-label">Senha*</span>
+                    <div class="password-row">
+                        <input type="password" name="senha" placeholder="Mínimo 8 caracteres" required>
+                        <button type="button" class="show-pass" aria-label="Mostrar senha">👁️</button>
+                    </div>
+                    <small class="hint">Sua senha deve ter no mínimo 8 caracteres</small>
+                </label>
+
+                <label class="field password-field">
+                    <span class="field-label">Confirmar Senha*</span>
+                    <div class="password-row">
+                        <input type="password" name="confirm_senha" placeholder="Digite sua senha novamente..." required>
+                        <button type="button" class="show-pass" aria-label="Mostrar senha">👁️</button>
+                    </div>
+                </label>
+
+                <button class="btn-cta" type="submit">Criar conta</button>
+
+                <p class="terms">Ao clicar em Criar, você concorda com os Termos de Uso e a Política de Privacidade.</p>
+            </form>
+        </div>
+    </main>
+
 
     
     <script src="../../scripts/pages/registro.js"></script>

@@ -1,1 +1,153 @@
 /* Registro Styles */
+
+.google-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 16px;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 15px;
+  color: #3c4043;
+  cursor: pointer;
+}
+
+.google-btn:hover {
+  background: #f7f8f8;
+}
+
+/* Registro page styles */
+.registro-header{
+  text-align: center;
+  padding: 28px 0 8px;
+}
+.registro-logo{
+  height: 56px;
+}
+
+.registro-page{
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  background: #f4f6f8;
+  min-height: calc(100vh - 120px);
+}
+
+.cadastro-container{
+  background: #ffffff;
+  width: 540px;
+  padding: 28px;
+  border-radius: 15px;
+  box-shadow: 0 6px 18px rgba(16,24,40,0.06);
+  position: relative;
+}
+
+.cadastro-voltar{
+  position: absolute;
+  left: 18px;
+  top: 18px;
+  text-decoration: none;
+  color: #1E3F6D;
+  font-size: 20px;
+}
+
+.cadastro-container h1{
+  text-align: center;
+  margin: 6px 0 18px;
+  color: #1E3F6D;
+  font-size: 26px;
+}
+
+.divider{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 6px 0 22px;
+}
+.divider::before,
+.divider::after{
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e6e9ee;
+}
+.divider span{
+  font-weight: 700;
+  color: #9aa7bb;
+  font-size: 13px;
+  padding: 0 6px;
+}
+
+.cadastro-form .field{
+  display: block;
+  margin-bottom: 18px;
+}
+.field-label{
+  display: block;
+  margin-bottom: 6px;
+  color: #1E3F6D;
+  font-weight: 700;
+  font-size: 14px;
+}
+.cadastro-form input{
+  width: 100%;
+  height: 30px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 14px;
+  color: #333;
+  box-sizing: border-box;
+}
+.password-row{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.password-row input{flex:1}
+.show-pass{
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 6px;
+  border-radius: 6px;
+}
+.hint{
+  display: block;
+  color: #8c98a8;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.btn-cta{
+  display: block;
+  width: 100%;
+  height: 50px;
+  padding: 10px 18px;
+  background: #1E3F6D;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 8px;
+}
+.btn-cta:hover{opacity:0.95}
+
+.terms{
+  font-size: 12px;
+  color: #8c98a8;
+  text-align: center;
+  margin-top: 12px;
+}
+
+/* Google button appearance consistent with login */
+.google-btn{
+  width: 100%;
+  justify-content: center;
+  padding: 10px 14px;
+  border-radius: 14px;
+}
