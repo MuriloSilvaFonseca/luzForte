@@ -1,13 +1,339 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LuzForte | Catálogo</title>
-    <link rel="stylesheet" href="../../styles/pages/catalogo.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fios Elétricos — Luz Forte</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-    <h1>Catálogo</h1>
-    <script src="../../scripts/pages/catalogo.js"></script>
+
+<!-- ════════════════════════════════════
+     HEADER
+════════════════════════════════════ -->
+<header>
+  <div class="header-inner">
+
+    <!-- Logo -->
+    <a href="#" class="logo">
+      <div class="logo-wordmark">
+        <span class="logo-luz">Luz</span><span class="logo-forte">Forte</span><span class="logo-wave">≋</span>
+      </div>
+    </a>
+
+    <!-- Busca -->
+    <div class="search-wrap">
+      <div class="search-bar">
+        <input type="text" placeholder="Buscar produtos..." />
+        <button class="search-btn" aria-label="Buscar">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke-width="2.5" stroke="currentColor">
+            <circle cx="11" cy="11" r="8"/>
+            <path stroke-linecap="round" d="m21 21-4.35-4.35"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Usuário + Carrinho -->
+    <div class="header-right">
+      <div class="user-info">
+        <div class="user-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke-width="1.8" stroke="currentColor">
+            <circle cx="12" cy="8" r="4"/>
+            <path stroke-linecap="round" d="M4 20c0-4 3.58-7 8-7s8 3 8 7"/>
+          </svg>
+        </div>
+        <div class="user-text">
+          <small>Olá,</small>
+          <strong>Rogério</strong>
+        </div>
+      </div>
+
+      <div class="cart-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          stroke-width="1.8" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M2.25 3h1.386c.51 0 .955.343 1.087.836l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+        </svg>
+        <span class="cart-badge" id="cartBadge">3</span>
+      </div>
+    </div>
+
+  </div>
+</header>
+
+<!-- ════════════════════════════════════
+     NAVEGAÇÃO
+════════════════════════════════════ -->
+<nav class="main-nav">
+  <div class="nav-inner">
+
+    <div class="nav-hamburguer">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+        stroke-width="2.2" stroke="currentColor">
+        <path stroke-linecap="round" d="M3 6h18M3 12h18M3 18h18"/>
+      </svg>
+      Categorias
+    </div>
+
+    <ul class="nav-links">
+      <li><a href="#">Fios e Cabos</a></li>
+      <li><a href="#">Disjuntores</a></li>
+      <li><a href="#">Iluminação</a></li>
+      <li><a href="#">Tomadas</a></li>
+      <li><a href="#">Ferramentas</a></li>
+      <li class="promo"><a href="#">Promoção</a></li>
+    </ul>
+
+  </div>
+</nav>
+
+<!-- ════════════════════════════════════
+     CONTEÚDO PRINCIPAL
+════════════════════════════════════ -->
+<main>
+  <div class="page-container">
+
+    <!-- Barra de título + ordenação -->
+    <div class="title-bar">
+      <div>
+        <h1>Fios Elétricos</h1>
+        <p class="prod-count">Produtos encontrados (1234)</p>
+      </div>
+      <div class="sort-area">
+        <span>Ordenar por</span>
+        <select id="sortSelect">
+          <option>Mais vendidos</option>
+          <option>Menor preço</option>
+          <option>Maior preço</option>
+          <option>Novidades</option>
+          <option>Avaliação</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <a href="#">Início</a>
+      <span class="sep">›</span>
+      <a href="#">Fios e Cabos</a>
+      <span class="sep">›</span>
+      <a href="#">Cabo de baixa tensão</a>
+      <span class="sep">›</span>
+      <span>Cabo Flexível 1KV 90G Hepr 35MM2...</span>
+    </div>
+
+    <!-- Sidebar + Grid -->
+    <div class="content-row">
+
+      <!-- ══ SIDEBAR ══ -->
+      <aside class="sidebar">
+
+        <!-- Categoria -->
+        <div class="filter-group">
+          <div class="filter-title open">
+            Categoria
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/>
+            </svg>
+          </div>
+          <div class="filter-body"></div>
+        </div>
+
+        <!-- Marca -->
+        <div class="filter-group">
+          <div class="filter-title open">
+            Marca
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/>
+            </svg>
+          </div>
+          <div class="filter-body">
+            <div class="marca-parent">
+              Marca 1
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke-width="2.5" stroke="currentColor">
+                <path stroke-linecap="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
+              </svg>
+            </div>
+            <label class="filter-check"><input type="checkbox" /> Marca 2</label>
+            <label class="filter-check"><input type="checkbox" /> Marca 3</label>
+            <label class="filter-check"><input type="checkbox" /> Marca 4</label>
+            <label class="filter-check"><input type="checkbox" /> Marca 5</label>
+          </div>
+        </div>
+
+        <!-- Categoria 2 -->
+        <div class="filter-group">
+          <div class="filter-title open">
+            Categoria
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/>
+            </svg>
+          </div>
+          <div class="filter-body"></div>
+        </div>
+
+        <!-- Categoria 3 -->
+        <div class="filter-group">
+          <div class="filter-title open">
+            Categoria
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/>
+            </svg>
+          </div>
+          <div class="filter-body"></div>
+        </div>
+
+        <!-- Categoria 4 -->
+        <div class="filter-group">
+          <div class="filter-title open">
+            Categoria
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/>
+            </svg>
+          </div>
+          <div class="filter-body"></div>
+        </div>
+
+        <!-- Avaliações -->
+        <div class="filter-group">
+          <div class="filter-title">Avaliações</div>
+          <div class="filter-body">
+            <div class="stars-row">
+              <span class="s">★</span>
+              <span class="s">★</span>
+              <span class="s">★</span>
+              <span class="s">★</span>
+              <span class="s">★</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preços -->
+        <div class="filter-group">
+          <div class="filter-title">Preços</div>
+          <div class="filter-body">
+            <div class="price-row"><div class="price-box"></div> R$ 0 - 200</div>
+            <div class="price-row"><div class="price-box"></div> R$ 200 - 400</div>
+            <div class="price-row"><div class="price-box"></div> R$ 400 - 600</div>
+            <div class="price-row"><div class="price-box"></div> R$ 600 - 800</div>
+            <div class="price-row"><div class="price-box"></div> R$ 800 - 1000</div>
+          </div>
+        </div>
+
+      </aside>
+      <!-- /sidebar -->
+
+      <!-- ══ GRID DE PRODUTOS ══ -->
+      <div class="products-area">
+        <div class="products-grid" id="productsGrid">
+          <!-- Preenchido via JS -->
+        </div>
+
+        <!-- Paginação -->
+        <div class="pagination">
+          <button class="pg-btn" aria-label="Anterior">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" d="M15.75 19.5L8.25 12l7.5-7.5"/>
+            </svg>
+          </button>
+          <button class="pg-btn active">1</button>
+          <button class="pg-btn" aria-label="Próxima">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <!-- /products-area -->
+
+    </div>
+    <!-- /content-row -->
+
+  </div>
+  <!-- /page-container -->
+</main>
+
+<!-- ════════════════════════════════════
+     FOOTER
+════════════════════════════════════ -->
+<footer>
+  <div class="footer-grid">
+
+    <!-- Logo + copyright -->
+    <div class="footer-logo-block">
+      <div class="wordmark">
+        <span class="wl">Luz</span><span class="wf">Forte</span><span class="ww">≋</span>
+      </div>
+      <p class="footer-copy">© 2025 LuzForte. Todos os<br>direitos reservados.</p>
+    </div>
+
+    <!-- Links -->
+    <div class="footer-col">
+      <ul>
+        <li><a href="#">Início</a></li>
+        <li><a href="#">Quem Somos</a></li>
+        <li><a href="#">Contato</a></li>
+        <li><a href="#">Nossas Lojas</a></li>
+        <li><a href="#">Serviços</a></li>
+      </ul>
+    </div>
+
+    <!-- Local -->
+    <div class="footer-col">
+      <h4>Local</h4>
+      <div class="addr">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          stroke-width="1.8" stroke="currentColor">
+          <path stroke-linecap="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+          <path stroke-linecap="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/>
+        </svg>
+        R. Quatorze de Julho, 880 – Vila Oriental, São João da Boa Vista – SP
+      </div>
+      <div class="social-row">
+        <a href="#" title="Facebook">f</a>
+        <a href="#" title="Instagram">in</a>
+        <a href="#" title="WhatsApp">W</a>
+      </div>
+    </div>
+
+    <!-- Atendimento -->
+    <div class="footer-col">
+      <h4>Atendimento</h4>
+      <div class="contact-row">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          stroke-width="1.8" stroke="currentColor">
+          <path stroke-linecap="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"/>
+        </svg>
+        (19) 99999-9999
+      </div>
+      <div class="contact-row">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          stroke-width="1.8" stroke="currentColor">
+          <path stroke-linecap="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/>
+        </svg>
+        luzforte@gmail.com
+      </div>
+    </div>
+
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
 </body>
 </html>
