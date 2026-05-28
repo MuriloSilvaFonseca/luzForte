@@ -1,4 +1,4 @@
-.container_produto { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+.container_produto { max-width: 1240px; margin: 2rem auto;}
 
 .breadcrumb_produto { margin-bottom: 2rem; color: #666; font-size: 0.9rem; }
 
@@ -33,9 +33,9 @@
 
 .reviews_produto { color: #666; font-size: 0.9rem; }
 
-.stock_produto { display: flex;  border: solid 1px #1e3c72;}
+.stock_produto { display: flex; border: solid 1px #1e3c72; align-items: center; justify-content: space-between; width: 140px;}
 
-.stock_produto p { display: inline-block;}
+.stock_produto p { display: inline;}
 
 .stock_produto img { width: 24px;}
 
