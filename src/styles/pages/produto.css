@@ -127,8 +127,6 @@
 
 .specs_table_produto td:first-child { font-weight: 600; color: #666; width: 40%; }
 
-footer { background: #1e3c72; color: white; text-align: center; padding: 2rem 0; margin-top: 3rem; }
-
 .notification_produto { position: fixed; top: 100px; right: 2rem; background: #27ae60; color: white; padding: 1rem 1.5rem; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); display: none; animation: slideIn 0.3s; }
 
 @keyframes slideIn { 
