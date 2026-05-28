@@ -398,7 +398,7 @@ body {
 
   color: white;
   padding: 12px;
-  margin-bottom:50px ;
+  margin-bottom: 50px;
 }
 
 .avaliacoes h2 {
@@ -411,9 +411,48 @@ body {
   width: 500px;
   height: 500px;
 }
+.texto-propaganda button {
+  background-color: #e92f24;
+   color: white;
+   width: fit-content;
+   height: fit-content;
+   border-radius: 10px;
+   border: none;
+   padding: 10px 30px;
+   
+}
+.texto-propaganda button:hover {
+  background-color: #ff3b30;
+}
+.texto-propaganda{
+width: 400px;
+height: 200px;
+margin-left: 70px;
 
+}
+.texto-propaganda h1 {
+  padding-bottom: 20px;
+}
+.texto-propaganda p {
+  padding-bottom: 20px;
+}
+.texto-propaganda a{
+  color: white;
+  text-decoration: none;
+  font-size: 20px;
+  overflow: hidden;
+}
 .propaganda {
   margin: 50px;
+  background-image: url(/src/assets/images/banners/banner4.png);
+  background-size: cover;
+  background-position: center;
+  flex: 1;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  border-radius: 5px;
 }
 
 .cards-avaliacao1 {
@@ -428,5 +467,45 @@ body {
   width: auto;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-  display:grid ;
+  display: grid;
+}
+.review-card {
+  width: 320px;
+  background: #ececec;
+  padding: 18px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+ 
+}
+
+.user-info h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #222;
+}
+
+.stars {
+  color: #f5c518;
+  font-size: 16px;
+  margin-top: 2px;
+}
+
+.review-text {
+  margin-top: 18px;
+  font-size: 16px;
+  color: #222;
+  line-height: 1.4;
 }
