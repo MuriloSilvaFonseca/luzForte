@@ -39,9 +39,11 @@
 
                     <!-- Usuário -->
                     <div class="user">
-                        <img classe="it" src="/src/assets/images/icons/icons8-usuário-homem-com-círculo-48.png"
+                        <a href="../../../src/pages/login/index.html">
+                            <img classe="it" src="/src/assets/images/icons/icons8-usuário-homem-com-círculo-48.png"
                             alt="Usuário" class="icon">
                         <span>Olá, Rogério</span>
+                        </a>
                     </div>
 
                     <!-- Carrinho -->
@@ -59,8 +61,15 @@
 
                     <!-- Botão de categorias -->
                     <button class="nav-categories">
-                        <span class="menu-icon">☰</span>
-                        <span>Categorias</span>
+                        
+                        <select name="categorias" id="categorias">
+                            <option value="" disabled selected hidden ><span class="menu-icon">☰  </span>Categorias</option>
+                            <option value="fios-cabos">Fios e Cabos</option>
+                            <option value="disjuntores">Disjuntores</option>
+                            <option value="iluminacao">Iluminação</option>
+                            <option value="tomadas">Tomadas</option>
+                            <option value="ferramentas">Ferramentas</option>
+                        </select>
                     </button>
 
                     <!-- Links do menu -->
@@ -70,7 +79,7 @@
                         <a href="#" class="nav-link"><span class="header-link-texto">Iluminação</span></a>
                         <a href="#" class="nav-link"><span class="header-link-texto">Tomadas</span></a>
                         <a href="#" class="nav-link"><span class="header-link-texto">Ferramentas</span></a>
-                        <a href="/src/pages/sobre-nos/index.html" class="nav-link"><span class="header-link-texto">Sobre nós</span></a>
+                        <a href="#" class="nav-link"><span class="header-link-texto">Ferramentas</span></a>
 
                         <a href="#" class="nav-link nav-link-highlight">Promoção</a>
                     </div>

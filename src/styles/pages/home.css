@@ -293,7 +293,7 @@ body {
 }
 
 .category-card p {
-  font-weight: 500;
+  font-weight: 500px;
 }
 
 /* PRODUCTS */
@@ -354,16 +354,12 @@ body {
 .product-info button {
   width: 100%;
   border: none;
-
   background: #183b6b;
   color: white;
-
   padding: 12px;
   border-radius: 8px;
-
   font-weight: 600;
   cursor: pointer;
-
   transition: .3s;
 }
 
@@ -377,7 +373,6 @@ body {
   height: auto;
   margin: auto;
   padding: 12px;
-
 }
 
 .cards-avaliacao1 {
@@ -395,27 +390,61 @@ body {
 }
 
 .avaliacoes {
-
   color: white;
   padding: 12px;
-  margin-bottom:50px ;
+  margin-bottom: 50px;
 }
 
 .avaliacoes h2 {
   padding-bottom: 20px;
 }
-
-
 .propaganda img {
 
   width: 500px;
   height: 500px;
 }
-
+.texto-propaganda button {
+  background-color: #e92f24;
+   color: white;
+   width: fit-content;
+   height: fit-content;
+   border-radius: 10px;
+   border: none;
+   padding: 10px 30px;
+  
+}
+.texto-propaganda button:hover {
+  background-color: #ff3b30;
+}
+.texto-propaganda{
+width: 400px;
+height: 200px;
+margin-left: 70px;
+}
+.texto-propaganda h1 {
+  padding-bottom: 20px;
+}
+.texto-propaganda p {
+  padding-bottom: 20px;
+}
+.texto-propaganda a{
+  color: white;
+  text-decoration: none;
+  font-size: 20px;
+  overflow: hidden;
+}
 .propaganda {
   margin: 50px;
+  background-image: url(/src/assets/images/banners/banner4.png);
+  background-size: cover;
+  background-position: center;
+  flex: 1;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  border-radius: 5px;
 }
-
 .cards-avaliacao1 {
   background-color: #fcfcfc;
   width: 374px;
@@ -428,5 +457,59 @@ body {
   width: auto;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-  display:grid ;
+  display: grid;
+}
+.review-card {
+  width: 320px;
+  background: #ececec;
+  padding: 18px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+ 
+}
+.avatar  {
+  margin-left: 20px;
+  margin-top: 40px;
+  height: auto;
+}
+.user-info h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #222;
+}
+.user-info  {
+ width: 80%;
+ margin-top: 40px;
+ height: auto;
+}
+.stars {
+  color: #f5c518;
+  font-size: 16px;
+  margin-top: 2px;
+}
+.test{
+  display: flex;
+  justify-content: space-between;
+  height: 100px;
+}
+.review-text {
+  margin-top: 18px;
+  font-size: 16px;
+  color: #222;
+  line-height: 1.4;
+   padding-left: 20px;
+   padding-right: 20px;
 }
