@@ -40,16 +40,19 @@
   padding: 28px;
   border-radius: 15px;
   box-shadow: 0 6px 18px rgba(16,24,40,0.06);
-  position: relative;
+  
 }
 
 .cadastro-voltar{
-  position: absolute;
   left: 18px;
   top: 18px;
   text-decoration: none;
   color: #1E3F6D;
   font-size: 20px;
+}
+.cadastro-voltar img{
+  width: 20px;
+  height: 20px;
 }
 
 .cadastro-container h1{

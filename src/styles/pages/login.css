@@ -148,3 +148,16 @@
 .google-btn:hover {
   background: #f7f8f8;
 }
+
+.cadastro-voltar{
+
+  left: 18px;
+  top: 18px;
+  text-decoration: none;
+  color: #1E3F6D;
+  font-size: 20px;
+}
+.cadastro-voltar img{
+  width: 20px;
+  height: 20px;
+}
