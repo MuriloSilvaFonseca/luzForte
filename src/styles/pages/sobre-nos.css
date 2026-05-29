@@ -9,26 +9,28 @@
     as regras do preset (ex: section->alinhamento....)
 */
 .sectionSobreNos{
-<<<<<<< Updated upstream
-    max-width: 1240px;
-    width: 100%;
+    max-width: 2000px;
+    width: 1555px;
     min-height: 650px;
     height: 65vh;
     margin: auto;
-=======
     max-width: 1440px;
     width: 100%;
     min-height: 650px;
+    max-height: 750px;
     height: 65vh;
->>>>>>> Stashed changes
 }
 .sobreNosBackground{
+    width: 100%;
+    max-width: 100vw;
     display: flex;
     align-content: center;
     background-color: rgba(18, 40, 72, 1);
 }
 .alinhamentoSobreNosTexto{
     margin: auto;
+    width: 900px;
+    height: 350px;
 }
 .tituloSobreNos{
     width: 757px;
@@ -54,13 +56,20 @@
 
 /*Sobre Nos parte texto e imagem loja */
 .alinhamentoNossaLojaPai{
+    margin: auto;
     display: flex;
     justify-content: space-around;
-    width: 100%;
-    padding: 60px;
+    width: 1250px;
+    padding-top: 40px;
+}
+.nossaLoja{
+    margin-bottom: 40px;
+    min-height: 650px;
+    max-height: 750px;
 }
 .alinhamentoTextoNossaLoja{
-    width: 680px;
+    width: 580px;
+    margin-right: 20px;
 }
 .alinhamentoTextoNossaLoja p{
     margin-top: 35px;
@@ -73,7 +82,7 @@
     padding-bottom: 15px;
 }
 .legendaNossaLoja{
-    width: 572px;
+    width: 552px;
     font-size: 22px;
     text-align: start;
     color: rgba(104, 104, 104, 1);
@@ -92,54 +101,80 @@
 
 /*Sobre Nos Parte Card*/
 .cardSobreNos{
-    display: flex;
+    width: 100%;
+    max-width: 100vw;
     align-content: center;
-    justify-content: center;
     background-color:rgba(240, 239, 239, 1);
+    display: flex;
+    justify-content: center;
+    align-items: start;
+    height: 600px;
+}
+.alinhamentoSobreNos{
+    width: 1200px;
+    margin: 55px auto;
 }
 .cardSobrePai{
+    display: flex;
+    justify-content: flex-start;
     margin: auto;
+    margin-top: 75px;
 }
 .tituloValores{
     font-size: 40px;
     color: rgba(175, 30, 30, 1);
-    justify-self: start;
-    align-self: start;
+    text-align: start;
+    margin-right: auto;
+    margin-bottom: auto;
 }
 .cardSobreNosPai{
     margin: auto;
     display: flex;
     justify-content: space-between;
-    gap: 28px;
+    gap: 25px;
 }
 .cardSobreNosFilho{
     border: 1px color rgba(209, 208, 208, 1);
     background-color: rgba(255, 255, 255, 1);
     width: 280px;
     height: 268px;
-    border-radius: 15px;    
+    border-radius: 15px; 
+    padding: 15px;  
+    box-shadow: 1px 2px 4px 0px rgba(0, 0, 0, 0.25);
 }
 .iconeSobreNos{
-    border: 1px white;
+    margin: 10px auto;
+    border: 1px solid rgba(148, 148, 148, 1);
     border-radius: 100px;
     width: 95px;
     height: 95px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.iconeSobreNos img{
+    width: 63px;
+    height: 63px;
+    margin: auto;
 }
 .tituloCardSobreNos{
     text-align: center;
     font-size: 19px;
-    color: blue;
+    color: rgba(32, 66, 116, 1);
+    margin-top: 20px;
 }
 .legendaCardSobreNos{
     text-align: center;
     font-size: 15px;
     color: grey;
+    width: 79%;
+    margin: 10px auto;
 }
 
 /*Sobre Nos Parte Contato Cliente*/
 .falarConoscoPai{
-    height: 551px;
-}
+    min-height: 650px;
+    max-height: 750px}
 .alinhamentoFalarConosco{
     padding: 60px;
     align-self: auto;
@@ -160,10 +195,10 @@
 .botaoSobreNosPai{
     margin-top: 45px;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     margin: auto;
     width: 730px;
-    gap: 35px;
+    gap: 15px;
     margin: auto;
 }
 .botaoSobreNosPai button{
@@ -175,4 +210,8 @@
     width: 287px;
     height: 63px;
     border-radius: 10px;
+}
+.botaoSobreNosPai button:hover{
+    background-color: rgba(30, 63, 109, 1);
+    color: white;
 }

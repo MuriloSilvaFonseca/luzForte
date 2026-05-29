@@ -4,62 +4,161 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LuzForte | Carrinho</title>
+    <link rel="stylesheet" href="../../styles/components/header.css">
+    <link rel="stylesheet" href="../../styles/components/footer.css">
     <link rel="stylesheet" href="../../styles/pages/carrinho.css">
 </head>
 <body>
+ 
     <div id="header"></div>
-    <section>
-        <div class="corpoCarrinho">
-            <div class="parteSuperiorCarrinho">
-
+ 
+    <section class="alinhamentoCarrinho">
+        <div class="pageWrapper">
+ 
+            <div class="corpoCarrinho">
+                <div class="parteSuperiorCarrinho">
+                    <input type="checkbox" id="checkTodos">
+                    <label for="checkTodos">Todos os produtos</label>
+                </div>
+ 
+                <hr class="linhaSeparadora">
+ 
+                <div class="produtos">
+                    <div class="checkCarrinho">
+                        <input type="checkbox" id="prod1">
+                    </div>
+                    <div class="imagemCarrinho">
+                        <img src="/src/assets/images/products/lampada.png" >
+                    </div>
+                    <div class="acoesCarrinho">
+                        <span class="nomeProduto">Disjuntor Tripolar WEG 30a Curva C</span>
+                        <span class="badgeCategoria">Disjuntores</span>
+                        <div class="controlesQty">
+                            <button class="btnQty" onclick="mudarQty(this, -1)">−</button>
+                            <span class="qtyValor">12</span>
+                            <button class="btnQty" onclick="mudarQty(this, 1)">+</button>
+                            <button class="btnFav" onclick="toggleFav(this)">
+                                <i class="ti ti-heart" style="color:#aaa"></i>
+                            </button>
+                            <button class="btnDel">
+                                <i class="ti ti-trash" style="color:#e24b4a"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="informacoesCarrinho">
+                        <span class="precoOff">-15% OFF</span>
+                        <span class="precoAtual">R$ 15,80</span>
+                        <span class="precoUn">R$ 3,45 /un</span>
+                    </div>
+                </div>
+ 
+                <hr class="linhaSeparadora">
+ 
+                <div class="produtos">
+                    <div class="checkCarrinho">
+                        <input type="checkbox" id="prod2">
+                    </div>
+                    <div class="imagemCarrinho">
+                        <img src="/src/assets/images/products/fios.png">
+                    </div>
+                    <div class="acoesCarrinho">
+                        <span class="nomeProduto">Disjuntor Tripolar WEG 30a Curva C</span>
+                        <span class="badgeCategoria">Disjuntores</span>
+                        <div class="controlesQty">
+                            <button class="btnQty" onclick="mudarQty(this, -1)">−</button>
+                            <span class="qtyValor">12</span>
+                            <button class="btnQty" onclick="mudarQty(this, 1)">+</button>
+                            <button class="btnFav" onclick="toggleFav(this)">
+                                <i class="ti ti-heart" style="color:#aaa"></i>
+                            </button>
+                            <button class="btnDel">
+                                <i class="ti ti-trash" style="color:#e24b4a"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="informacoesCarrinho">
+                        <span class="precoOff">-15% OFF</span>
+                        <span class="precoAtual">R$ 15,80</span>
+                        <span class="precoUn">R$ 3,45 /un</span>
+                    </div>
+                </div>
+ 
+                <hr class="linhaSeparadora">
+ 
+                <div class="produtos">
+                    <div class="checkCarrinho">
+                        <input type="checkbox" id="prod3">
+                    </div>
+                    <div class="imagemCarrinho">
+                        <img src="/src/assets/images/products/furadeira.png">
+                    </div>
+                    <div class="acoesCarrinho">
+                        <span class="nomeProduto">Disjuntor Tripolar WEG 30a Curva C</span>
+                        <span class="badgeCategoria">Disjuntores</span>
+                        <div class="controlesQty">
+                            <button class="btnQty" onclick="mudarQty(this, -1)">−</button>
+                            <span class="qtyValor">12</span>
+                            <button class="btnQty" onclick="mudarQty(this, 1)">+</button>
+                            <button class="btnFav" onclick="toggleFav(this)" data-ativo="true">
+                                <i class="ti ti-heart-filled" style="color:#1a6be8"></i>
+                            </button>
+                            <button class="btnDel">
+                                <i class="ti ti-trash" style="color:#e24b4a"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="informacoesCarrinho">
+                        <span class="precoOff">-15% OFF</span>
+                        <span class="precoAtual">R$ 15,80</span>
+                        <span class="precoUn">R$ 3,45 /un</span>
+                    </div>
+                </div>
+ 
+                <hr class="linhaSeparadora">
             </div>
-
-            <hr class="linhaSeparadora">
-            <div class="produtos">
-                <div class="checkCarrinho"></div>
-                <div class="imagemCarrinho"></div>
-                <div class="acoesCarrinho"></div>
-                <div class="informacoesCarrinho"></div>
+ 
+            <div class="colunaDireita">
+ 
+                <div class="resumoProduto">
+                    <p class="tituloResumo">Resumo produtos:</p>
+                    <hr class="linhaProduto">
+                    <div class="linhaResumo">
+                        <span class="labelResumo">Subtotal (100 itens):</span>
+                        <span class="valorResumo">R$ 99,90</span>
+                    </div>
+                    <div class="linhaResumo">
+                        <span class="labelResumo">Desconto (R$):</span>
+                        <span class="descontoValor">R$ - 99,90</span>
+                    </div>
+                    <div class="linhaTotal">
+                        <span class="labelTotal">Total (R$):</span>
+                        <span class="valorTotal">R$ 99,90</span>
+                    </div>
+                    <div class="botaoCarrinhoFinalizar">
+                        <button>Continuar com a compra</button>
+                    </div>
+                    <div class="compraSegura">
+                        <i class="ti ti-lock" aria-hidden="true"></i>
+                        <p class="legendaCompra">Compra 100% segura</p>
+                    </div>
+                </div>
+ 
+                <div class="cupomDesconto">
+                    <h2 class="textoCupom">Cupom de desconto:</h2>
+                    <hr class="linhaProduto">
+                    <h3 class="labelCupom">Insira aqui o cupom:</h3>
+                    <input type="text" placeholder="">
+                    <button class="botaoCarrinho">Aplicar desconto</button>
+                </div>
+ 
             </div>
-            <hr class="linhaSeparadora">
-        </div>
-
-        <div class="resumoProduto">
-            <h4 class="textoCinza">Resumo Cinza</h4>
-            <hr class="linhaProduto">
-            <h4 class="textoCinza">Subtotal(100): </h4>
         </div>
     </section>
-
+ 
     <div id="footer"></div>
+ 
     <script src="../../scripts/modules/header.js"></script>
     <script src="../../scripts/pages/carrinho.js"></script>
-
-    <section>
-        <div class="corpoCarrinho">
-            <div class="parteSuperiorCarrinho">
-
-            </div>
-
-            <hr class="linhaSeparadora">
-            <div class="produtos">
-                <div class="checkCarrinho"></div>
-                <div class="imagemCarrinho"></div>
-                <div class="acoesCarrinho"></div>
-                <div class="informacoesCarrinho"></div>
-            </div>
-            <hr class="linhaSeparadora">
-        </div>
-
-        <div class="resumoProduto">
-            <h4 class="textoCinza">Resumo Cinza</h4>
-            <hr class="linhaProduto">
-            <h4 class="textoCinza">Subtotal(100): </h4>
-        </div>
-    </section>
-
-
-
-
+ 
 </body>
 </html>
