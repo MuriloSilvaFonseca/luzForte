@@ -1,0 +1,10 @@
+// usuarios para login via JSON
+[
+    {   
+        "id": 1,
+        "nome": "Usuário Teste",
+        "email": "user@email.com", 
+        "senha": "123456",
+        "CPF": "123.456.789-00"
+}
+]
