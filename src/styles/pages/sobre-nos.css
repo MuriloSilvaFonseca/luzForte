@@ -9,10 +9,11 @@
     as regras do preset (ex: section->alinhamento....)
 */
 .sectionSobreNos{
-    max-width: 1440px;
+    max-width: 1240px;
     width: 100%;
     min-height: 650px;
     height: 65vh;
+    margin: auto;
 }
 .sobreNosBackground{
     display: flex;
