@@ -11,49 +11,36 @@
     <div id="header"></div>
 
     <div class="container_produto">
-        <div class="breadcrumb_produto">
-            <a href="#">Início</a> / <a href="#">Disjuntores</a> / <a href="#">Tripolares</a> / Disjuntor Tripolar 63A
-        </div>
+        <div class="breadcrumb_produto" id="breadcrumbProduto"></div>
 
         <div class="product_section_produto">
             <div class="gallery_produto">
                 <div class="main_image_produto" id="mainImage">
-                    <img src="../../assets/images/products/dijuntor.png" alt="Disjuntor Tripolar 63A">
+                    <img src="" alt="">
                 </div>
-                <div class="thumbnails_produto">
-                    <div class="thumbnail_produto active_produto" onclick="changeImage(0)">
-                        <img src="../../assets/images/products/dijuntor.png" alt="Disjuntor Tripolar 63A">
-                    </div>
-                    <div class="thumbnail_produto" onclick="changeImage(1)">
-                        <img src="../../assets/images/products/fio.png" alt="Fio eletrico">
-                    </div>
-                    <div class="thumbnail_produto" onclick="changeImage(2)">
-                        <img src="../../assets/images/products/fios.png" alt="Fios eletricos">
-                    </div>
-                </div>
+                <div class="thumbnails_produto" id="thumbnailsProduto"></div>
             </div>
 
             <div class="product_info_produto">
-                <p class="classification_label_produto">MAIS VENDIDOS</p>
-                
-                
-                <h1>Disjuntor Tripolar 63A - Curva C</h1>
-                <p class="product_code_produto">Cód: DJT-63A-3P-001</p>
-                
+                <p class="classification_label_produto" id="classificationLabel"></p>
+
+                <h1 id="productName"></h1>
+                <p class="product_code_produto" id="productCode"></p>
+
                 <div class="rating_produto">
-                    <div class="stars_produto">★★★★★</div>
-                    <span class="reviews_produto">(127 avaliações)</span>
+                    <div class="stars_produto" id="productStars"></div>
+                    <span class="reviews_produto" id="productReviews"></span>
                 </div>
 
                 <div class="stock_produto">
                     <img src="../../assets/images/icons/icons8-caixa-128.png" alt="">
-                    <p>Em estoque</p>
+                    <p id="productStock"></p>
                 </div>
 
                 <div class="price_section_produto">
-                    <p class="old_price_produto">De R$ 189,90</p>
-                    <p class="current_price_produto">R$ 142,90</p>
-                    <p class="installments_produto">ou 3x de R$ 47,63 sem juros</p>
+                    <p class="old_price_produto" id="productOldPrice"></p>
+                    <p class="current_price_produto" id="productCurrentPrice"></p>
+                    <p class="installments_produto" id="productInstallments"></p>
                 </div>
 
                 <div class="quantity_section_produto">
@@ -68,117 +55,19 @@
                     <button class="btn_produto btn_primary_produto" onclick="addToCart()">Adicionar ao Carrinho</button>
                     <button class="btn_produto btn_secondary_produto" onclick="buyNow()">Comprar Agora</button>
                 </div>
-
-        
             </div>
         </div>
 
         <div class="tabs_produto">
             <div class="tab_buttons_produto">
-                <button class="tab_btn_produto active_produto" onclick="openTab('description')">Descrição</button>
-                <button class="tab_btn_produto" onclick="openTab('specs')">Especificações Técnicas</button>
-                <button class="tab_btn_produto" onclick="openTab('installation')">Instalação</button>
+                <button class="tab_btn_produto active_produto" data-tab="description">Descrição</button>
+                <button class="tab_btn_produto" data-tab="specs">Especificações Técnicas</button>
+                <button class="tab_btn_produto" data-tab="installation">Instalação</button>
             </div>
 
-            <div id="description" class="tab_content_produto active_produto">
-                <h2>Descrição do Produto</h2>
-                <p>O Disjuntor Tripolar 63A com Curva C é ideal para proteção de circuitos trifásicos em instalações residenciais, comerciais e industriais leves. Projetado para oferecer máxima segurança e confiabilidade, este disjuntor protege seus equipamentos contra sobrecargas e curtos-circuitos.</p>
-                
-                <h3>Características Principais:</h3>
-                <p>Fabricado com materiais de alta qualidade, o disjuntor possui contatos em prata que garantem maior durabilidade e menor aquecimento. O sistema de extinção de arco elétrico é projetado para interromper rapidamente correntes de falta, protegendo toda a instalação.</p>
-                
-                <p>A curva C é especialmente indicada para cargas com corrente de partida moderada, como motores, transformadores e iluminação em geral. Com capacidade de interrupção de 6kA, este disjuntor atende à maioria das aplicações residenciais e comerciais.</p>
-            </div>
-
-            <div id="specs" class="tab_content_produto">
-                <h2>Especificações Técnicas</h2>
-                <table class="specs_table_produto">
-                    <tr>
-                        <td>Corrente Nominal (In)</td>
-                        <td>63A</td>
-                    </tr>
-                    <tr>
-                        <td>Número de Polos</td>
-                        <td>3 Polos</td>
-                    </tr>
-                    <tr>
-                        <td>Curva de Disparo</td>
-                        <td>C (5 a 10 × In)</td>
-                    </tr>
-                    <tr>
-                        <td>Capacidade de Interrupção</td>
-                        <td>6kA em 240V</td>
-                    </tr>
-                    <tr>
-                        <td>Tensão Nominal</td>
-                        <td>220/380V CA</td>
-                    </tr>
-                    <tr>
-                        <td>Frequência</td>
-                        <td>50/60 Hz</td>
-                    </tr>
-                    <tr>
-                        <td>Normas</td>
-                        <td>NBR IEC 60898-1, NBR NM 60898</td>
-                    </tr>
-                    <tr>
-                        <td>Grau de Proteção</td>
-                        <td>IP20</td>
-                    </tr>
-                    <tr>
-                        <td>Temperatura de Operação</td>
-                        <td>-5°C a +40°C</td>
-                    </tr>
-                    <tr>
-                        <td>Seção de Cabos</td>
-                        <td>10 a 35 mm²</td>
-                    </tr>
-                    <tr>
-                        <td>Durabilidade Mecânica</td>
-                        <td>20.000 manobras</td>
-                    </tr>
-                    <tr>
-                        <td>Durabilidade Elétrica</td>
-                        <td>10.000 manobras</td>
-                    </tr>
-                    <tr>
-                        <td>Dimensões (A×L×P)</td>
-                        <td>54 × 72 × 78 mm</td>
-                    </tr>
-                    <tr>
-                        <td>Peso</td>
-                        <td>280g</td>
-                    </tr>
-                    <tr>
-                        <td>Garantia</td>
-                        <td>2 anos</td>
-                    </tr>
-                </table>
-            </div>
-
-            <div id="installation" class="tab_content_produto">
-                <h2>Instruções de Instalação</h2>
-                
-                <h3>Segurança em Primeiro Lugar</h3>
-                <p><strong>ATENÇÃO:</strong> A instalação deve ser realizada por eletricista qualificado e habilitado. Sempre desligue a energia antes de iniciar qualquer trabalho elétrico.</p>
-                
-                <h3>Passo a Passo:</h3>
-                <ol>
-                    <li><strong>Verificação:</strong> Certifique-se de que o disjuntor é adequado para a corrente e tensão do circuito.</li>
-                    <li><strong>Montagem:</strong> Fixe o disjuntor no trilho DIN do quadro de distribuição até ouvir um clique.</li>
-                    <li><strong>Conexão:</strong> Conecte os cabos de entrada (parte superior) e saída (parte inferior) nos terminais.</li>
-                    <li><strong>Aperto:</strong> Aperte os parafusos dos terminais com torque adequado (2,5 N.m).</li>
-                    <li><strong>Teste:</strong> Ligue o disjuntor e verifique o funcionamento correto.</li>
-                </ol>
-                
-                <h3>Dicas Importantes:</h3>
-                <ul>
-                    <li>Use cabos com seção adequada à corrente nominal</li>
-                    <li>Mantenha ventilação adequada no quadro</li>
-                    <li>Não instale em ambientes com umidade excessiva</li>
-                    <li>Respeite a temperatura de operação especificada</li>
-                </ul>
-            </div>
+            <div id="description" class="tab_content_produto active_produto"></div>
+            <div id="specs" class="tab_content_produto"></div>
+            <div id="installation" class="tab_content_produto"></div>
         </div>
     </div>
 
@@ -186,9 +75,8 @@
         ✓ Produto adicionado ao carrinho!
     </div>
 
-
     <div id="footer"></div>
-    
+
     <script src="../../scripts/pages/produto.js"></script>
     <script src="../../scripts/modules/header.js"></script>
 </body>

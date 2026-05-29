@@ -6,7 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fios Elétricos — Luz Forte</title>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="/src/styles/pages/catalogo.css">
+  <link rel="stylesheet" href="../../styles/base/reset.css">
+  <link rel="stylesheet" href="../../styles/components/header.css">
+  <link rel="stylesheet" href="../../styles/pages/catalogo.css">
 </head>
 <body>
 
@@ -49,16 +51,22 @@
       <!-- ══ SIDEBAR ══ -->
       <aside class="sidebar">
 
-        <!-- Categoria -->
+        <!-- Tipo de cabo -->
         <div class="filter-group">
           <div class="filter-title open">
-            Categoria
+            Tipo de cabo
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
               stroke-width="2.5" stroke="currentColor">
               <path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/>
             </svg>
           </div>
-          <div class="filter-body"></div>
+          <div class="filter-body">
+            <label class="filter-check"><input type="checkbox" /> Cabo flexível (412)</label>
+            <label class="filter-check"><input type="checkbox" /> Cabo rígido (287)</label>
+            <label class="filter-check"><input type="checkbox" /> Cabo de cobre nu (156)</label>
+            <label class="filter-check"><input type="checkbox" /> Cabo paralelo (93)</label>
+            <label class="filter-check"><input type="checkbox" /> Cabo de telefone (64)</label>
+          </div>
         </div>
 
         <!-- Marca -->
@@ -71,79 +79,128 @@
             </svg>
           </div>
           <div class="filter-body">
-            <div class="marca-parent">
-              Marca 1
+            <div class="marca-parent open">
+              Prysmian
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                 stroke-width="2.5" stroke="currentColor">
-                <path stroke-linecap="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
+                <path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/>
               </svg>
             </div>
-            <label class="filter-check"><input type="checkbox" /> Marca 2</label>
-            <label class="filter-check"><input type="checkbox" /> Marca 3</label>
-            <label class="filter-check"><input type="checkbox" /> Marca 4</label>
-            <label class="filter-check"><input type="checkbox" /> Marca 5</label>
+            <div class="marca-children">
+              <label class="filter-check"><input type="checkbox" /> Antigrip (98)</label>
+              <label class="filter-check"><input type="checkbox" /> Superastic (76)</label>
+              <label class="filter-check"><input type="checkbox" /> Enerflex (54)</label>
+            </div>
+            <label class="filter-check"><input type="checkbox" /> Nexans (189)</label>
+            <label class="filter-check"><input type="checkbox" /> Sil (143)</label>
+            <label class="filter-check"><input type="checkbox" /> Corfio (112)</label>
+            <label class="filter-check"><input type="checkbox" /> Conduspar (87)</label>
           </div>
         </div>
 
-        <!-- Categoria 2 -->
+        <!-- Bitola -->
         <div class="filter-group">
           <div class="filter-title open">
-            Categoria
+            Bitola
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
               stroke-width="2.5" stroke="currentColor">
               <path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/>
             </svg>
           </div>
-          <div class="filter-body"></div>
+          <div class="filter-body">
+            <label class="filter-check"><input type="checkbox" /> 1,5 mm² (234)</label>
+            <label class="filter-check"><input type="checkbox" /> 2,5 mm² (198)</label>
+            <label class="filter-check"><input type="checkbox" /> 4 mm² (167)</label>
+            <label class="filter-check"><input type="checkbox" /> 6 mm² (121)</label>
+            <label class="filter-check"><input type="checkbox" /> 10 mm² (89)</label>
+            <label class="filter-check"><input type="checkbox" /> 16 mm² (52)</label>
+          </div>
         </div>
 
-        <!-- Categoria 3 -->
+        <!-- Cor -->
         <div class="filter-group">
-          <div class="filter-title open">
-            Categoria
+          <div class="filter-title">
+            Cor
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
               stroke-width="2.5" stroke="currentColor">
               <path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/>
             </svg>
           </div>
-          <div class="filter-body"></div>
+          <div class="filter-body">
+            <label class="filter-check"><input type="checkbox" /> Azul (178)</label>
+            <label class="filter-check"><input type="checkbox" /> Vermelho (165)</label>
+            <label class="filter-check"><input type="checkbox" /> Amarelo (142)</label>
+            <label class="filter-check"><input type="checkbox" /> Verde (131)</label>
+            <label class="filter-check"><input type="checkbox" /> Preto (119)</label>
+            <label class="filter-check"><input type="checkbox" /> Branco (97)</label>
+          </div>
         </div>
 
-        <!-- Categoria 4 -->
+        <!-- Isolamento -->
         <div class="filter-group">
-          <div class="filter-title open">
-            Categoria
+          <div class="filter-title">
+            Isolamento
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
               stroke-width="2.5" stroke="currentColor">
               <path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/>
             </svg>
           </div>
-          <div class="filter-body"></div>
+          <div class="filter-body">
+            <label class="filter-check"><input type="checkbox" /> PVC 750V (356)</label>
+            <label class="filter-check"><input type="checkbox" /> XLPE 1kV (214)</label>
+            <label class="filter-check"><input type="checkbox" /> HEPR 90°C (148)</label>
+            <label class="filter-check"><input type="checkbox" /> EPR blindado (76)</label>
+          </div>
         </div>
 
         <!-- Avaliações -->
         <div class="filter-group">
-          <div class="filter-title">Avaliações</div>
+          <div class="filter-title open">
+            Avaliações
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/>
+            </svg>
+          </div>
           <div class="filter-body">
-            <div class="stars-row">
-              <span class="s">★</span>
-              <span class="s">★</span>
-              <span class="s">★</span>
-              <span class="s">★</span>
-              <span class="s">★</span>
-            </div>
+            <label class="filter-check filter-rating">
+              <input type="checkbox" />
+              <span class="stars-row"><span class="s on">★</span><span class="s on">★</span><span class="s on">★</span><span class="s on">★</span><span class="s on">★</span></span>
+              <span class="rating-count">(128)</span>
+            </label>
+            <label class="filter-check filter-rating">
+              <input type="checkbox" />
+              <span class="stars-row"><span class="s on">★</span><span class="s on">★</span><span class="s on">★</span><span class="s on">★</span><span class="s off">★</span></span>
+              <span class="rating-count">(256)</span>
+            </label>
+            <label class="filter-check filter-rating">
+              <input type="checkbox" />
+              <span class="stars-row"><span class="s on">★</span><span class="s on">★</span><span class="s on">★</span><span class="s off">★</span><span class="s off">★</span></span>
+              <span class="rating-count">(189)</span>
+            </label>
+            <label class="filter-check filter-rating">
+              <input type="checkbox" />
+              <span class="stars-row"><span class="s on">★</span><span class="s on">★</span><span class="s off">★</span><span class="s off">★</span><span class="s off">★</span></span>
+              <span class="rating-count">(74)</span>
+            </label>
           </div>
         </div>
 
         <!-- Preços -->
         <div class="filter-group">
-          <div class="filter-title">Preços</div>
+          <div class="filter-title open">
+            Preços
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/>
+            </svg>
+          </div>
           <div class="filter-body">
-            <div class="price-row"><div class="price-box"></div> R$ 0 - 200</div>
-            <div class="price-row"><div class="price-box"></div> R$ 200 - 400</div>
-            <div class="price-row"><div class="price-box"></div> R$ 400 - 600</div>
-            <div class="price-row"><div class="price-box"></div> R$ 600 - 800</div>
-            <div class="price-row"><div class="price-box"></div> R$ 800 - 1000</div>
+            <label class="filter-check"><input type="checkbox" /> Até R$ 50 (312)</label>
+            <label class="filter-check"><input type="checkbox" /> R$ 50 – R$ 100 (428)</label>
+            <label class="filter-check"><input type="checkbox" /> R$ 100 – R$ 200 (267)</label>
+            <label class="filter-check"><input type="checkbox" /> R$ 200 – R$ 400 (154)</label>
+            <label class="filter-check"><input type="checkbox" /> Acima de R$ 400 (73)</label>
           </div>
         </div>
 
@@ -259,6 +316,7 @@
 </main>
   <div id="footer"></div>
 
+<script src="../../scripts/pages/catalogo.js"></script>
 <script src="../../scripts/modules/header.js"></script>
 </body>
 </html>
