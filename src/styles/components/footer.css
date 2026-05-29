@@ -82,6 +82,10 @@
   transition: 0.3s;
 }
 
+.social-icons img {
+  width: 30px;
+}
+
 .social-icons a:hover {
   transform: scale(1.1);
   color: #ff2d2d;

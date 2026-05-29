@@ -293,7 +293,7 @@ body {
 }
 
 .category-card p {
-  font-weight: 500;
+  font-weight: 500px;
 }
 
 /* PRODUCTS */
@@ -354,16 +354,12 @@ body {
 .product-info button {
   width: 100%;
   border: none;
-
   background: #183b6b;
   color: white;
-
   padding: 12px;
   border-radius: 8px;
-
   font-weight: 600;
   cursor: pointer;
-
   transition: .3s;
 }
 
@@ -377,7 +373,6 @@ body {
   height: auto;
   margin: auto;
   padding: 12px;
-
 }
 
 .cards-avaliacao1 {
@@ -395,7 +390,6 @@ body {
 }
 
 .avaliacoes {
-
   color: white;
   padding: 12px;
   margin-bottom: 50px;
@@ -404,8 +398,6 @@ body {
 .avaliacoes h2 {
   padding-bottom: 20px;
 }
-
-
 .propaganda img {
 
   width: 500px;
@@ -419,7 +411,7 @@ body {
    border-radius: 10px;
    border: none;
    padding: 10px 30px;
-   
+  
 }
 .texto-propaganda button:hover {
   background-color: #ff3b30;
@@ -428,7 +420,6 @@ body {
 width: 400px;
 height: 200px;
 margin-left: 70px;
-
 }
 .texto-propaganda h1 {
   padding-bottom: 20px;
@@ -454,7 +445,6 @@ margin-left: 70px;
   justify-content: start;
   border-radius: 5px;
 }
-
 .cards-avaliacao1 {
   background-color: #fcfcfc;
   width: 374px;
@@ -489,23 +479,37 @@ margin-left: 70px;
   border-radius: 50%;
  
 }
-
+.avatar  {
+  margin-left: 20px;
+  margin-top: 40px;
+  height: auto;
+}
 .user-info h3 {
   margin: 0;
   font-size: 16px;
   font-weight: 500;
   color: #222;
 }
-
+.user-info  {
+ width: 80%;
+ margin-top: 40px;
+ height: auto;
+}
 .stars {
   color: #f5c518;
   font-size: 16px;
   margin-top: 2px;
 }
-
+.test{
+  display: flex;
+  justify-content: space-between;
+  height: 100px;
+}
 .review-text {
   margin-top: 18px;
   font-size: 16px;
   color: #222;
   line-height: 1.4;
+   padding-left: 20px;
+   padding-right: 20px;
 }
