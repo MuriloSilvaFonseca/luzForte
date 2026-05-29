@@ -24,7 +24,7 @@
                 </button>
             <div class="divider"><span>OU</span></div>
 
-            <form class="cadastro-form" action="#" method="post" novalidate>
+            <form class="cadastro-form" action="" method="post">
                 <label class="field">
                     <span class="field-label">Nome completo*</span>
                     <input type="text" name="nome" placeholder="Digite seu nome completo..." required>
@@ -33,6 +33,7 @@
                 <label class="field">
                     <span class="field-label">E-mail *</span>
                     <input type="email" name="email" placeholder="Digite seu e-mail..." required>
+                    <span class="campo-error" id="email-error">Por favor, insira um e-mail válido.</span>
                 </label>
 
                 <label class="field">
@@ -42,7 +43,7 @@
 
                 <label class="field">
                     <span class="field-label">CPF</span>
-                    <input type="text" name="cpf" placeholder="000.000.000-00">
+                    <input type="number" name="cpf" placeholder="000.000.000-00">
                 </label>
 
                 <label class="field password-field">
@@ -58,7 +59,8 @@
                     <span class="field-label">Confirmar Senha*</span>
                     <div class="password-row">
                         <input type="password" name="confirm_senha" placeholder="Digite sua senha novamente..." required>
-                        <button type="button" class="show-pass" aria-label="Mostrar senha"></button>
+                        <span class="campo-error" id="confirm-password-error">As senhas não coincidem</span>
+                    <button type="button" class="show-pass" aria-label="Mostrar senha"></button>
                     </div>
                 </label>
 
