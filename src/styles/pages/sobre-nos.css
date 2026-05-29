@@ -9,11 +9,18 @@
     as regras do preset (ex: section->alinhamento....)
 */
 .sectionSobreNos{
+<<<<<<< Updated upstream
     max-width: 1240px;
     width: 100%;
     min-height: 650px;
     height: 65vh;
     margin: auto;
+=======
+    max-width: 1440px;
+    width: 100%;
+    min-height: 650px;
+    height: 65vh;
+>>>>>>> Stashed changes
 }
 .sobreNosBackground{
     display: flex;
