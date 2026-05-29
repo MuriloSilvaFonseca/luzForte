@@ -270,9 +270,7 @@ height: 57px;
     transition: transform 0.3s ease-in-out;
     
 }
-.nav-link::before {
-  top: -5px;
-}
+
 
 .nav-link:hover::before,
 .nav-link:hover::after {
