@@ -8,6 +8,8 @@
 
 .product_section_produto { background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 2px 20px rgba(0,0,0,0.08); display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
 
+.classification_label_produto { background: #ff0000; color: white; padding: 0.7rem 1.2rem; border-radius: 8px; font-size: 0.9rem; font-weight: bold; display: inline-block; margin-bottom: 1.5rem;}
+
 .gallery_produto { display: flex; flex-direction: column; gap: 1rem; }
 
 .main_image_produto { width: 100%; height: 450px; border: 2px solid #e0e0e0; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fafafa; }
@@ -33,9 +35,9 @@
 
 .reviews_produto { color: #666; font-size: 0.9rem; }
 
-.stock_produto { display: flex; border: solid 1px #1e3c72; align-items: center; justify-content: space-between; width: 140px;}
+.stock_produto { display: flex; border: solid 1px #1e3c72; align-items: center; justify-content: space-between; padding: 10px; max-width: 150px; border-radius: 8px; margin-bottom: 1.5rem;}
 
-.stock_produto p { display: inline;}
+.stock_produto p { display: inline; color: #1e3c72; font-weight: bold;}
 
 .stock_produto img { width: 24px;}
 
@@ -64,8 +66,6 @@
 .spec_value_produto { font-weight: 600; color: #333; }
 
 .quantity_section_produto { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
-
-.quantity_label_produto { font-weight: 600; color: #2a5298; font-weight: bold;}
 
 .quantity_control_produto { display: flex; align-items: center; border: 2px solid #e0e0e0; border-radius: 6px; overflow: hidden; }
 
@@ -103,7 +103,7 @@
 
 .tab_content_produto.active_produto { display: block; animation: fadeIn 0.3s; }
 
-.tab_content_produto h3, .tab_content_produto h2 { color: #2a5298; }
+.tab_content_produto h3, .tab_content_produto h2 { color: #2a5298; margin-bottom: 1rem;}
 
 .tab_content_produto h3 { margin-top: 1.5rem; }
 
