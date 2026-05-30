@@ -25,7 +25,8 @@ $(document).ready(function () {
         }
 
         code = gerarCodigo();
-        console.log('Código gerado:', code); // Exibe o código no console para testes
+        console.log('Código gerado:', code); 
+        // Exibe o código no console para testes
 
         // isso aqui é para enviar o email pela API
         emailjs.send('service_kaqt165', 'template_264o0hf', {
@@ -45,7 +46,7 @@ $(document).ready(function () {
     });
 
     $('#step-2 .step-btn').click(function () {
-        console.log(code); // Exibe o código inserido no console para testes
+        // console.log(code);  Exibe o código inserido no console para testes
 
         if (forgotCode.value.trim() === '' || forgotCode.value.trim() !== code.toString()) {
             $('#code-error').css('display', 'block');
