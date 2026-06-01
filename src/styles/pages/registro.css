@@ -35,12 +35,13 @@
 }
 
 .cadastro-container{
+  margin-top: 10vh;
   background: #ffffff;
   width: 540px;
   padding: 28px;
   border-radius: 15px;
   box-shadow: 0 6px 18px rgba(16,24,40,0.06);
-  
+  height: fit-content;
 }
 
 .cadastro-voltar{
@@ -104,12 +105,30 @@
   color: #333;
   box-sizing: border-box;
 }
+.cadastro-form input:focus{
+  border-color: #1E3F6D;
+  outline: none;
+}
+
 .password-row{
   display: flex;
   align-items: center;
   gap: 8px;
+  border: 1px solid #ccc;
+  padding: 0 8px;
+  border-radius: 4px;
 }
-.password-row input{flex:1}
+.password-row:focus-within{
+  border-color: #1E3F6D;
+}
+.password-row input{
+  flex: 1;
+  border: none;
+  padding: 15px 0;
+}
+.password-row input:focus{
+  outline: none;
+}
 .show-pass{
   background: transparent;
   border: none;
@@ -153,4 +172,16 @@
   justify-content: center;
   padding: 10px 14px;
   border-radius: 14px;
+}
+
+.show-pass{
+  width: 10px;
+  height: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.show-pass img{
+  width: 20px;
+  height: 20px;
 }

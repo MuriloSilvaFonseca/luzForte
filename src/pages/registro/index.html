@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="../../styles/base/reset.css">
     <link rel="stylesheet" href="../../styles/pages/registro.css">
     <link rel="stylesheet" href="../../styles/components/messages.css">
+    <script src="../../scripts/modules/jquery-4.0.0.min.js"></script>
+    <script src="../../scripts/pages/registro.js"></script>
+    
 </head>
 <body>
 
@@ -51,7 +54,7 @@
                     <span class="field-label">Senha*</span>
                     <div class="password-row">
                         <input type="password" name="senha" placeholder="Mínimo 8 caracteres" required>
-                        <button type="button" class="show-pass" aria-label="Mostrar senha"></button>
+                        <button id="mostrarSenha1" type="button" class="show-pass" aria-label="Mostrar senha"><img src="../../assets/images/icons/olho-fechado.png" alt="Mostrar senha"></button>
                     </div>
                     <small class="hint">Sua senha deve ter no mínimo 8 caracteres</small>
                 </label>
@@ -61,7 +64,7 @@
                     <div class="password-row">
                         <input type="password" name="confirm_senha" placeholder="Digite sua senha novamente..." required>
                         <span class="campo-error" id="confirm-password-error">As senhas não coincidem</span>
-                    <button type="button" class="show-pass" aria-label="Mostrar senha"></button>
+                    <button id="mostrarSenha2" type="button" class="show-pass" aria-label="Mostrar senha"><img src="../../assets/images/icons/olho-fechado.png" alt="Mostrar senha"></button>
                     </div>
                 </label>
 
@@ -74,6 +77,6 @@
 
 
     
-    <script src="../../scripts/pages/registro.js"></script>
+   
 </body>
 </html>

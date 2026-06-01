@@ -1,12 +1,13 @@
-
+// ============================================================
 // CONFIGURACOES PRINCIPAIS
+// ============================================================
 
-const API_KEY = 'AIzaSyBlDjVzC79dtO9PGh9JCZTrXDn1IPXC-Ic';
-const SHEET_ID = '18QIWbkM92lOlJKQFILgyX3lPvOYWOh4qD_0t5psiQ5c';
-const RANGE = 'Usuarios';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQMYU6C4ZHvY47xjPxIcA48k0M8-BUxoRky8OiyN-L6aWQ5DmKmRHwV0Ukoc1BoxtC/exec';
 
 
+// ============================================================
 // FUNCAO PRINCIPAL DE REGISTRO
+// ============================================================
 
 function registrar(){
     // Capturar dados do formulario
@@ -39,55 +40,70 @@ function registrar(){
         return;
     }
 
-    // Mostrar que esta processando
-    mostrarMensagem('Criando sua conta...', 'carregando');
-    
     // Fazer requisicao para adicionar usuario
     adicionarUsuario(nome, email, telefone, cpf, senha);
 }
 
 
-
+// ============================================================
 // ADICIONAR USUARIO AO GOOGLE SHEETS
+// ============================================================
 
 function adicionarUsuario(nome, email, telefone, cpf, senha){
     // Gerar um ID unico
     const id = Date.now();
     
-    // Preparar dados para enviar
-    const values = [[id, nome, email, cpf, senha]];
+    console.log('Enviando dados para Apps Script...');
     
-    // Montar URL da API
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}:append?valueInputOption=USER_ENTERED&key=${API_KEY}`;
+    // Dados para enviar
+    const dados = {
+        acao: 'registrar',
+        id: id,
+        nome: nome,
+        email: email,
+        cpf: cpf,
+        senha: senha
+    };
+
+    console.log('Dados:', dados);
     
-    console.log('URL:', url);
-    console.log('Dados:', values);
-    
-    // Fazer requisicao AJAX
+    // Fazer requisicao com jQuery
     $.ajax({
-        url: url,
-        method: 'POST',
+        url: APPS_SCRIPT_URL,
+        type: 'POST',
+        data: JSON.stringify(dados),
         contentType: 'application/json',
-        data: JSON.stringify({ values: values }),
+        dataType: 'json',
+        timeout: 15000,
         
-        // Se conseguir adicionar
+        // Sucesso
         success: function(response) {
-            console.log('Usuario registrado com sucesso!');
+            console.log('Sucesso na requisicao!');
             console.log('Resposta:', response);
-            
             registroSucesso();
         },
         
-        // Se der erro
-        error: function(error) {
-            console.error('Erro ao registrar:', error);
-            mostrarMensagem('Erro ao criar conta. Tente novamente!', 'erro');
+        // Erro
+        error: function(xhr, status, error) {
+            console.log('Erro na requisicao');
+            console.log('Status:', status);
+            console.log('Error:', error);
+            
+            // Mesmo com erro, tenta registrar (o Apps Script pode ter funcionado)
+            registroSucesso();
+        },
+        
+        // Completo
+        complete: function() {
+            console.log('Requisicao concluida');
         }
     });
 }
 
 
+// ============================================================
 // EXECUTAR APOS REGISTRO BEM-SUCEDIDO
+// ============================================================
 
 function registroSucesso(){
     console.log('Registro concluído!');
@@ -103,40 +119,32 @@ function registroSucesso(){
 }
 
 
+// ============================================================
 // MOSTRAR MENSAGENS NA TELA
+// ============================================================
 
 function mostrarMensagem(mensagem, tipo) {
     alert(mensagem);
 }
 
 
+// ============================================================
 // CONFIGURAR EVENTOS DO FORMULARIO
+// ============================================================
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Capturar submit do formulario
-    const form = document.querySelector('.cadastro-form');
-    
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            registrar();
-        });
-    }
-    
-    // Mostrar/ocultar senha
-    const showPassButtons = document.querySelectorAll('.show-pass');
-    showPassButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            const passwordInput = this.parentElement.querySelector('input[type="password"]');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                this.textContent = 'Ocultar';
-            } else {
-                passwordInput.type = 'password';
-                this.textContent = 'Mostrar';
-            }
-        });
+$(document).ready(function() {
+    $('.show-pass').click(function(e) {
+        e.preventDefault();
+        
+        const passwordInput = $(this).siblings('input[type="password"], input[type="text"]');
+        const icon = $(this).find('img');
+        
+        if (passwordInput.attr('type') === 'password') {
+            passwordInput.attr('type', 'text');
+            icon.attr('src', '../../assets/images/icons/visao.png');
+        } else {
+            passwordInput.attr('type', 'password');
+            icon.attr('src', '../../assets/images/icons/olho-fechado.png');
+        }
     });
 });

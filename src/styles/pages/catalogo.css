@@ -1,9 +1,9 @@
-<<<<<<< Updated upstream
 /* ========= MAIN ========= */
 .page-container{
-  width:95%;
-  max-width:1240px;
-  margin:40px auto;
+  width: 100%;
+  max-width: 1240px;
+  margin: auto;
+  padding: 30px 20px;
 }
 
 /* ========= TITLE BAR ========= */
@@ -313,6 +313,3 @@
     grid-template-columns:repeat(2, 1fr);
   }
 }
-=======
-
->>>>>>> Stashed changes
