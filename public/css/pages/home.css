@@ -21,11 +21,6 @@ body {
 .hero {
   position: relative;
   height: 630px;
-
-  background-image:
-    linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15)),
-    url('https://images.unsplash.com/photo-1621905252507-b35492cc74b4?q=80&w=1200');
-
   background-size: cover;
   background-position: center;
 
