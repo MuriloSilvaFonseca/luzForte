@@ -1,29 +1,21 @@
 # Estrutura do Projeto LuzForte
 
-O projeto LuzForte foi organizado para separar páginas, estilos, scripts, componentes, assets e documentação. Essa divisão facilita a manutenção do sistema durante a etapa atual em HTML, CSS e JavaScript e prepara o projeto para uma futura integração com backend em Node.js.
+O projeto usa Node.js com Express e EJS. O servidor (`app.js`) recebe cada URL, a rota correspondente em `routes/` escolhe a view em `views/` e o EJS monta o HTML final que é enviado ao navegador.
 
 ## Pastas principais
 
-- `src/pages`: telas acessíveis pelo usuário, como home, catálogo, carrinho, login e registro.
-- `src/styles`: arquivos CSS separados em estilos base, componentes reutilizáveis e estilos específicos de páginas.
-- `src/scripts`: arquivos JavaScript separados por páginas, módulos reutilizáveis e dados simulados.
-- `src/components`: partes reaproveitáveis da interface, como cabeçalho, rodapé, cards e formulários.
-- `src/assets`: imagens, ícones, logotipos, fontes e vídeos utilizados pelo frontend.
-- `docs`: documentação acadêmica e técnica do projeto.
-- `server`: estrutura reservada para o futuro backend em Node.js.
+- `app.js`: configura o Express, o EJS, a pasta `public/` e registra as rotas.
+- `routes/`: define as URLs do sistema e qual página cada uma mostra.
+- `views/`: páginas em EJS (HTML com a possibilidade de exibir dados vindos do servidor).
+  - `partials/`: trechos reutilizados em todas as páginas, como cabeçalho e rodapé.
+  - `loja/`: telas do cliente.
+  - `auth/`: login, registro e recuperação de senha.
+  - `admin/`: telas do painel administrativo.
+- `public/`: arquivos enviados diretamente ao navegador (CSS, imagens, JavaScript do navegador e dados JSON provisórios).
+- `config/`: configurações, como a conexão com o banco de dados.
+- `database/`: script de criação do banco MySQL.
+- `docs/`: documentação acadêmica e técnica.
 
-## Telas previstas
+## Observação
 
-- Home
-- Catálogo de produtos
-- Detalhes do produto
-- Carrinho
-- Checkout simulado
-- Login
-- Registro
-- Sobre nós
-- Contato
-
-## Observação acadêmica
-
-Nesta etapa, o sistema não possui banco de dados, autenticação real ou processamento de pagamento. Os dados podem ser simulados com JavaScript e arquivos locais, mantendo a estrutura preparada para integração futura com API.
+Nesta etapa as rotas apenas exibem as páginas. Os dados de produtos ainda vêm de `public/data/produtos.json`; a integração com MySQL será feita nas próximas etapas.

@@ -1,0 +1,357 @@
+{
+  "produtos": [
+    {
+      "id": 1,
+      "slug": "fio-flexivel-1-5mm-azul-prysmian",
+      "nome": "Fio Elétrico Cabo Flexível 1 via 1,50mm Azul",
+      "codigo": "CAB-FLX-1V-1.5-AZ-001",
+      "classificacao": "MAIS VENDIDOS",
+      "imagemCard": "img/products/fios.png",
+      "imagens": [
+        "img/products/fios.png",
+        "img/products/fio.png"
+      ],
+      "precoAntigo": 69.90,
+      "precoAtual": 49.99,
+      "parcelas": {
+        "quantidade": 3,
+        "valor": 16.66,
+        "semJuros": true
+      },
+      "avaliacao": {
+        "nota": 5,
+        "totalAvaliacoes": 128
+      },
+      "estoque": "Em estoque",
+      "breadcrumb": ["Início", "Fios e Cabos", "Cabo de baixa tensão", "Cabo Flexível 1,50mm Azul"],
+      "filtros": {
+        "tipoCabo": "Cabo flexível",
+        "marca": "Prysmian",
+        "submarca": "Antigrip",
+        "bitola": "1,5 mm²",
+        "cor": "Azul",
+        "isolamento": "PVC 750V",
+        "faixaPreco": "Até R$ 50"
+      },
+      "descricao": {
+        "resumo": "Cabo flexível de cobre eletrolítico com isolação em PVC 750V, ideal para instalações elétricas residenciais e comerciais.",
+        "caracteristicas": [
+          "Condutor em cobre eletrolítico com 99,9% de pureza",
+          "Isolação em PVC antichama",
+          "Indicado para circuitos de iluminação e tomadas",
+          "Atende normas ABNT NBR 5410 e NBR 7286"
+        ],
+        "textoCompleto": "O Cabo Flexível 1,50mm Azul Prysmian Antigrip é a escolha ideal para instalações elétricas que exigem flexibilidade e segurança. Fabricado com cobre eletrolítico de alta pureza, oferece excelente condutividade e durabilidade."
+      },
+      "especificacoes": [
+        { "label": "Bitola", "valor": "1,5 mm²" },
+        { "label": "Número de vias", "valor": "1 via" },
+        { "label": "Cor", "valor": "Azul" },
+        { "label": "Isolamento", "valor": "PVC 750V" },
+        { "label": "Tensão nominal", "valor": "750V" },
+        { "label": "Temperatura máxima", "valor": "70°C" },
+        { "label": "Normas", "valor": "NBR 7286, NBR 5410" },
+        { "label": "Marca", "valor": "Prysmian Antigrip" },
+        { "label": "Unidade de venda", "valor": "Metro" },
+        { "label": "Garantia", "valor": "1 ano" }
+      ],
+      "instalacao": {
+        "aviso": "A instalação deve ser realizada por eletricista qualificado. Desligue a energia antes de iniciar qualquer trabalho.",
+        "passos": [
+          "Verifique se a bitola é adequada à corrente do circuito.",
+          "Passe o cabo por eletrodutos ou canaletas conforme o projeto.",
+          "Faça as conexões nos terminais com ferramentas adequadas.",
+          "Teste a continuidade e o isolamento antes de energizar."
+        ],
+        "dicas": [
+          "Não exceda a corrente máxima da bitola",
+          "Evite dobras acentuadas no cabo",
+          "Mantenha distância de fontes de calor"
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "slug": "fio-flexivel-2-5mm-vermelho-nexans",
+      "nome": "Fio Elétrico Cabo Flexível 1 via 2,50mm Vermelho",
+      "codigo": "CAB-FLX-1V-2.5-VM-002",
+      "classificacao": null,
+      "imagemCard": "img/products/fios.png",
+      "imagens": [
+        "img/products/fios.png",
+        "img/products/fio.png"
+      ],
+      "precoAntigo": 89.90,
+      "precoAtual": 64.90,
+      "parcelas": {
+        "quantidade": 3,
+        "valor": 21.63,
+        "semJuros": true
+      },
+      "avaliacao": {
+        "nota": 4,
+        "totalAvaliacoes": 87
+      },
+      "estoque": "Em estoque",
+      "breadcrumb": ["Início", "Fios e Cabos", "Cabo de baixa tensão", "Cabo Flexível 2,50mm Vermelho"],
+      "filtros": {
+        "tipoCabo": "Cabo flexível",
+        "marca": "Nexans",
+        "submarca": null,
+        "bitola": "2,5 mm²",
+        "cor": "Vermelho",
+        "isolamento": "PVC 750V",
+        "faixaPreco": "R$ 50 – R$ 100"
+      },
+      "descricao": {
+        "resumo": "Cabo flexível 2,50mm vermelho para circuitos de tomadas e equipamentos de maior consumo.",
+        "caracteristicas": [
+          "Condutor em cobre eletrolítico",
+          "Isolação PVC 750V antichama",
+          "Ideal para circuitos de tomadas de uso geral",
+          "Alta flexibilidade para instalação em eletrodutos"
+        ],
+        "textoCompleto": "O Cabo Flexível 2,50mm Vermelho Nexans é indicado para circuitos de tomadas residenciais e comerciais. Sua bitola suporta correntes maiores, sendo ideal para áreas de cozinha, lavanderia e equipamentos eletrodomésticos."
+      },
+      "especificacoes": [
+        { "label": "Bitola", "valor": "2,5 mm²" },
+        { "label": "Número de vias", "valor": "1 via" },
+        { "label": "Cor", "valor": "Vermelho" },
+        { "label": "Isolamento", "valor": "PVC 750V" },
+        { "label": "Tensão nominal", "valor": "750V" },
+        { "label": "Temperatura máxima", "valor": "70°C" },
+        { "label": "Normas", "valor": "NBR 7286, NBR 5410" },
+        { "label": "Marca", "valor": "Nexans" },
+        { "label": "Unidade de venda", "valor": "Metro" },
+        { "label": "Garantia", "valor": "1 ano" }
+      ],
+      "instalacao": {
+        "aviso": "A instalação deve ser realizada por eletricista qualificado. Desligue a energia antes de iniciar qualquer trabalho.",
+        "passos": [
+          "Confirme a bitola conforme o projeto elétrico.",
+          "Utilize disjuntor adequado para o circuito (mínimo 20A).",
+          "Realize as conexões com terminais apropriados.",
+          "Verifique aterramento antes de energizar."
+        ],
+        "dicas": [
+          "Use eletroduto com diâmetro compatível",
+          "Respeite a ocupação máxima do eletroduto",
+          "Identifique o circuito com etiqueta no quadro"
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "slug": "cabo-rigido-4mm-amarelo-sil",
+      "nome": "Cabo Rígido 4mm² Amarelo Sil",
+      "codigo": "CAB-RIG-4MM-AM-003",
+      "classificacao": null,
+      "imagemCard": "img/products/fio.png",
+      "imagens": [
+        "img/products/fio.png",
+        "img/products/fios.png"
+      ],
+      "precoAntigo": 119.90,
+      "precoAtual": 94.50,
+      "parcelas": {
+        "quantidade": 3,
+        "valor": 31.50,
+        "semJuros": true
+      },
+      "avaliacao": {
+        "nota": 4,
+        "totalAvaliacoes": 56
+      },
+      "estoque": "Em estoque",
+      "breadcrumb": ["Início", "Fios e Cabos", "Cabo rígido", "Cabo Rígido 4mm² Amarelo"],
+      "filtros": {
+        "tipoCabo": "Cabo rígido",
+        "marca": "Sil",
+        "submarca": null,
+        "bitola": "4 mm²",
+        "cor": "Amarelo",
+        "isolamento": "PVC 750V",
+        "faixaPreco": "R$ 50 – R$ 100"
+      },
+      "descricao": {
+        "resumo": "Cabo rígido 4mm² amarelo para instalações em eletrocalhas, bandejas e passagem aparente.",
+        "caracteristicas": [
+          "Condutor rígido de cobre",
+          "Isolação PVC 750V",
+          "Indicado para instalações industriais leves",
+          "Alta resistência mecânica"
+        ],
+        "textoCompleto": "O Cabo Rígido 4mm² Amarelo Sil é recomendado para instalações onde a rigidez do condutor é vantajosa, como em eletrocalhas, bandejas e quadros de distribuição."
+      },
+      "especificacoes": [
+        { "label": "Bitola", "valor": "4 mm²" },
+        { "label": "Tipo", "valor": "Cabo rígido" },
+        { "label": "Cor", "valor": "Amarelo" },
+        { "label": "Isolamento", "valor": "PVC 750V" },
+        { "label": "Tensão nominal", "valor": "750V" },
+        { "label": "Temperatura máxima", "valor": "70°C" },
+        { "label": "Normas", "valor": "NBR 7286" },
+        { "label": "Marca", "valor": "Sil" },
+        { "label": "Unidade de venda", "valor": "Metro" },
+        { "label": "Garantia", "valor": "1 ano" }
+      ],
+      "instalacao": {
+        "aviso": "A instalação deve ser realizada por eletricista qualificado. Desligue a energia antes de iniciar qualquer trabalho.",
+        "passos": [
+          "Fixe o cabo em eletrocalhas ou bandejas com abraçadeiras.",
+          "Mantenha raio de curvatura adequado nas curvas.",
+          "Conecte nos terminais do quadro com torque correto.",
+          "Identifique o circuito no diagrama unifilar."
+        ],
+        "dicas": [
+          "Evite emendas no meio do percurso",
+          "Proteja o cabo em áreas de tráfego",
+          "Use disjuntor de 32A para este circuito"
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "slug": "cabo-flexivel-hepr-6mm-verde-corfio",
+      "nome": "Cabo Flexível HEPR 6mm² Verde 90°C",
+      "codigo": "CAB-HEPR-6MM-VD-004",
+      "classificacao": "NOVIDADE",
+      "imagemCard": "img/products/fios.png",
+      "imagens": [
+        "img/products/fios.png"
+      ],
+      "precoAntigo": 189.90,
+      "precoAtual": 149.90,
+      "parcelas": {
+        "quantidade": 3,
+        "valor": 49.97,
+        "semJuros": true
+      },
+      "avaliacao": {
+        "nota": 5,
+        "totalAvaliacoes": 34
+      },
+      "estoque": "Em estoque",
+      "breadcrumb": ["Início", "Fios e Cabos", "Cabo de baixa tensão", "Cabo Flexível HEPR 6mm² Verde"],
+      "filtros": {
+        "tipoCabo": "Cabo flexível",
+        "marca": "Corfio",
+        "submarca": null,
+        "bitola": "6 mm²",
+        "cor": "Verde",
+        "isolamento": "HEPR 90°C",
+        "faixaPreco": "R$ 100 – R$ 200"
+      },
+      "descricao": {
+        "resumo": "Cabo flexível com isolação HEPR para ambientes com temperatura elevada, ideal para circuitos de aterramento e alimentação.",
+        "caracteristicas": [
+          "Isolação HEPR resistente a 90°C",
+          "Condutor flexível de cobre",
+          "Indicado para circuitos de aterramento (TN-S)",
+          "Maior durabilidade em ambientes quentes"
+        ],
+        "textoCompleto": "O Cabo Flexível HEPR 6mm² Verde Corfio suporta temperaturas de operação de até 90°C, sendo ideal para circuitos de aterramento e alimentação de equipamentos em ambientes com exigência térmica superior."
+      },
+      "especificacoes": [
+        { "label": "Bitola", "valor": "6 mm²" },
+        { "label": "Número de vias", "valor": "1 via" },
+        { "label": "Cor", "valor": "Verde" },
+        { "label": "Isolamento", "valor": "HEPR 90°C" },
+        { "label": "Tensão nominal", "valor": "750V" },
+        { "label": "Temperatura máxima", "valor": "90°C" },
+        { "label": "Normas", "valor": "NBR 7286, NBR 5410" },
+        { "label": "Marca", "valor": "Corfio" },
+        { "label": "Unidade de venda", "valor": "Metro" },
+        { "label": "Garantia", "valor": "2 anos" }
+      ],
+      "instalacao": {
+        "aviso": "A instalação deve ser realizada por eletricista qualificado. Desligue a energia antes de iniciar qualquer trabalho.",
+        "passos": [
+          "Utilize exclusivamente para circuito de aterramento ou alimentação conforme projeto.",
+          "Conecte ao barramento de terra do quadro.",
+          "Verifique continuidade com multímetro.",
+          "Registre a instalação no laudo de conformidade."
+        ],
+        "dicas": [
+          "Nunca use cabo verde para fase ou neutro",
+          "Mantenha conexões firmes no barramento",
+          "Inspecione periodicamente em ambientes úmidos"
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "slug": "disjuntor-tripolar-63a-curva-c",
+      "nome": "Disjuntor Tripolar 63A - Curva C",
+      "codigo": "DJT-63A-3P-001",
+      "classificacao": "MAIS VENDIDOS",
+      "imagemCard": "img/products/dijuntor.png",
+      "imagens": [
+        "img/products/dijuntor.png",
+        "img/products/fio.png",
+        "img/products/fios.png"
+      ],
+      "precoAntigo": 189.90,
+      "precoAtual": 142.90,
+      "parcelas": {
+        "quantidade": 3,
+        "valor": 47.63,
+        "semJuros": true
+      },
+      "avaliacao": {
+        "nota": 5,
+        "totalAvaliacoes": 127
+      },
+      "estoque": "Em estoque",
+      "breadcrumb": ["Início", "Disjuntores", "Tripolares", "Disjuntor Tripolar 63A"],
+      "filtros": {
+        "tipoCabo": null,
+        "marca": "Conduspar",
+        "submarca": null,
+        "bitola": null,
+        "cor": null,
+        "isolamento": null,
+        "faixaPreco": "R$ 100 – R$ 200"
+      },
+      "descricao": {
+        "resumo": "Disjuntor tripolar 63A curva C para proteção de circuitos trifásicos em instalações residenciais, comerciais e industriais leves.",
+        "caracteristicas": [
+          "Contatos em prata para maior durabilidade",
+          "Curva C para cargas com corrente de partida moderada",
+          "Capacidade de interrupção de 6kA",
+          "Atende NBR IEC 60898-1 e NBR NM 60898"
+        ],
+        "textoCompleto": "O Disjuntor Tripolar 63A com Curva C é ideal para proteção de circuitos trifásicos. Projetado para oferecer máxima segurança e confiabilidade, protege equipamentos contra sobrecargas e curtos-circuitos."
+      },
+      "especificacoes": [
+        { "label": "Corrente Nominal (In)", "valor": "63A" },
+        { "label": "Número de Polos", "valor": "3 Polos" },
+        { "label": "Curva de Disparo", "valor": "C (5 a 10 × In)" },
+        { "label": "Capacidade de Interrupção", "valor": "6kA em 240V" },
+        { "label": "Tensão Nominal", "valor": "220/380V CA" },
+        { "label": "Frequência", "valor": "50/60 Hz" },
+        { "label": "Normas", "valor": "NBR IEC 60898-1, NBR NM 60898" },
+        { "label": "Grau de Proteção", "valor": "IP20" },
+        { "label": "Dimensões (A×L×P)", "valor": "54 × 72 × 78 mm" },
+        { "label": "Peso", "valor": "280g" },
+        { "label": "Garantia", "valor": "2 anos" }
+      ],
+      "instalacao": {
+        "aviso": "ATENÇÃO: A instalação deve ser realizada por eletricista qualificado e habilitado. Sempre desligue a energia antes de iniciar qualquer trabalho elétrico.",
+        "passos": [
+          "Verifique se o disjuntor é adequado para a corrente e tensão do circuito.",
+          "Fixe o disjuntor no trilho DIN do quadro de distribuição até ouvir um clique.",
+          "Conecte os cabos de entrada (parte superior) e saída (parte inferior) nos terminais.",
+          "Aperte os parafusos dos terminais com torque adequado (2,5 N.m).",
+          "Ligue o disjuntor e verifique o funcionamento correto."
+        ],
+        "dicas": [
+          "Use cabos com seção adequada à corrente nominal",
+          "Mantenha ventilação adequada no quadro",
+          "Não instale em ambientes com umidade excessiva",
+          "Respeite a temperatura de operação especificada"
+        ]
+      }
+    }
+  ]
+}
