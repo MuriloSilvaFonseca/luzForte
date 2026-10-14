@@ -1,6 +1,18 @@
 const express = require('express')
 const router = express.Router()
 
+const conexao = require('../config/database')
+
+router.get('/teste-banco', (req, res) => {
+  conexao.query('SELECT COUNT(*) AS total FROM produto', (erro, resultado) => {
+    if (erro) {
+      console.log(erro)
+      return res.send('Erro ao conectar: ' + erro.message)
+    }
+    res.send('Conectou! Produtos no banco: ' + resultado[0].total)
+  })
+})
+
 router.get('/', (req, res) => {
   res.render('loja/home')
 })
