@@ -29,4 +29,5 @@ router.get('/contato', (req, res) => {
   res.render('loja/contato')
 })
 
+
 module.exports = router

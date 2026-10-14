@@ -1,8 +1,9 @@
 const express = require('express')
 const lojaRouter = require('./routes/loja')
 const authRouter = require('./routes/auth')
+const produtosApi = require('./routes/api-produtos')   // NOVO
 const app = express()
-const port = 3000
+const port = 4000
 
 app.use(express.urlencoded({ extended: true }))
 
@@ -11,6 +12,7 @@ app.use(express.static('public'))
 
 app.use('/', lojaRouter)
 app.use('/', authRouter)
+app.use('/', produtosApi)                              // NOVO (antes do 404)
 
 // Nenhuma rota respondeu: página não existe
 app.use((req, res) => {
