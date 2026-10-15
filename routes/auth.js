@@ -7,6 +7,8 @@ router.get('/registro', (req, res) => {
   res.render('auth/registro')
 })
 
+
+// ROTA POST PARA CADASTRO DE USUÁRIO
 router.post('/registro', (req, res) => {
   const { nome, email, telefone, senha, confirm_senha } = req.body
 
@@ -41,21 +43,21 @@ router.post('/registro', (req, res) => {
         return res.status(500).send('Erro do servidor')
       }
 
-      const sqlInsert = 'INSERT INTO() usuario VALUES (?, ?, ?, ?)'
+      const sqlInsert = 'INSERT INTO usuario(nome_usuario, email, telefone, senha) VALUES (?, ?, ?, ?)'
 
-      conexao.query(sqlInsert, [nome, email, telefone, hash], (erro, resultado) => {
-        if(erro) {
-          console.log(erro);
+      conexao.query(sqlInsert, [nome, email, telefone, hash], (erroInsert, resultadoInsert) => {
+        if(erroInsert) {
+          if(erroInsert.code === 'ER_DUP_ENTRY') {
+            return res.render('auth/registro', { erro: 'Esse e-mail já existe' })
+          }
+          console.log(erroInsert);
           return res.status(500).send('Erro do servidor')
         }
 
-        return res.render('auth/login')
+        return res.redirect('/login')
       })
     })
   })
-
-  
-
 })
 
 router.get('/login', (req, res) => {
