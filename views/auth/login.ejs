@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="/css/components/messages.css">
     <!-- Script -->
     <script src="/js/modules/jquery-4.0.0.min.js"></script>
-    <script src="/js/pages/login.js"></script>
 </head>
 
 <body>
@@ -26,10 +25,10 @@
 
             <div class="login-container">
 
-                <form id="login-form">
+                <form id="login-form" method="post" action="/login">
                  <a class="cadastro-voltar" href="/" aria-label="Voltar"><img src="/img/icons/de-volta.png" alt="Voltar"></a>
                 <h2>Acesse sua conta</h2>
-                <button id="google-btn" class="google-btn">
+                <button id="google-btn" class="google-btn" type="button">
                     <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" height="20"
                         alt="Google" />
                     Continuar com o Google
@@ -46,7 +45,7 @@
                     <input type="password" id="password" name="password" placeholder="Digite sua senha" required>
                     <a href="/esqueci-senha">Esqueceu sua senha?</a>
                 </div>
-                <button class="login-button" type="button" onclick="login()">Entrar</button>
+                <button class="login-button" type="submit">Entrar</button>
                 <p class="goCadastro">Não possui uma conta? <a href="/registro">Crie uma</a></p>
                 </form>
             </div>
