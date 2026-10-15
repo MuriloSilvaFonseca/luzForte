@@ -10,8 +10,12 @@
   "license": "MIT",
   "type": "commonjs",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^18.0.8",
     "ejs": "^3.1.10",
-    "express": "^4.22.3"
+    "express": "^4.22.3",
+    "express-session": "^1.19.0",
+    "mysql2": "^3.24.6"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
