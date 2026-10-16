@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LuzForte | Cadastro de produto</title>
+  <link rel="stylesheet" href="/css/pages/admin-cadastro-produto.css">
+</head>
+<body class="admin-produto-body">
+  <div class="admin-produto-app">
+    <header class="admin-produto-topo">
+      <a class="admin-produto-logo" href="/" aria-label="LuzForte, página inicial">Luz<span>Forte</span></a>
+      <div class="admin-produto-usuario">
+        <span class="admin-produto-avatar" aria-hidden="true">A</span>
+        <span>Área administrativa</span>
+      </div>
+    </header>
+
+    <div class="admin-produto-layout">
+      <aside class="admin-produto-sidebar">
+        <div class="admin-produto-sidebar-titulo">Administração</div>
+        <nav class="admin-produto-menu" aria-label="Menu administrativo">
+          <a class="admin-produto-link" href="#">Visão geral</a>
+          <a class="admin-produto-link admin-produto-link-ativo" href="#" aria-current="page">Cadastrar produto</a>
+          <a class="admin-produto-link" href="#">Produtos cadastrados</a>
+          <a class="admin-produto-link" href="#">Pedidos</a>
+          <a class="admin-produto-link" href="#">Usuários</a>
+        </nav>
+        <a class="admin-produto-voltar" href="/">Voltar para a loja</a>
+      </aside>
+
+      <main class="admin-produto-conteudo">
+        <div class="admin-produto-caminho">Administração <span>›</span> Produtos <span>›</span> Cadastro</div>
+        <div class="admin-produto-cabecalho">
+          <div>
+            <h1 class="admin-produto-titulo">Cadastrar produto</h1>
+            <p class="admin-produto-subtitulo">Preencha as informações para adicionar um produto ao catálogo.</p>
+          </div>
+          <span class="admin-produto-aviso"><span class="admin-produto-obrigatorio">*</span> Campos obrigatórios</span>
+        </div>
+
+        <% if (erro) { %>
+          <p class="admin-produto-mensagem admin-produto-mensagem-erro"><%= erro %></p>
+        <% } %>
+        <% if (salvo) { %>
+          <p class="admin-produto-mensagem admin-produto-mensagem-sucesso">Produto cadastrado com sucesso.</p>
+        <% } %>
+
+        <form class="admin-produto-formulario" action="/admin/produtos/novo" method="post">
+          <section class="admin-produto-secao" aria-labelledby="admin-produto-identificacao">
+            <div class="admin-produto-secao-cabecalho">
+              <span class="admin-produto-numero">1</span>
+              <div>
+                <h2 class="admin-produto-secao-titulo" id="admin-produto-identificacao">Identificação</h2>
+                <p class="admin-produto-secao-texto">Informações principais para reconhecer o produto.</p>
+              </div>
+            </div>
+            <div class="admin-produto-grade">
+              <div class="admin-produto-campo admin-produto-campo-largo">
+                <label class="admin-produto-label" for="titulo-produto">Nome do produto <span class="admin-produto-obrigatorio">*</span></label>
+                <input class="admin-produto-input" id="titulo-produto" name="titulo_produto" type="text" maxlength="70" placeholder="Ex.: Lâmpada LED 9W branca" required>
+                <small class="admin-produto-ajuda">Máximo de 70 caracteres.</small>
+              </div>
+              <div class="admin-produto-campo">
+                <label class="admin-produto-label" for="sku-produto">SKU <span class="admin-produto-obrigatorio">*</span></label>
+                <input class="admin-produto-input" id="sku-produto" name="sku" type="number" min="1" placeholder="Ex.: 1001" required>
+                <small class="admin-produto-ajuda">Código definido conforme o banco atual.</small>
+              </div>
+              <div class="admin-produto-campo">
+                <label class="admin-produto-label" for="ean-produto">Código de barras (EAN)</label>
+                <input class="admin-produto-input" id="ean-produto" name="GTIN_EAN" type="text" maxlength="14" placeholder="Opcional">
+              </div>
+              <fieldset class="admin-produto-campo admin-produto-status">
+                <legend class="admin-produto-label">Status do produto</legend>
+                <label class="admin-produto-opcao"><input type="radio" name="ativo" value="ativo" checked> Ativo</label>
+                <label class="admin-produto-opcao"><input type="radio" name="ativo" value="desativado"> Desativado</label>
+                <label class="admin-produto-opcao"><input type="radio" name="ativo" value="oculto"> Oculto</label>
+              </fieldset>
+            </div>
+          </section>
+
+          <section class="admin-produto-secao" aria-labelledby="admin-produto-classificacao">
+            <div class="admin-produto-secao-cabecalho">
+              <span class="admin-produto-numero">2</span>
+              <div>
+                <h2 class="admin-produto-secao-titulo" id="admin-produto-classificacao">Classificação</h2>
+                <p class="admin-produto-secao-texto">Organize o produto para facilitar a busca na loja.</p>
+              </div>
+            </div>
+            <div class="admin-produto-grade">
+              <div class="admin-produto-campo">
+                <label class="admin-produto-label" for="marca-produto">Marca <span class="admin-produto-obrigatorio">*</span></label>
+                <select class="admin-produto-input" id="marca-produto" name="marca_id" required>
+                  <option value="">Selecione uma marca</option>
+                </select>
+              </div>
+              <div class="admin-produto-campo">
+                <label class="admin-produto-label" for="subcategoria-produto">Categoria e subcategoria <span class="admin-produto-obrigatorio">*</span></label>
+                <select class="admin-produto-input" id="subcategoria-produto" name="subcategoria_id" required>
+                  <option value="">Selecione uma subcategoria</option>
+                </select>
+              </div>
+            </div>
+          </section>
+
+          <section class="admin-produto-secao" aria-labelledby="admin-produto-valores">
+            <div class="admin-produto-secao-cabecalho">
+              <span class="admin-produto-numero">3</span>
+              <div>
+                <h2 class="admin-produto-secao-titulo" id="admin-produto-valores">Preço e estoque</h2>
+                <p class="admin-produto-secao-texto">Informe os valores e a quantidade disponível.</p>
+              </div>
+            </div>
+            <div class="admin-produto-grade admin-produto-grade-tres">
+              <div class="admin-produto-campo">
+                <label class="admin-produto-label" for="custo-produto">Custo (R$) <span class="admin-produto-obrigatorio">*</span></label>
+                <input class="admin-produto-input" id="custo-produto" name="custo_produto" type="number" min="0" step="0.01" placeholder="0,00" required>
+              </div>
+              <div class="admin-produto-campo">
+                <label class="admin-produto-label" for="preco-produto">Preço de venda (R$) <span class="admin-produto-obrigatorio">*</span></label>
+                <input class="admin-produto-input" id="preco-produto" name="preco_produto" type="number" min="0" step="0.01" placeholder="0,00" required>
+              </div>
+              <div class="admin-produto-campo">
+                <label class="admin-produto-label" for="estoque-produto">Estoque (unidades)</label>
+                <input class="admin-produto-input" id="estoque-produto" name="estoque_produto" type="number" min="0" step="1" value="0">
+              </div>
+            </div>
+          </section>
+
+          <section class="admin-produto-secao" aria-labelledby="admin-produto-detalhes">
+            <div class="admin-produto-secao-cabecalho">
+              <span class="admin-produto-numero">4</span>
+              <div>
+                <h2 class="admin-produto-secao-titulo" id="admin-produto-detalhes">Detalhes do produto</h2>
+                <p class="admin-produto-secao-texto">Essas informações ajudam o cliente a conhecer o produto.</p>
+              </div>
+            </div>
+            <div class="admin-produto-grade">
+              <div class="admin-produto-campo">
+                <label class="admin-produto-label" for="descricao-produto">Descrição</label>
+                <textarea class="admin-produto-input admin-produto-textarea" id="descricao-produto" name="descricao" rows="4" placeholder="Descreva o produto"></textarea>
+              </div>
+              <div class="admin-produto-campo">
+                <label class="admin-produto-label" for="especificacao-produto">Especificações</label>
+                <textarea class="admin-produto-input admin-produto-textarea" id="especificacao-produto" name="especificacao" rows="4" placeholder="Ex.: potência, cor, tensão"></textarea>
+              </div>
+              <div class="admin-produto-campo admin-produto-campo-largo">
+                <label class="admin-produto-label" for="instalacao-produto">Orientações de instalação</label>
+                <textarea class="admin-produto-input admin-produto-textarea" id="instalacao-produto" name="instalacao" rows="3" placeholder="Orientações de uso ou instalação, se houver"></textarea>
+              </div>
+            </div>
+          </section>
+
+          <section class="admin-produto-secao" aria-labelledby="admin-produto-imagem">
+            <div class="admin-produto-secao-cabecalho">
+              <span class="admin-produto-numero">5</span>
+              <div>
+                <h2 class="admin-produto-secao-titulo" id="admin-produto-imagem">Imagem</h2>
+                <p class="admin-produto-secao-texto">Adicione o endereço da imagem principal do produto.</p>
+              </div>
+            </div>
+            <div class="admin-produto-campo">
+              <label class="admin-produto-label" for="imagem-produto">URL da imagem</label>
+              <input class="admin-produto-input" id="imagem-produto" name="imagem_url" type="url" maxlength="500" placeholder="https://exemplo.com/imagem.jpg">
+            </div>
+          </section>
+
+          <div class="admin-produto-acoes">
+            <span class="admin-produto-rascunho">Os campos marcados com * são obrigatórios.</span>
+            <div class="admin-produto-botoes">
+              <a class="admin-produto-botao admin-produto-botao-secundario" href="/">Cancelar</a>
+              <button class="admin-produto-botao admin-produto-botao-principal" type="submit">Salvar produto</button>
+            </div>
+          </div>
+        </form>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
