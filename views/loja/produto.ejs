@@ -4,37 +4,72 @@
 
     <%- include("../partials/header") %>
 
+    <%
+      // Preço no formato brasileiro: "49.90" (como vem do banco) vira "49,90"
+      const precoFormatado = String(produto.preco_produto).replace('.', ',')
+
+      // Estrelas: arredonda a média (ex.: 4.5 vira 5) e monta ★★★★★
+      const estrelasCheias = Math.round(mediaNota)
+      let estrelas = ''
+      for (let i = 1; i <= 5; i++) {
+        if (i <= estrelasCheias) {
+          estrelas = estrelas + '★'
+        } else {
+          estrelas = estrelas + '☆'
+        }
+      }
+
+      // Imagem principal: a primeira da lista, ou uma imagem padrão
+      let imagemPrincipal = '/img/icons/icons8-caixa-128.png'
+      if (imagens.length > 0) {
+        imagemPrincipal = imagens[0].url
+      }
+    %>
+
     <div class="container_produto">
-        <div class="breadcrumb_produto" id="breadcrumbProduto"></div>
+        <div class="breadcrumb_produto">
+            <a href="/">Início</a> /
+            <a href="/catalogo?categoria=<%= produto.id_categoria %>"><%= produto.categoria %></a> /
+            <span><%= produto.subcategoria %></span> /
+            <span><%= produto.titulo_produto %></span>
+        </div>
 
         <div class="product_section_produto">
             <div class="gallery_produto">
                 <div class="main_image_produto" id="mainImage">
-                    <img src="" alt="">
+                    <img src="<%= imagemPrincipal %>" alt="<%= produto.titulo_produto %>">
                 </div>
-                <div class="thumbnails_produto" id="thumbnailsProduto"></div>
+                <div class="thumbnails_produto">
+                    <% imagens.forEach(function (imagem, indice) { %>
+                        <div class="thumbnail_produto <%= indice === 0 ? 'active_produto' : '' %>" onclick="changeImage(<%= indice %>)">
+                            <img src="<%= imagem.url %>" alt="<%= produto.titulo_produto %>">
+                        </div>
+                    <% }) %>
+                </div>
             </div>
 
             <div class="product_info_produto">
-                <p class="classification_label_produto" id="classificationLabel"></p>
+                <p class="classification_label_produto"><%= produto.marca %></p>
 
-                <h1 id="productName"></h1>
-                <p class="product_code_produto" id="productCode"></p>
+                <h1 id="productName"><%= produto.titulo_produto %></h1>
+                <p class="product_code_produto">Cód: <%= produto.sku %></p>
 
                 <div class="rating_produto">
-                    <div class="stars_produto" id="productStars"></div>
-                    <span class="reviews_produto" id="productReviews"></span>
+                    <div class="stars_produto"><%= estrelas %></div>
+                    <span class="reviews_produto">(<%= avaliacoes.length %> avaliações)</span>
                 </div>
 
                 <div class="stock_produto">
                     <img src="/img/icons/icons8-caixa-128.png" alt="">
-                    <p id="productStock"></p>
+                    <% if (produto.estoque_produto > 0) { %>
+                        <p>Em estoque (<%= produto.estoque_produto %> unidades)</p>
+                    <% } else { %>
+                        <p>Sem estoque no momento</p>
+                    <% } %>
                 </div>
 
                 <div class="price_section_produto">
-                    <p class="old_price_produto" id="productOldPrice"></p>
-                    <p class="current_price_produto" id="productCurrentPrice"></p>
-                    <p class="installments_produto" id="productInstallments"></p>
+                    <p class="current_price_produto">R$ <%= precoFormatado %></p>
                 </div>
 
                 <div class="quantity_section_produto">
@@ -57,11 +92,62 @@
                 <button class="tab_btn_produto active_produto" data-tab="description">Descrição</button>
                 <button class="tab_btn_produto" data-tab="specs">Especificações Técnicas</button>
                 <button class="tab_btn_produto" data-tab="installation">Instalação</button>
+                <button class="tab_btn_produto" data-tab="reviews">Avaliações</button>
             </div>
 
-            <div id="description" class="tab_content_produto active_produto"></div>
-            <div id="specs" class="tab_content_produto"></div>
-            <div id="installation" class="tab_content_produto"></div>
+            <!-- Descrição (tabela descricao) -->
+            <div id="description" class="tab_content_produto active_produto">
+                <% if (descricoes.length === 0) { %>
+                    <p>Sem descrição cadastrada.</p>
+                <% } %>
+                <% descricoes.forEach(function (descricao) { %>
+                    <h3><%= descricao.nome_descricao %></h3>
+                    <p><%= descricao.texto_descricao %></p>
+                <% }) %>
+            </div>
+
+            <!-- Especificações (tabela especificacao) -->
+            <div id="specs" class="tab_content_produto">
+                <% if (especificacoes.length === 0) { %>
+                    <p>Sem especificações cadastradas.</p>
+                <% } else { %>
+                    <table class="specs_table_produto">
+                        <% especificacoes.forEach(function (especificacao) { %>
+                            <tr>
+                                <td><%= especificacao.nome_especificacao %></td>
+                                <td><%= especificacao.texto_especificacao %></td>
+                            </tr>
+                        <% }) %>
+                    </table>
+                <% } %>
+            </div>
+
+            <!-- Instalação (tabela instalacao) -->
+            <div id="installation" class="tab_content_produto">
+                <% if (instalacoes.length === 0) { %>
+                    <p>Sem instruções de instalação cadastradas.</p>
+                <% } %>
+                <% instalacoes.forEach(function (instalacao) { %>
+                    <h3><%= instalacao.nome_instalacao %></h3>
+                    <p><%= instalacao.texto_instalacao %></p>
+                <% }) %>
+            </div>
+
+            <!-- Avaliações (tabela avaliacao_produto) -->
+            <div id="reviews" class="tab_content_produto">
+                <% if (avaliacoes.length === 0) { %>
+                    <p>Este produto ainda não tem avaliações.</p>
+                <% } else { %>
+                    <p>Nota média: <%= mediaNota %> de 5</p>
+                <% } %>
+                <% avaliacoes.forEach(function (avaliacao) { %>
+                    <div>
+                        <!-- Só o primeiro nome, para não expor o nome completo do cliente -->
+                        <h3><%= avaliacao.nome_usuario.split(' ')[0] %> — <%= avaliacao.nota %>/5</h3>
+                        <p><%= avaliacao.comentario %></p>
+                    </div>
+                <% }) %>
+            </div>
         </div>
     </div>
 

@@ -32,12 +32,13 @@
                     </div>
 
                     <!-- Busca -->
-                    <div class="search">
-                        <input type="text" placeholder="    Buscar produtos..." class="search-input">
-                        <button class="search-button">
+                    <!-- A busca envia para /catalogo?q=... (a rota do catálogo faz o filtro) -->
+                    <form class="search" method="get" action="/catalogo">
+                        <input type="text" name="q" placeholder="    Buscar produtos..." class="search-input">
+                        <button type="submit" class="search-button">
                             <img src="/img/icons/icons8-pesquisar-50.png" alt="Buscar" class="icon">
                         </button>
-                    </div>
+                    </form>
 
                     <!-- Usuário -->
                     <div class="user">

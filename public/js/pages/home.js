@@ -1,6 +1,5 @@
 const slides = document.querySelectorAll('.slide');
 const dots = document.querySelectorAll('.dot');
-const card = document.querySelector('.product-card');
 
 let ativoSlide = 0;
 
@@ -50,13 +49,3 @@ dots.forEach((dot, index) => {
 
 
 setInterval(nextSlide, 4000);
-
-  
-
-
-// cards.forEach((card) => {
-  card.addEventListener("click", () => {
-    const link = card.getAttribute("data-link");
-    window.location.href = "/produto";
-  });
-// });

@@ -1,289 +1,218 @@
-    <%- include("../partials/head")  %>
+<%- include("../partials/head") %>
 
     <link rel="stylesheet" href="/css/pages/home.css">
 
     <%- include("../partials/header") %>
 
-    <!-- HERO -->
-    <section class="hero">
-        <!-- SLIDES -->
-        <div class="slide active">
-            <img src="/img/banners/image.png" alt="Banner 1">
+        <section class="hero">
+            <div class="slide active">
+                <img src="/img/banners/image.png" alt="Banner 1">
 
-            <div class="hero-content">
-                <h1>Promoção de<br>Cabos Elétricos</h1>
+                <div class="hero-content">
+                    <h1>Promoção de<br>Cabos Elétricos</h1>
 
-                <p>Alta qualidade para<br>instalações seguras</p>
+                    <p>Alta qualidade para<br>instalações seguras</p>
 
-                <button>Ver produtos</button>
+                    <button>Ver produtos</button>
+                </div>
             </div>
+
+            <div class="slide">
+                <img src="/img/banners/Banner2.png" alt="Banner 2">
+
+                <div class="hero-content">
+                    <h1>Ferramentas<br>Profissionais</h1>
+
+                    <p>Os melhores preços<br>para sua obra</p>
+
+                    <button>Comprar agora</button>
+                </div>
+            </div>
+
+            <div class="slide">
+                <img src="/img/banners/Banner3.png" alt="Banner 3">
+
+                <div class="hero-content">
+                    <h1>Iluminação<br>Residencial</h1>
+
+                    <p>Modernidade e economia</p>
+
+                    <button>Explorar</button>
+                </div>
+            </div>
+
+            <div class="dots">
+                <span class="dot active"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        </section>
+
+        <div class="container">
+            <section class="benefits">
+
+                <div class="benefit-card">
+                    <div class="icons"><img src="/img/icons/Cartao.png" alt=""></div>
+
+                    <div>
+                        <h4>Parcelamento</h4>
+                        <p>Até 12x Cartão</p>
+                    </div>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="icons"><img src="/img/icons/Caixa.png" alt=""></div>
+
+                    <div>
+                        <h4>Retirada na loja</h4>
+                        <p>Estoque imediato</p>
+                    </div>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="icons"><img src="/img/icons/dinheiro.png" alt=""></div>
+
+                    <div>
+                        <h4>Descontos Especiais</h4>
+                        <p>Para pagamentos via Pix</p>
+                    </div>
+                </div>
+
+            </section>
+
+
+            <section class="section">
+                <div class="section-title">
+                    <h2>Principais <span>Categorias</span></h2>
+                </div>
+
+                <div class="categories">
+                    <% categorias.forEach(function (categoria) { %>
+                        <a class="category-card" href="/catalogo?categoria=<%= categoria.id_categoria %>">
+                            <img src="/img/icons/icons8-caixa-128.png" alt="">
+                            <p>
+                                <%= categoria.nome %>
+                            </p>
+                        </a>
+                    <% }) %>
+                </div>
+
+            </section>
+
+            <!-- PRODUTOS EM DESTAQUE (vêm da tabela produto) -->
+            <section class="section">
+
+                <div class="section-header">
+                    <h2>Produtos em <span>Destaque</span></h2>
+
+                    <a href="/catalogo">Ver mais</a>
+                </div>
+
+                <div class="products">
+                    <% if (produtos.length===0) { %>
+                        <p>Nenhum produto cadastrado ainda.</p>
+                    <% } %>
+
+                        <% produtos.forEach(function (produto) { %>
+                            <% const preco=String(produto.preco_produto).split('.') %>
+                                <a class="product-card" href="/produto/<%= produto.sku %>">
+
+                                    <img src="<%= produto.imagem || '/img/icons/icons8-caixa-128.png' %>"
+                                        alt="<%= produto.titulo_produto %>">
+
+                                    <div class="product-info">
+                                        <p class="product-name">
+                                            <%= produto.titulo_produto %>
+                                        </p>
+
+                                        <h3>R$ <%= preco[0] %><span>,<%= preco[1] %></span></h3>
+
+                                        <button type="button">Adicionar ao carrinho</button>
+                                    </div>
+                                </a>
+                        <% }) %>
+                </div>
+
+            </section>
+
+
+            <section class="anuncio">
+
+                <div class="propaganda">
+                    <div class="texto-propaganda">
+                        <h1>Cadastre e aproveite nossas ofertas!</h1>
+                        <p>Materiais elétricos com os melhores preços</p>
+                        <button><a href="/login">Cadastre-se</a></button>
+                    </div>
+                </div>
+
+            </section>
+
+            <section class="avaliacoes">
+
+
+                <div class="section-title">
+                    <h2>Avaliações de <span>Clientes</span></h2>
+                </div>
+
+                <div class="cards-avaliacao-principal">
+
+                    <div class="cards-avaliacao1">
+                        <div class="test">
+                            <div class="avatar">
+                                <img src="/img/icons/userblack.png" alt="">
+                            </div>
+                            <div class="user-info">
+                                <h3>Nome usuario</h3>
+                                <div class="stars">★★★★★</div>
+                            </div>
+
+                        </div>
+
+                        <p class="review-text">
+                            "Produto chegou antes do prazo, embalado com muito cuidado.
+                            Qualidade excelente, vou comprar de novo!"
+                        </p>
+                    </div>
+
+
+
+                    <div class="cards-avaliacao1">
+                        <div class="test">
+                            <div class="avatar">
+                                <img src="/img/icons/userblack.png" alt="">
+                            </div>
+                            <div class="user-info">
+                                <h3>Nome usuario</h3>
+                                <div class="stars">★★★★★</div>
+                            </div>
+                        </div>
+
+                        <p class="review-text">
+                            "Melhor loja elétrica online! Preços competitivos e atendimento rápido. Super recomendo."
+                        </p>
+                    </div>
+                    <div class="cards-avaliacao1">
+                        <div class="test">
+                            <div class="avatar">
+                                <img src="/img/icons/userblack.png" alt="">
+                            </div>
+                            <div class="user-info">
+                                <h3>Nome usuario</h3>
+                                <div class="stars">★★★★★</div>
+                            </div>
+                        </div>
+                        <p class="review-text">
+                            "Produto original e bem embalado. Demorou 2 dias a mais que o previsto, mas valeu a espera."
+                        </p>
+                    </div>
+
+
+            </section>
+
         </div>
 
-        <div class="slide">
-            <img src="/img/banners/Banner2.png" alt="Banner 2">
 
-            <div class="hero-content">
-                <h1>Ferramentas<br>Profissionais</h1>
+        <script src="/js/pages/home.js"></script>
 
-                <p>Os melhores preços<br>para sua obra</p>
-
-                <button>Comprar agora</button>
-            </div>
-        </div>
-
-        <div class="slide">
-            <img src="/img/banners/Banner3.png" alt="Banner 3">
-
-            <div class="hero-content">
-                <h1>Iluminação<br>Residencial</h1>
-
-                <p>Modernidade e economia</p>
-
-                <button>Explorar</button>
-            </div>
-        </div>
-
-        <!-- BOLINHAS -->
-        <div class="dots">
-            <span class="dot active"></span>
-            <span class="dot"></span>
-            <span class="dot"></span>
-        </div>
-    </section>
-
-    <div class="container">
-
-
-        <!-- BENEFÍCIOS -->
-        <section class="benefits">
-
-            <div class="benefit-card">
-                <div class="icons"><img src="/img/icons/Cartao.png" alt=""></div>
-
-                <div>
-                    <h4>Parcelamento</h4>
-                    <p>Até 12x Cartão</p>
-                </div>
-            </div>
-
-            <div class="benefit-card">
-                <div class="icons"><img src="/img/icons/Caixa.png" alt=""></div>
-
-                <div>
-                    <h4>Retirada na loja</h4>
-                    <p>Estoque imediato</p>
-                </div>
-            </div>
-
-            <div class="benefit-card">
-                <div class="icons"><img src="/img/icons/dinheiro.png" alt=""></div>
-
-                <div>
-                    <h4>Descontos Especiais</h4>
-                    <p>Para pagamentos via Pix</p>
-                </div>
-            </div>
-
-        </section>
-
-        <!-- CATEGORIAS -->
-        <section class="section">
-
-            <div class="section-title">
-                <h2>Principais <span>Categorias</span></h2>
-            </div>
-
-            <div class="categories">
-
-                <div class="category-card">
-                    <img src="/img/products/fio.png" alt="">
-                    <p>Fios e Cabos</p>
-                </div>
-
-                <div class="category-card">
-                    <img src="/img/products/furadeira.png" alt="">
-                    <p>Ferramentas</p>
-                </div>
-
-                <div class="category-card">
-                    <img src="/img/products/lampada.png" alt="">
-                    <p>Iluminação</p>
-                </div>
-
-                <div class="category-card">
-                    <img src="/img/products/dijuntor.png" alt="">
-                    <p>Disjuntores</p>
-                </div>
-
-            </div>
-
-        </section>
-
-        <!-- PRODUTOS -->
-        <section class="section">
-
-            <div class="section-header">
-                <h2>Mais <span>Vendidos</span></h2>
-
-                <a href="">Ver mais</a>
-            </div>
-
-            <div class="products">
-
-                <div class="product-card">
-
-                    <img src="/img/products/fios.png" alt="">
-
-                    <div class="product-info">
-                        <p class="product-name">
-                            Fio Elétrico Cabo Flexível 1 via 1,50mm Azul
-                        </p>
-
-                        <span class="old-price">R$ 69,90</span>
-
-                        <h3>R$ 49<span>,99</span></h3>
-
-                        <button>Adicionar ao carrinho</button>
-                    </div>
-
-                </div>
-
-                <div class="product-card">
-
-                    <img src="/img/products/fios.png" alt="">
-
-                    <div class="product-info">
-                        <p class="product-name">
-                            Fio Elétrico Cabo Flexível 1 via 1,50mm Azul
-                        </p>
-
-                        <span class="old-price">R$ 69,90</span>
-
-                        <h3>R$ 49<span>,99</span></h3>
-
-                        <button>Adicionar ao carrinho</button>
-                    </div>
-
-                </div>
-
-                <div class="product-card">
-
-                    <img src="/img/products/fios.png" alt="">
-
-                    <div class="product-info">
-                        <p class="product-name">
-                            Fio Elétrico Cabo Flexível 1 via 1,50mm Azul
-                        </p>
-
-                        <span class="old-price">R$ 69,90</span>
-
-                        <h3>R$ 49<span>,99</span></h3>
-
-                        <button>Adicionar ao carrinho</button>
-                    </div>
-
-                </div>
-
-                <div class="product-card">
-
-                    <img src="/img/products/fios.png" alt="">
-
-                    <div class="product-info">
-                        <p class="product-name">
-                            Fio Elétrico Cabo Flexível 1 via 1,50mm Azul
-                        </p>
-
-                        <span class="old-price">R$ 69,90</span>
-
-                        <h3>R$ 49<span>,99</span></h3>
-
-                        <button>Adicionar ao carrinho</button>
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-        <section class="anuncio">
-
-            <div class="propaganda">
-                <div class="texto-propaganda">
-                    <h1>Cadastre e aproveite nossas ofertas!</h1>
-                    <p>Materiais elétricos com os melhores preços</p>
-                    <button><a href="/login">Cadastre-se</a></button>
-                </div>
-            </div>
-
-        </section>
-
-        <section class="avaliacoes">
-
-
-            <div class="section-title">
-                <h2>Avaliações de <span>Clientes</span></h2>
-            </div>
-
-            <div class="cards-avaliacao-principal">
-
-                <div class="cards-avaliacao1">
-                    <div class="test">
-                        <div class="avatar">
-                            <img src="/img/icons/userblack.png" alt="">
-                        </div>
-                        <div class="user-info">
-                            <h3>Nome usuario</h3>
-                            <div class="stars">★★★★★</div>
-                        </div>
-
-                    </div>
-
-                    <p class="review-text">
-                        "Produto chegou antes do prazo, embalado com muito cuidado.
-                        Qualidade excelente, vou comprar de novo!"
-                    </p>
-                </div>
-
-
-
-                <div class="cards-avaliacao1">
-                    <div class="test">
-                        <div class="avatar">
-                            <img src="/img/icons/userblack.png" alt="">
-                        </div>
-                        <div class="user-info">
-                            <h3>Nome usuario</h3>
-                            <div class="stars">★★★★★</div>
-                        </div>
-                    </div>
-
-                    <p class="review-text">
-                        "Melhor loja elétrica online! Preços competitivos e atendimento rápido. Super recomendo."
-                    </p>
-                </div>
-                <div class="cards-avaliacao1">
-                    <div class="test">
-                        <div class="avatar">
-                            <img src="/img/icons/userblack.png" alt="">
-                        </div>
-                        <div class="user-info">
-                            <h3>Nome usuario</h3>
-                            <div class="stars">★★★★★</div>
-                        </div>
-                    </div>
-                    <p class="review-text">
-                        "Produto original e bem embalado. Demorou 2 dias a mais que o previsto, mas valeu a espera."
-                    </p>
-                </div>
-
-
-        </section>
-
-    </div>
-
-
-    <script src="/js/pages/home.js"></script>
-    
-    <%- include("../partials/footer") %>
-
+        <%- include("../partials/footer") %>
