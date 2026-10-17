@@ -34,7 +34,7 @@
     display: flex;
     flex-direction: column;
 
-    background: #be5a5a;
+    background: #1a365a;
 }
 
 .caixa1 {
@@ -215,6 +215,10 @@
 .navegacao {
     background: #1a365a;
     height: 58px;
+}
+
+.caixas > .navegacao {
+    flex: 1;
 }
 
 

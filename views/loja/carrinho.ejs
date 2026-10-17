@@ -15,6 +15,7 @@
                     <input type="checkbox" id="checkTodos">
                     <label for="checkTodos">Todos os produtos</label>
                 </div>
+                <p class="orientacaoCarrinho">Marque os produtos para incluí-los no resumo. Desmarcar não remove o produto do carrinho.</p>
  
                 <hr class="linhaSeparadora">
  
@@ -38,8 +39,11 @@
                             <button class="btnFav" onclick="toggleFav(this)">
                                 <i class="ti ti-heart" style="color:#aaa"></i>
                             </button>
-                            <button class="btnDel">
-                                <i class="ti ti-trash" style="color:#e24b4a"></i>
+                            <button type="button" class="btnDel">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                                    <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" />
+                                </svg>
+                                <span>Remover</span>
                             </button>
                         </div>
                     </div>
@@ -55,7 +59,8 @@
             <div class="colunaDireita">
  
                 <div class="resumoProduto">
-                    <p class="tituloResumo">Resumo produtos:</p>
+                    <p class="tituloResumo">Resumo dos produtos selecionados:</p>
+                    <p id="avisoSelecaoCarrinho" class="orientacaoCarrinho" role="status"></p>
                     <hr class="linhaProduto">
                     <div class="linhaResumo">
                         <span class="labelResumo">Subtotal (0 itens):</span>
@@ -66,7 +71,7 @@
                         <span class="descontoValor">R$ 0,00</span>
                     </div>
                     <div class="linhaTotal">
-                        <span class="labelTotal">Total (R$):</span>
+                        <span class="labelTotal">Total selecionado (R$):</span>
                         <span class="valorTotal">R$ 0,00</span>
                     </div>
                     <div class="botaoCarrinhoFinalizar">

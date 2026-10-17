@@ -13,6 +13,9 @@ function atualizarResumoCarrinho() {
   document.querySelector('.valorResumo').textContent = reaisCarrinho(centavos / 100)
   document.querySelector('.descontoValor').textContent = reaisCarrinho(0)
   document.querySelector('.valorTotal').textContent = reaisCarrinho(centavos / 100)
+  document.getElementById('avisoSelecaoCarrinho').textContent = itensCarrinho.length && !itens.length
+    ? 'Nenhum produto selecionado. Marque um produto para ver seu valor no resumo.'
+    : ''
   const todos = document.getElementById('checkTodos')
   todos.checked = itensCarrinho.length > 0 && itens.length === itensCarrinho.length
   todos.indeterminate = itens.length > 0 && itens.length < itensCarrinho.length
