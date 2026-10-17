@@ -22,7 +22,14 @@ router.get('/catalogo', (req, res) => {
 })
 
 router.get('/produto', (req, res) => {
+  if (!req.query.id) return res.redirect('/catalogo')
   res.render('loja/produto')
+})
+
+// Compatibilidade com os links usados em origin/catalogo-banco.
+router.get('/produto/:sku', (req, res) => {
+  if (!/^\d+$/.test(req.params.sku)) return res.status(404).send('Produto não encontrado')
+  res.redirect('/produto?id=' + encodeURIComponent(req.params.sku))
 })
 
 router.get('/carrinho', (req, res) => {
