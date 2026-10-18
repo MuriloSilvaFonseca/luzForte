@@ -11,8 +11,11 @@ router.get('/registro', (req, res) => {
 // ROTA POST PARA CADASTRO DE USUÁRIO
 router.post('/registro', (req, res) => {
   const { nome, email, telefone, senha, confirm_senha } = req.body
+  const nomeUsuario = typeof nome === 'string' ? nome.trim() : ''
+  const emailUsuario = typeof email === 'string' ? email.trim() : ''
+  const telefoneUsuario = typeof telefone === 'string' ? telefone.trim() : ''
 
-  if (!nome || !email || !telefone || !senha) {
+  if (!nomeUsuario || !emailUsuario || !telefoneUsuario || typeof senha !== 'string' || !senha) {
     return res.render('auth/registro', { erro: 'Preencha todos os campos' })
   }
 
@@ -26,7 +29,7 @@ router.post('/registro', (req, res) => {
 
   const sqlSelectEmail = 'SELECT COUNT(*) AS Existe FROM usuario WHERE email = ?'
 
-  conexao.query(sqlSelectEmail, [email], (erro, resultado) => {
+  conexao.query(sqlSelectEmail, [emailUsuario], (erro, resultado) => {
     if(erro) {
       console.log(erro);
       return res.status(500).send('Erro do servidor')
@@ -45,7 +48,7 @@ router.post('/registro', (req, res) => {
 
       const sqlInsert = 'INSERT INTO usuario(nome_usuario, email, telefone, senha) VALUES (?, ?, ?, ?)'
 
-      conexao.query(sqlInsert, [nome, email, telefone, hash], (erroInsert, resultadoInsert) => {
+      conexao.query(sqlInsert, [nomeUsuario, emailUsuario, telefoneUsuario, hash], (erroInsert, resultadoInsert) => {
         if(erroInsert) {
           if(erroInsert.code === 'ER_DUP_ENTRY') {
             return res.render('auth/registro', { erro: 'Esse e-mail já existe' })
