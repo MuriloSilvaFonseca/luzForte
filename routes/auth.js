@@ -64,6 +64,27 @@ router.get('/login', (req, res) => {
   res.render('auth/login')
 })
 
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body
+  if (typeof email !== 'string' || typeof password !== 'string' || !email || !password || password.length > 256) {
+    return res.status(400).render('auth/login', { erro: 'Informe e-mail e senha.' })
+  }
+  try {
+    const [usuarios] = await conexao.promise().execute('SELECT id_usuario, nome_usuario, acesso, senha FROM usuario WHERE email = ? LIMIT 1', [email.trim()])
+    const usuario = usuarios[0]
+    const senhaValida = usuario && await bcrypt.compare(password, usuario.senha)
+    if (!senhaValida) {
+      return res.status(401).render('auth/login', { erro: 'E-mail ou senha inválidos.' })
+    }
+    await new Promise((resolve, reject) => req.session.regenerate(erro => erro ? reject(erro) : resolve()))
+    req.session.usuario = { id_usuario: usuario.id_usuario, nome_usuario: usuario.nome_usuario, acesso: usuario.acesso }
+    await new Promise((resolve, reject) => req.session.save(erro => erro ? reject(erro) : resolve()))
+    return res.redirect('/carrinho')
+  } catch (_) {
+    return res.status(500).render('auth/login', { erro: 'Não foi possível entrar. Tente novamente.' })
+  }
+})
+
 router.get('/esqueci-senha', (req, res) => {
   res.render('auth/esqueci-senha')
 })

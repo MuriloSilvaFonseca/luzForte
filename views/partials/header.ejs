@@ -12,7 +12,7 @@
           <div class="caixas">
             <div class="top-bar"></div>
             <div class="header"></div>
-            <div class="nav"></div>
+            <div class="navegacao"></div>
           </div>
 
 
@@ -44,7 +44,7 @@
                         <a href="/login">
                             <img classe="it" src="/img/icons/icons8-usuário-homem-com-círculo-48.png"
                             alt="Usuário" class="icon">
-                        <span>Olá, professor Matheus</span>
+                        <span><%= usuario ? 'Olá, ' + usuario.nome_usuario : 'Entre na sua conta' %></span>
                         </a>
                     </div>
 
@@ -58,41 +58,53 @@
                     </div>
                 </div>
 
-                <!-- Menu de navegação -->
-                <nav class="nav">
-
-                    <!-- Botão de categorias -->
-                    <button class="nav-categories">
-                        
-                        <select name="categorias" id="categorias">
-                            <option value="" disabled selected hidden ><span class="menu-icon">☰  </span>Categorias</option>
-                            <option value="fios-cabos">Fios e Cabos</option>
-                            <option value="disjuntores">Disjuntores</option>
-                            <option value="iluminacao">Iluminação</option>
-                            <option value="tomadas">Tomadas</option>
-                            <option value="ferramentas">Ferramentas</option>
-                        </select>
-                    </button>
-
-                    <!-- Links do menu -->
-                    <div class="nav-links">
-                        <a href="/catalogo" class="nav-link"><span class="header-link-texto">Catalogo</span></a>
-                        <a href="#" class="nav-link"><span class="header-link-texto">Disjuntores</span></a>
-                        <a href="#" class="nav-link"><span class="header-link-texto">Iluminação</span></a>
-                        <a href="#" class="nav-link"><span class="header-link-texto">Tomadas</span></a>
-                        <a href="#" class="nav-link"><span class="header-link-texto">Ferramentas</span></a>
-                        <a href="/sobre-nos" class="nav-link"><span class="header-link-texto">Sobre nós</span></a>
-
-                        <a href="#" class="nav-link nav-link-highlight">Promoção</a>
+                <!-- Categorias carregadas do MySQL -->
+                <nav class="navegacao barra-categorias" aria-label="Navegação principal">
+                    <details class="menu-suspenso todas-categorias">
+                        <summary class="botao-categorias">&#9776; Categorias</summary>
+                        <ul class="painel-menu lista-categorias">
+                            <% navbarCategorias.forEach(categoria => { %>
+                                <li>
+                                    <details class="menu-suspenso categoria-submenu">
+                                        <summary><%= categoria.nome %> <span aria-hidden="true">&rsaquo;</span></summary>
+                                        <ul class="painel-menu painel-lateral">
+                                            <li><a href="/catalogo?categoria=<%= categoria.id_categoria %>">Ver categoria</a></li>
+                                            <% categoria.subcategorias.forEach(sub => { %>
+                                                <li><a href="/catalogo?subcategoria=<%= sub.id_subcategoria %>"><%= sub.nome %></a></li>
+                                            <% }) %>
+                                        </ul>
+                                    </details>
+                                </li>
+                            <% }) %>
+                            <% if (!navbarCategorias.length) { %>
+                                <li class="menu-vazio"><%= navbarIndisponivel ? 'Categorias indisponíveis no momento.' : 'Nenhuma categoria cadastrada.' %></li>
+                            <% } %>
+                        </ul>
+                    </details>
+                    <div class="links-menu">
+                        <% if (navbarIndisponivel) { %>
+                            <span class="aviso-categorias" role="status">Categorias temporariamente indisponíveis.</span>
+                        <% } %>
+                        <% navbarPrincipais.forEach(categoria => { %>
+                            <details class="menu-suspenso categoria-principal">
+                                <summary class="link-menu"><%= categoria.nome %></summary>
+                                <ul class="painel-menu">
+                                    <li><a href="/catalogo?categoria=<%= categoria.id_categoria %>">Ver categoria</a></li>
+                                    <% categoria.subcategorias.forEach(sub => { %>
+                                        <li><a href="/catalogo?subcategoria=<%= sub.id_subcategoria %>"><%= sub.nome %></a></li>
+                                    <% }) %>
+                                </ul>
+                            </details>
+                        <% }) %>
+                        <a href="/sobre-nos" class="link-menu">Sobre nós</a>
                     </div>
-
                 </nav>
             </div>
 
             <div class="caixas">
             <div class="top-bar"></div>
             <div class="header"></div>
-            <div class="nav"></div>
+            <div class="navegacao"></div>
           </div>
 
 
@@ -101,3 +113,5 @@
 
         </div>
     </header>
+    <script src="/js/modules/navbar.js" defer></script>
+    <script src="/js/modules/carrinho-api.js" defer></script>

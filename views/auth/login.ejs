@@ -28,6 +28,9 @@
                 <form id="login-form" method="post" action="/login">
                  <a class="cadastro-voltar" href="/" aria-label="Voltar"><img src="/img/icons/de-volta.png" alt="Voltar"></a>
                 <h2>Acesse sua conta</h2>
+                <% if (typeof erro !== 'undefined') { %>
+                  <p role="alert"><%= erro %></p>
+                <% } %>
                 <button id="google-btn" class="google-btn" type="button">
                     <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" height="20"
                         alt="Google" />

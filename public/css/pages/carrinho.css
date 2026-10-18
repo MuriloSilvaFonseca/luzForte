@@ -50,6 +50,17 @@ body {
     cursor: pointer;
 }
 
+.orientacaoCarrinho {
+    font-size: 12px;
+    line-height: 1.5;
+    color: #666;
+    margin-bottom: 12px;
+}
+
+.orientacaoCarrinho:empty {
+    display: none;
+}
+
 .linhaSeparadora {
     border: none;
     border-top: 0.5px solid #e8e8e0;
@@ -92,6 +103,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    min-width: 0;
 }
 
 .nomeProduto {
@@ -115,6 +127,7 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 .btnQty {
@@ -147,8 +160,7 @@ body {
     color: #1a1a1a;
 }
 
-.btnFav,
-.btnDel {
+.btnFav {
     background: none;
     border: none;
     cursor: pointer;
@@ -157,6 +169,31 @@ body {
     line-height: 1;
     display: flex;
     align-items: center;
+}
+
+.btnDel {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 32px;
+    padding: 6px 10px;
+    border: 1px solid #e0e0d8;
+    border-radius: 6px;
+    background: #fff;
+    color: #b63737;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.btnDel:hover {
+    background: #fff2f2;
+    border-color: #b63737;
+}
+
+.btnDel:focus-visible {
+    outline: 2px solid #1a6be8;
+    outline-offset: 3px;
 }
 
 .informacoesCarrinho {

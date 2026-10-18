@@ -54,9 +54,31 @@ setInterval(nextSlide, 4000);
   
 
 
-// cards.forEach((card) => {
-  card.addEventListener("click", () => {
-    const link = card.getAttribute("data-link");
-    window.location.href = "/produto";
-  });
-// });
+// Mantém os cards e usa produtos reais.
+(async () => {
+  const cards = [...document.querySelectorAll('.products .product-card')];
+  cards.forEach(card => { card.querySelector('button').disabled = true; });
+  try {
+    const resposta = await fetch('/api/produtos');
+    const dados = await resposta.json();
+    if (!resposta.ok) throw new Error(dados.erro);
+    cards.forEach((card, indice) => {
+      const produto = dados.produtos[indice];
+      if (!produto) { card.hidden = true; return; }
+      card.querySelector('.product-name').textContent = produto.titulo_produto;
+      const imagem = card.querySelector('img');
+      imagem.src = window.imagemProdutoSegura(produto.imagem);
+      imagem.alt = produto.titulo_produto;
+      imagem.addEventListener('error', () => { imagem.src = '/img/icons/icons8-caixa-128.png'; }, { once: true });
+      card.querySelector('.old-price').textContent = '';
+      card.querySelector('h3').textContent = Number(produto.preco_produto).toLocaleString('pt-BR', {style:'currency',currency:'BRL'});
+      const botao = card.querySelector('button');
+      botao.disabled = false;
+      botao.addEventListener('click', async evento => {
+        evento.stopPropagation();
+        await window.adicionarPeloBotao(botao, produto.sku);
+      });
+      card.addEventListener('click', evento => { if (!evento.target.closest('button')) window.location.href = '/produto?id=' + produto.sku; });
+    });
+  } catch (_) { cards.forEach(card => { card.querySelector('.product-name').textContent = 'Produtos indisponíveis no momento.'; }); }
+})();
