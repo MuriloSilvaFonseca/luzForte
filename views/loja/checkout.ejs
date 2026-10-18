@@ -1,10 +1,66 @@
 <%- include("../partials/head") %>
 
-    <link rel="stylesheet" href="/css/pages/checkout.css">
+<link rel="stylesheet" href="/css/pages/checkout.css">
 
-    <%- include("../partials/header") %>
+<%- include("../partials/header") %>
 
-    <h1>Checkout</h1>
+<main class="checkout-page">
+    <% if (pedidoFinalizado) { %>
+        <section class="checkout-card checkout-confirmacao">
+            <p class="checkout-selo">Pedido enviado</p>
+            <h1>Obrigado pela sua compra!</h1>
+            <p>Seu pedido <strong>#<%= pedidoFinalizado.id_pedido %></strong> foi registrado.</p>
+            <p>Status: <strong>Solicitado</strong></p>
+            <p>Forma de pagamento: <strong><%= pedidoFinalizado.nome_pagamento %></strong></p>
+            <p class="checkout-total">Total: <%= Number(pedidoFinalizado.total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></p>
+            <p class="checkout-aviso">O pagamento não é processado pelo site. A equipe combinará os próximos passos.</p>
+            <a class="checkout-botao" href="/catalogo">Continuar comprando</a>
+        </section>
+    <% } else { %>
+        <section class="checkout-card">
+            <h1>Finalizar pedido</h1>
+            <p class="checkout-intro">Confira os produtos do seu carrinho e escolha como pretende pagar.</p>
 
-    <script src="/js/pages/checkout.js"></script>
-    <%- include("../partials/footer") %>
+            <% if (erro) { %>
+                <p class="checkout-erro" role="alert"><%= erro %></p>
+            <% } %>
+
+            <% if (!itens.length) { %>
+                <p class="checkout-vazio">Seu carrinho está vazio.</p>
+                <a class="checkout-botao" href="/catalogo">Voltar ao catálogo</a>
+            <% } else { %>
+                <div class="checkout-itens">
+                    <% itens.forEach(item => { %>
+                        <div class="checkout-item">
+                            <div>
+                                <strong><%= item.titulo_produto %></strong>
+                                <span>Quantidade: <%= item.quantidade %></span>
+                            </div>
+                            <span><%= Number(item.subtotal).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></span>
+                        </div>
+                    <% }) %>
+                </div>
+
+                <p class="checkout-total">Total: <%= Number(total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></p>
+
+                <% if (formasPagamento.length) { %>
+                    <form action="/checkout" method="post">
+                        <label for="forma_pagamento_id">Forma de pagamento</label>
+                        <select id="forma_pagamento_id" name="forma_pagamento_id" required>
+                            <option value="">Selecione uma opção</option>
+                            <% formasPagamento.forEach(forma => { %>
+                                <option value="<%= forma.id_forma_pagamento %>"><%= forma.nome_pagamento %></option>
+                            <% }) %>
+                        </select>
+                        <p class="checkout-aviso">O pedido será enviado como solicitação. O pagamento não é processado nesta página.</p>
+                        <button class="checkout-botao" type="submit">Confirmar pedido</button>
+                    </form>
+                <% } else { %>
+                    <p class="checkout-erro">Não há formas de pagamento disponíveis no momento.</p>
+                <% } %>
+            <% } %>
+        </section>
+    <% } %>
+</main>
+
+<%- include("../partials/footer") %>

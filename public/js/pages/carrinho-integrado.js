@@ -13,9 +13,11 @@ function atualizarResumoCarrinho() {
   document.querySelector('.valorResumo').textContent = reaisCarrinho(centavos / 100)
   document.querySelector('.descontoValor').textContent = reaisCarrinho(0)
   document.querySelector('.valorTotal').textContent = reaisCarrinho(centavos / 100)
-  document.getElementById('avisoSelecaoCarrinho').textContent = itensCarrinho.length && !itens.length
-    ? 'Nenhum produto selecionado. Marque um produto para ver seu valor no resumo.'
+  const todosSelecionados = itensCarrinho.length > 0 && itens.length === itensCarrinho.length
+  document.getElementById('avisoSelecaoCarrinho').textContent = itensCarrinho.length && !todosSelecionados
+    ? 'Selecione todos os produtos para continuar com a compra.'
     : ''
+  document.querySelector('.botaoCarrinhoFinalizar button').disabled = !todosSelecionados
   const todos = document.getElementById('checkTodos')
   todos.checked = itensCarrinho.length > 0 && itens.length === itensCarrinho.length
   todos.indeterminate = itens.length > 0 && itens.length < itensCarrinho.length
@@ -91,6 +93,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   })
   document.querySelector('.cupomDesconto .botaoCarrinho').addEventListener('click', () => {
     mensagemCarrinho('Cupons ainda não estão disponíveis. Os valores exibidos são os registrados no carrinho.')
+  })
+  document.querySelector('.botaoCarrinhoFinalizar button').addEventListener('click', () => {
+    window.location.href = '/checkout'
   })
   try {
     const resultado = await window.carrinhoApi()
