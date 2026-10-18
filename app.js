@@ -3,7 +3,7 @@ const lojaRouter = require('./routes/loja')
 const authRouter = require('./routes/auth')
 const produtosApi = require('./routes/api-produtos')   // NOVO
 const app = express()
-const port = 4000
+const port = 3000
 
 app.use(express.urlencoded({ extended: true }))
 
