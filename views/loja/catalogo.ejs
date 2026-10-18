@@ -1,15 +1,6 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fios Elétricos — Luz Forte</title>
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="/css/base/reset.css">
-  <link rel="stylesheet" href="/css/components/header.css">
+<%- include("../partials/head") %>
+
   <link rel="stylesheet" href="/css/pages/catalogo.css">
-</head>
-<body>
 
   <%- include("../partials/header") %>
 <main>
@@ -19,15 +10,16 @@
     <div class="title-bar">
       <div>
         <h1>Fios Elétricos</h1>
-        <p class="prod-count" id="prodCount">Carregando produtos...</p>
+        <p class="prod-count">Produtos encontrados (1234)</p>
       </div>
       <div class="sort-area">
         <span>Ordenar por</span>
         <select id="sortSelect">
-          <option value="padrao">Mais vendidos</option>
-          <option value="menor">Menor preço</option>
-          <option value="maior">Maior preço</option>
-          <option value="novidades">Novidades</option>
+          <option>Mais vendidos</option>
+          <option>Menor preço</option>
+          <option>Maior preço</option>
+          <option>Novidades</option>
+          <option>Avaliação</option>
         </select>
       </div>
     </div>
@@ -46,13 +38,17 @@
     <!-- Sidebar + Grid -->
     <div class="content-row">
 
-      <!-- ══ SIDEBAR (visual por enquanto) ══ -->
+      <!-- ══ SIDEBAR ══ -->
       <aside class="sidebar">
 
+        <!-- Tipo de cabo -->
         <div class="filter-group">
           <div class="filter-title open">
             Tipo de cabo
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/>
+            </svg>
           </div>
           <div class="filter-body">
             <label class="filter-check"><input type="checkbox" /> Cabo flexível (412)</label>
@@ -63,15 +59,22 @@
           </div>
         </div>
 
+        <!-- Marca -->
         <div class="filter-group">
           <div class="filter-title open">
             Marca
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/>
+            </svg>
           </div>
           <div class="filter-body">
             <div class="marca-parent open">
               Prysmian
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke-width="2.5" stroke="currentColor">
+                <path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/>
+              </svg>
             </div>
             <div class="marca-children">
               <label class="filter-check"><input type="checkbox" /> Antigrip (98)</label>
@@ -85,10 +88,14 @@
           </div>
         </div>
 
+        <!-- Bitola -->
         <div class="filter-group">
           <div class="filter-title open">
             Bitola
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/>
+            </svg>
           </div>
           <div class="filter-body">
             <label class="filter-check"><input type="checkbox" /> 1,5 mm² (234)</label>
@@ -100,10 +107,14 @@
           </div>
         </div>
 
+        <!-- Cor -->
         <div class="filter-group">
           <div class="filter-title">
             Cor
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/>
+            </svg>
           </div>
           <div class="filter-body">
             <label class="filter-check"><input type="checkbox" /> Azul (178)</label>
@@ -115,10 +126,14 @@
           </div>
         </div>
 
+        <!-- Isolamento -->
         <div class="filter-group">
           <div class="filter-title">
             Isolamento
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/>
+            </svg>
           </div>
           <div class="filter-body">
             <label class="filter-check"><input type="checkbox" /> PVC 750V (356)</label>
@@ -128,10 +143,14 @@
           </div>
         </div>
 
+        <!-- Avaliações -->
         <div class="filter-group">
           <div class="filter-title open">
             Avaliações
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/>
+            </svg>
           </div>
           <div class="filter-body">
             <label class="filter-check filter-rating">
@@ -157,10 +176,14 @@
           </div>
         </div>
 
+        <!-- Preços -->
         <div class="filter-group">
           <div class="filter-title open">
             Preços
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/>
+            </svg>
           </div>
           <div class="filter-body">
             <label class="filter-check"><input type="checkbox" /> Até R$ 50 (312)</label>
@@ -174,20 +197,102 @@
       </aside>
       <!-- /sidebar -->
 
-      <!-- ══ GRID DE PRODUTOS (preenchido pelo catalogo.js com dados do Neon) ══ -->
+      <!-- ══ GRID DE PRODUTOS ══ -->
       <div class="products-area">
-        <div class="products-grid" id="productsGrid"></div>
+        <div class="products-grid" id="productsGrid">
+          <div class="product-card">
+            <img src="/img/products/fios.png" alt="">
 
-        <p class="grid-status" id="gridStatus">Carregando...</p>
+            <div class="product-info">
+                <p class="product-name">
+                    Fio Elétrico Cabo Flexível 1 via 1,50mm Azul
+                </p>
+                <span class="old-price">R$ 69,90</span>
+                <h3>R$ 49<span>,99</span></h3>
+                <button>Adicionar ao carrinho</button>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <img src="/img/products/fios.png" alt="">
+
+            <div class="product-info">
+                <p class="product-name">
+                    Fio Elétrico Cabo Flexível 1 via 1,50mm Azul
+                </p>
+                <span class="old-price">R$ 69,90</span>
+                <h3>R$ 49<span>,99</span></h3>
+                <button>Adicionar ao carrinho</button>
+            </div>
+          </div>
+
+          <div class="product-card">
+            <img src="/img/products/fios.png" alt="">
+
+            <div class="product-info">
+                <p class="product-name">
+                    Fio Elétrico Cabo Flexível 1 via 1,50mm Azul
+                </p>
+                <span class="old-price">R$ 69,90</span>
+                <h3>R$ 49<span>,99</span></h3>
+                <button>Adicionar ao carrinho</button>
+            </div>
+          </div>
+        
+          <div class="product-card">
+            <img src="/img/products/fios.png" alt="">
+
+            <div class="product-info">
+                <p class="product-name">
+                    Fio Elétrico Cabo Flexível 1 via 1,50mm Azul
+                </p>
+                <span class="old-price">R$ 69,90</span>
+                <h3>R$ 49<span>,99</span></h3>
+                <button>Adicionar ao carrinho</button>
+            </div>
+          </div>
+
+          <div class="product-card">
+              <img src="/img/products/fios.png" alt="">
+
+              <div class="product-info">
+                  <p class="product-name">
+                      Fio Elétrico Cabo Flexível 1 via 1,50mm Azul
+                  </p>
+                  <span class="old-price">R$ 69,90</span>
+                  <h3>R$ 49<span>,99</span></h3>
+                  <button>Adicionar ao carrinho</button>
+              </div>
+          </div>
+
+          <div class="product-card">
+              <img src="/img/products/fios.png" alt="">
+
+              <div class="product-info">
+                  <p class="product-name">
+                      Fio Elétrico Cabo Flexível 1 via 1,50mm Azul
+                  </p>
+                  <span class="old-price">R$ 69,90</span>
+                  <h3>R$ 49<span>,99</span></h3>
+                  <button>Adicionar ao carrinho</button>
+              </div>
+          </div>
+      </div>
 
         <!-- Paginação -->
         <div class="pagination">
           <button class="pg-btn" aria-label="Anterior">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" d="M15.75 19.5L8.25 12l7.5-7.5"/>
+            </svg>
           </button>
           <button class="pg-btn active">1</button>
           <button class="pg-btn" aria-label="Próxima">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+            </svg>
           </button>
         </div>
       </div>
@@ -199,8 +304,9 @@
   </div>
   <!-- /page-container -->
 </main>
-  <%- include("../partials/footer") %>
 
 <script src="/js/pages/catalogo.js"></script>
-</body>
-</html>
+
+<%- include("../partials/footer") %>
+
+
