@@ -1,0 +1,113 @@
+<%- include('../partials/admin/admin-topo', { pagina: 'produtos', titulo: 'Produtos cadastrados' }) %>
+
+<%
+  const moeda = (v) => 'R$ ' + Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })
+  const statusInfo = {
+    ativo: { rotulo: 'Ativo', cor: 'green' },
+    desativado: { rotulo: 'Desativado', cor: 'gray' },
+    oculto: { rotulo: 'Oculto', cor: 'yellow' }
+  }
+  // Mantém os filtros ativos ao trocar de página
+  const qs = (extra) => {
+    const p = new URLSearchParams()
+    Object.keys(filtros).forEach(function (k) { if (filtros[k]) p.set(k, filtros[k]) })
+    Object.keys(extra).forEach(function (k) { p.set(k, extra[k]) })
+    return '?' + p.toString()
+  }
+%>
+
+<nav class="adm-breadcrumb" aria-label="Você está em">
+  <a href="/admin">Administração</a>
+  <span>Produtos</span>
+</nav>
+
+<div class="adm-pagehead">
+  <div>
+    <h1>Produtos cadastrados</h1>
+    <p><%= total %> produto<%= total === 1 ? '' : 's' %> no catálogo.</p>
+  </div>
+  <a class="adm-btn adm-btn--primary" href="/admin/produtos/novo">+ Cadastrar produto</a>
+</div>
+
+<form class="adm-card adm-filters" method="get" action="/admin/produtos">
+  <input class="adm-field adm-field--search" type="search" name="q" value="<%= filtros.q %>" placeholder="Buscar por nome, SKU ou EAN">
+  <select class="adm-field" name="status" aria-label="Status">
+    <option value="">Todos os status</option>
+    <% Object.keys(statusInfo).forEach(function (s) { %>
+      <option value="<%= s %>"<%= filtros.status === s ? ' selected' : '' %>><%= statusInfo[s].rotulo %></option>
+    <% }) %>
+  </select>
+  <select class="adm-field" name="marca" aria-label="Marca">
+    <option value="">Todas as marcas</option>
+    <% marcas.forEach(function (m) { %>
+      <option value="<%= m.id %>"<%= String(filtros.marca) === String(m.id) ? ' selected' : '' %>><%= m.nome %></option>
+    <% }) %>
+  </select>
+  <label class="adm-check">
+    <input type="checkbox" name="estoque" value="baixo"<%= filtros.estoque === 'baixo' ? ' checked' : '' %>> Estoque baixo
+  </label>
+  <button class="adm-btn" type="submit">Filtrar</button>
+</form>
+
+<section class="adm-card">
+  <div class="adm-tablewrap">
+    <table class="adm-table">
+      <thead>
+        <tr>
+          <th>Produto</th>
+          <th>SKU</th>
+          <th>Marca</th>
+          <th class="is-num">Custo</th>
+          <th class="is-num">Preço</th>
+          <th class="is-num">Estoque</th>
+          <th>Status</th>
+          <th class="is-actions">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (produtos.length === 0) { %>
+          <tr><td colspan="8">
+            <div class="adm-empty"><strong>Nenhum produto encontrado</strong>Ajuste os filtros ou cadastre um novo produto.</div>
+          </td></tr>
+        <% } %>
+        <% produtos.forEach(function (p) { const st = statusInfo[p.ativo] || statusInfo.ativo %>
+          <tr>
+            <td>
+              <div class="adm-prod">
+                <% if (p.imagem) { %>
+                  <img class="adm-prod__img" src="<%= p.imagem %>" alt="" loading="lazy">
+                <% } else { %>
+                  <span class="adm-prod__img" aria-hidden="true"></span>
+                <% } %>
+                <div>
+                  <div class="adm-prod__name"><%= p.titulo %></div>
+                  <div class="adm-prod__sub"><%= p.subcategoria %></div>
+                </div>
+              </div>
+            </td>
+            <td><%= p.sku %></td>
+            <td><%= p.marca %></td>
+            <td class="is-num"><%= moeda(p.custo) %></td>
+            <td class="is-num"><strong><%= moeda(p.preco) %></strong></td>
+            <td class="is-num<%= p.estoque <= 5 ? ' adm-stock-low' : '' %>"><%= p.estoque %></td>
+            <td><span class="adm-badge adm-badge--<%= st.cor %>"><%= st.rotulo %></span></td>
+            <td class="is-actions">
+              <a class="adm-btn adm-btn--sm" href="/admin/produtos/<%= p.sku %>/editar">Editar</a>
+              <a class="adm-btn adm-btn--sm" href="/admin/avaliacoes?produto=<%= p.sku %>">Avaliações</a>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="adm-pagination">
+    <span>Página <%= pagina %> de <%= totalPaginas %></span>
+    <nav aria-label="Paginação">
+      <% if (pagina > 1) { %><a class="adm-btn adm-btn--sm" href="<%= qs({ pagina: pagina - 1 }) %>">Anterior</a><% } %>
+      <% if (pagina < totalPaginas) { %><a class="adm-btn adm-btn--sm" href="<%= qs({ pagina: pagina + 1 }) %>">Próxima</a><% } %>
+    </nav>
+  </div>
+</section>
+
+<%- include('../partials/admin/admin-rodape') %>

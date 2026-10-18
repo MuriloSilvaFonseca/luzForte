@@ -1,0 +1,104 @@
+<%- include('../partials/admin-topo', { pagina: 'usuarios', titulo: 'Usuários' }) %>
+
+<%
+  const perfis = {
+    cliente: { rotulo: 'Cliente', cor: 'blue' },
+    admin: { rotulo: 'Administrador', cor: 'red' }
+  }
+  const situacoes = {
+    ativo: { rotulo: 'Ativo', cor: 'green' },
+    bloqueado: { rotulo: 'Bloqueado', cor: 'gray' }
+  }
+%>
+
+<nav class="adm-breadcrumb" aria-label="Você está em">
+  <a href="/admin">Administração</a>
+  <span>Usuários</span>
+</nav>
+
+<div class="adm-pagehead">
+  <div>
+    <h1>Usuários</h1>
+    <p><%= total %> usuário<%= total === 1 ? '' : 's' %> cadastrado<%= total === 1 ? '' : 's' %>.</p>
+  </div>
+</div>
+
+<form class="adm-card adm-filters" method="get" action="/admin/usuarios">
+  <input class="adm-field adm-field--search" type="search" name="q" value="<%= filtros.q %>" placeholder="Buscar por nome ou e-mail">
+  <select class="adm-field" name="perfil" aria-label="Perfil">
+    <option value="">Todos os perfis</option>
+    <% Object.keys(perfis).forEach(function (k) { %>
+      <option value="<%= k %>"<%= filtros.perfil === k ? ' selected' : '' %>><%= perfis[k].rotulo %></option>
+    <% }) %>
+  </select>
+  <select class="adm-field" name="situacao" aria-label="Situação">
+    <option value="">Qualquer situação</option>
+    <% Object.keys(situacoes).forEach(function (k) { %>
+      <option value="<%= k %>"<%= filtros.situacao === k ? ' selected' : '' %>><%= situacoes[k].rotulo %></option>
+    <% }) %>
+  </select>
+  <button class="adm-btn" type="submit">Filtrar</button>
+</form>
+
+<section class="adm-card">
+  <div class="adm-tablewrap">
+    <table class="adm-table">
+      <thead>
+        <tr>
+          <th>Usuário</th>
+          <th>Perfil</th>
+          <th>Situação</th>
+          <th>Cadastro</th>
+          <th class="is-num">Pedidos</th>
+          <th class="is-num">Avaliações</th>
+          <th class="is-actions">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (usuarios.length === 0) { %>
+          <tr><td colspan="7"><div class="adm-empty"><strong>Nenhum usuário encontrado</strong>Tente outro filtro.</div></td></tr>
+        <% } %>
+        <% usuarios.forEach(function (u) {
+          const pf = perfis[u.perfil] || perfis.cliente
+          const sit = situacoes[u.situacao] || situacoes.ativo %>
+          <tr>
+            <td>
+              <div class="adm-prod">
+                <span class="adm-avatar" style="background:var(--adm-blue-bg);color:var(--adm-blue)"><%= u.nome.charAt(0).toUpperCase() %></span>
+                <div>
+                  <div class="adm-prod__name"><%= u.nome %></div>
+                  <div class="adm-prod__sub"><%= u.email %></div>
+                </div>
+              </div>
+            </td>
+            <td><span class="adm-badge adm-badge--<%= pf.cor %>"><%= pf.rotulo %></span></td>
+            <td><span class="adm-badge adm-badge--<%= sit.cor %>"><%= sit.rotulo %></span></td>
+            <td><%= u.cadastro %></td>
+            <td class="is-num"><%= u.pedidos %></td>
+            <td class="is-num"><%= u.avaliacoes %></td>
+            <td class="is-actions">
+              <a class="adm-btn adm-btn--sm" href="/admin/usuarios/<%= u.id %>">Ver</a>
+              <% if (u.perfil !== 'admin') { %>
+                <form method="post" action="/admin/usuarios/<%= u.id %>/<%= u.situacao === 'bloqueado' ? 'desbloquear' : 'bloquear' %>" style="display:inline">
+                  <button class="adm-btn adm-btn--sm<%= u.situacao === 'bloqueado' ? '' : ' adm-btn--danger' %>" type="submit">
+                    <%= u.situacao === 'bloqueado' ? 'Desbloquear' : 'Bloquear' %>
+                  </button>
+                </form>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="adm-pagination">
+    <span>Página <%= pagina %> de <%= totalPaginas %></span>
+    <nav aria-label="Paginação">
+      <% if (pagina > 1) { %><a class="adm-btn adm-btn--sm" href="?pagina=<%= pagina - 1 %>">Anterior</a><% } %>
+      <% if (pagina < totalPaginas) { %><a class="adm-btn adm-btn--sm" href="?pagina=<%= pagina + 1 %>">Próxima</a><% } %>
+    </nav>
+  </div>
+</section>
+
+<%- include('../partials/admin-rodape') %>

@@ -4,10 +4,8 @@ const express = require('express')
 const sessao = require('express-session')
 const rotasLoja = require('./routes/loja')
 const rotasAutenticacao = require('./routes/auth')
-const session = require('express-session')
-const lojaRouter = require('./routes/loja')
-const authRouter = require('./routes/auth')
-const produtosApi = require('./routes/api-produtos')   // NOVO
+const rotasAdmin = require('./routes/admin-paineis')
+const produtosApi = require('./routes/api-produtos')
 const app = express()
 const porta = 3000
 
@@ -17,7 +15,7 @@ app.use(sessao({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: {maxAge: 1000 * 60 * 60 * 0.5}
+  cookie: { maxAge: 1000 * 60 * 60 * 0.5 }
 }))
 
 app.use((req, res, next) => {
@@ -35,9 +33,8 @@ app.use(require('./middlewares/navbar'))
 
 app.use('/', rotasLoja)
 app.use('/', rotasAutenticacao)
-app.use('/', lojaRouter)
-app.use('/', authRouter)
-app.use('/', produtosApi)                              // NOVO (antes do 404)
+app.use('/', produtosApi)
+app.use('/admin', rotasAdmin)
 
 // Nenhuma rota respondeu: página não existe
 app.use((req, res) => {

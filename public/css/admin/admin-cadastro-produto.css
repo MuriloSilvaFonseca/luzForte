@@ -1,0 +1,330 @@
+/* juntei o arquivo css e todos os outros para gerar 1 arquivo só de css  ta em admin paineis*/
+
+.admin-produto-body {
+  margin: 0;
+  background: #f3f5f8;
+  color: #263445;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+}
+
+.admin-produto-app button,
+.admin-produto-app input,
+.admin-produto-app select,
+.admin-produto-app textarea {
+  font: inherit;
+}
+
+.admin-produto-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 28px;
+  background: #14284b;
+  color: #fff;
+}
+
+.admin-produto-logo {
+  color: #fff;
+  font-size: 23px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.admin-produto-logo span {
+  color: #e5483a;
+}
+
+.admin-produto-usuario {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.admin-produto-avatar {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 50%;
+  background: #344b70;
+  color: #fff;
+  font-weight: 700;
+}
+
+.admin-produto-layout {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+}
+
+.admin-produto-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 25px 15px;
+  background: #0f172a;
+  color: #e3eaf4;
+}
+
+.admin-produto-sidebar-titulo {
+  padding: 0 11px;
+  color: #9daec5;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.admin-produto-menu {
+  display: grid;
+  gap: 5px;
+}
+
+.admin-produto-link,
+.admin-produto-voltar {
+  display: block;
+  padding: 11px 12px;
+  border-radius: 5px;
+  color: #e3eaf4;
+  text-decoration: none;
+}
+
+.admin-produto-link:hover,
+.admin-produto-link-ativo {
+  background: #1e293b;
+  color: #fff;
+}
+
+.admin-produto-link-ativo {
+  border-left: 3px solid #e5483a;
+  padding-left: 9px;
+}
+
+.admin-produto-voltar {
+  margin-top: auto;
+  border-top: 1px solid #293449;
+  border-radius: 0;
+  color: #c4cedc;
+}
+
+.admin-produto-conteudo {
+  min-width: 0;
+  padding: 28px 36px 48px;
+}
+
+.admin-produto-caminho {
+  margin-bottom: 10px;
+  color: #697586;
+  font-size: 12px;
+}
+
+.admin-produto-caminho span {
+  padding: 0 5px;
+  color: #a0a9b5;
+}
+
+.admin-produto-cabecalho {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.admin-produto-titulo {
+  margin: 0;
+  color: #1e2d40;
+  font-size: 25px;
+}
+
+.admin-produto-subtitulo {
+  margin: 6px 0 0;
+  color: #697586;
+}
+
+.admin-produto-aviso,
+.admin-produto-ajuda,
+.admin-produto-rascunho {
+  color: #697586;
+  font-size: 12px;
+}
+
+.admin-produto-obrigatorio {
+  color: #b42318;
+}
+
+.admin-produto-mensagem {
+  max-width: 1050px;
+  margin: 0 0 15px;
+  padding: 11px 14px;
+  border: 1px solid;
+  border-radius: 5px;
+}
+
+.admin-produto-mensagem-erro {
+  border-color: #f0b7b2;
+  background: #fff1f0;
+  color: #9f241b;
+}
+
+.admin-produto-mensagem-sucesso {
+  border-color: #a9d9b3;
+  background: #effaf1;
+  color: #216b31;
+}
+
+.admin-produto-formulario {
+  max-width: 1050px;
+  padding: 25px;
+  border: 1px solid #dce2e9;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.admin-produto-secao + .admin-produto-secao {
+  margin-top: 25px;
+  padding-top: 23px;
+  border-top: 1px solid #e4e8ed;
+}
+
+.admin-produto-secao-cabecalho {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.admin-produto-numero {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  place-items: center;
+  border-radius: 50%;
+  background: #edf2f8;
+  color: #14284b;
+  font-weight: 700;
+}
+
+.admin-produto-secao-titulo {
+  margin: 2px 0 4px;
+  color: #263445;
+  font-size: 16px;
+}
+
+.admin-produto-secao-texto {
+  margin: 0;
+  color: #697586;
+  font-size: 12px;
+}
+
+.admin-produto-grade {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.admin-produto-grade-tres {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.admin-produto-campo {
+  min-width: 0;
+}
+
+.admin-produto-campo-largo {
+  grid-column: span 2;
+}
+
+.admin-produto-label {
+  display: block;
+  margin-bottom: 6px;
+  color: #344256;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-produto-input {
+  display: block;
+  width: 100%;
+  min-height: 40px;
+  padding: 9px 11px;
+  border: 1px solid #cfd7e1;
+  border-radius: 5px;
+  background: #fff;
+  color: #263445;
+}
+
+.admin-produto-input:focus {
+  border-color: #477fbd;
+  outline: 2px solid #dce9f7;
+}
+
+.admin-produto-ajuda {
+  display: block;
+  margin-top: 5px;
+}
+
+.admin-produto-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.admin-produto-status .admin-produto-label {
+  width: 100%;
+}
+
+.admin-produto-opcao {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #465365;
+}
+
+.admin-produto-textarea {
+  min-height: 95px;
+  resize: vertical;
+}
+
+.admin-produto-acoes {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 25px;
+  padding-top: 19px;
+  border-top: 1px solid #e4e8ed;
+}
+
+.admin-produto-botoes {
+  display: flex;
+  gap: 9px;
+}
+
+.admin-produto-botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 9px 15px;
+  border: 1px solid #cfd7e1;
+  border-radius: 5px;
+  background: #fff;
+  color: #344256;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.admin-produto-botao-principal {
+  border-color: #14284b;
+  background: #14284b;
+  color: #fff;
+}
+
+.admin-produto-botao:hover {
+  filter: brightness(.95);
+}

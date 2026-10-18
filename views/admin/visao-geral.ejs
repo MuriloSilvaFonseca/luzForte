@@ -1,0 +1,94 @@
+<%- include('../partials/admin/admin-topo', { pagina: 'visao-geral', titulo: 'Visão geral' }) %>
+
+<%
+  const moeda = (v) => 'R$ ' + Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })
+%>
+
+<nav class="adm-breadcrumb" aria-label="Você está em">
+  <a href="/admin">Administração</a>
+  <span>Visão geral</span>
+</nav>
+
+<div class="adm-pagehead">
+  <div>
+    <h1>Visão geral</h1>
+    <p>Resumo da loja e pendências que precisam da sua atenção.</p>
+  </div>
+  <a class="adm-btn adm-btn--primary" href="/admin/produtos/novo">+ Cadastrar produto</a>
+</div>
+
+<section class="adm-kpis" aria-label="Indicadores">
+  <article class="adm-card adm-kpi">
+    <p class="adm-kpi__label">Pedidos hoje</p>
+    <p class="adm-kpi__value"><%= resumo.pedidosHoje %></p>
+    <p class="adm-kpi__hint"><%= resumo.pedidosAguardando %> aguardando envio</p>
+  </article>
+  <article class="adm-card adm-kpi">
+    <p class="adm-kpi__label">Faturamento do mês</p>
+    <p class="adm-kpi__value"><%= moeda(resumo.faturamentoMes) %></p>
+    <p class="adm-kpi__hint">Pedidos pagos</p>
+  </article>
+  <article class="adm-card adm-kpi">
+    <p class="adm-kpi__label">Produtos ativos</p>
+    <p class="adm-kpi__value"><%= resumo.produtosAtivos %></p>
+    <p class="adm-kpi__hint"><%= resumo.estoqueBaixo %> com estoque baixo</p>
+  </article>
+  <article class="adm-card adm-kpi adm-kpi--alert">
+    <p class="adm-kpi__label">Avaliações pendentes</p>
+    <p class="adm-kpi__value"><%= resumo.avaliacoesPendentes %></p>
+    <p class="adm-kpi__hint"><a href="/admin/avaliacoes?status=pendente">Moderar agora</a></p>
+  </article>
+</section>
+
+<div class="adm-grid-2">
+  <section class="adm-card">
+    <header class="adm-card__head">
+      <h2>Últimos pedidos</h2>
+      <a href="/admin/pedidos">Ver todos</a>
+    </header>
+    <div class="adm-tablewrap">
+      <table class="adm-table">
+        <thead>
+          <tr><th>Pedido</th><th>Cliente</th><th>Status</th><th class="is-num">Total</th></tr>
+        </thead>
+        <tbody>
+          <% if (ultimosPedidos.length === 0) { %>
+            <tr><td colspan="4"><div class="adm-empty">Nenhum pedido ainda.</div></td></tr>
+          <% } %>
+          <% ultimosPedidos.forEach(function (p) { %>
+            <tr>
+              <td><a href="/admin/pedidos#pedido-<%= p.id %>"><strong>#<%= p.id %></strong></a></td>
+              <td><%= p.cliente %></td>
+              <td><span class="adm-badge adm-badge--<%= p.statusCor %>"><%= p.status %></span></td>
+              <td class="is-num"><%= moeda(p.total) %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="adm-card">
+    <header class="adm-card__head">
+      <h2>Estoque baixo</h2>
+      <a href="/admin/produtos?estoque=baixo">Ver todos</a>
+    </header>
+    <% if (estoqueBaixoLista.length === 0) { %>
+      <div class="adm-empty">Tudo em ordem por aqui.</div>
+    <% } else { %>
+      <ul class="adm-list">
+        <% estoqueBaixoLista.forEach(function (p) { %>
+          <li class="adm-list__item">
+            <div>
+              <p class="adm-list__title"><%= p.titulo %></p>
+              <p class="adm-list__meta">SKU <%= p.sku %></p>
+            </div>
+            <span class="adm-list__value"><%= p.estoque %> un.</span>
+          </li>
+        <% }) %>
+      </ul>
+    <% } %>
+  </section>
+</div>
+
+<%- include('../partials/admin/admin-rodape') %>

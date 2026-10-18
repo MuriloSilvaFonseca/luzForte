@@ -1,0 +1,172 @@
+<%- include('../partials/admin/admin-topo', { pagina: 'avaliacoes', titulo: 'Avaliações', avaliacoesPendentes: contagens.pendente }) %>
+
+<%
+  const statusInfo = {
+    pendente: { rotulo: 'Pendente', cor: 'yellow' },
+    aprovada: { rotulo: 'Aprovada', cor: 'green' },
+    recusada: { rotulo: 'Recusada', cor: 'red' }
+  }
+  const abas = [
+    { id: '', rotulo: 'Todas', n: contagens.todas },
+    { id: 'pendente', rotulo: 'Pendentes', n: contagens.pendente },
+    { id: 'aprovada', rotulo: 'Aprovadas', n: contagens.aprovada },
+    { id: 'recusada', rotulo: 'Recusadas', n: contagens.recusada },
+    { id: 'negativas', rotulo: 'Negativas sem resposta', n: contagens.negativasSemResposta }
+  ]
+  const estrelas = (n) => '★'.repeat(n) + '<span class="off">' + '★'.repeat(5 - n) + '</span>'
+  const motivos = [
+    'Linguagem ofensiva ou discriminatória',
+    'Spam ou propaganda',
+    'Não se refere ao produto',
+    'Contém dados pessoais',
+    'Outro motivo'
+  ]
+%>
+
+<nav class="adm-breadcrumb" aria-label="Você está em">
+  <a href="/admin">Administração</a>
+  <span>Avaliações</span>
+</nav>
+
+<div class="adm-pagehead">
+  <div>
+    <h1>Avaliações</h1>
+    <p>Modere os comentários dos clientes e responda às avaliações negativas.</p>
+  </div>
+</div>
+
+<section class="adm-card rev-summary" aria-label="Resumo das avaliações">
+  <div class="rev-summary__score">
+    <strong><%= resumo.media.toFixed(1).replace('.', ',') %></strong>
+    <span class="stars" aria-hidden="true">★★★★★</span><br>
+    <span><%= resumo.total %> avaliações</span>
+  </div>
+  <div class="rev-bars">
+    <% [5, 4, 3, 2, 1].forEach(function (n) {
+      const qtd = resumo.distribuicao[n] || 0
+      const pct = resumo.total ? Math.round(qtd / resumo.total * 100) : 0 %>
+      <div class="rev-bar">
+        <span><%= n %> ★</span>
+        <span class="rev-bar__track"><span class="rev-bar__fill" style="width:<%= pct %>%"></span></span>
+        <span><%= qtd %></span>
+      </div>
+    <% }) %>
+  </div>
+</section>
+
+<nav class="adm-chips" aria-label="Filtrar por status">
+  <% abas.forEach(function (a) {
+       const ativa = (filtros.status || '') === a.id %>
+    <a class="adm-chip<%= ativa ? ' is-active' : '' %>"
+       href="/admin/avaliacoes<%= a.id ? '?status=' + a.id : '' %>"
+       <%- ativa ? 'aria-current="true"' : '' %>>
+      <%= a.rotulo %><small>(<%= a.n %>)</small>
+    </a>
+  <% }) %>
+</nav>
+
+<form class="adm-card adm-filters" method="get" action="/admin/avaliacoes">
+  <% if (filtros.status) { %><input type="hidden" name="status" value="<%= filtros.status %>"><% } %>
+  <input class="adm-field adm-field--search" type="search" name="q" value="<%= filtros.q %>" placeholder="Buscar no texto, cliente ou produto">
+  <select class="adm-field" name="nota" aria-label="Nota">
+    <option value="">Todas as notas</option>
+    <% [5, 4, 3, 2, 1].forEach(function (n) { %>
+      <option value="<%= n %>"<%= String(filtros.nota) === String(n) ? ' selected' : '' %>><%= n %> estrela<%= n > 1 ? 's' : '' %></option>
+    <% }) %>
+  </select>
+  <input class="adm-field adm-field--sm" type="text" name="produto" value="<%= filtros.produto %>" placeholder="SKU do produto">
+  <button class="adm-btn" type="submit">Filtrar</button>
+</form>
+
+<% if (avaliacoes.length === 0) { %>
+  <div class="adm-card adm-empty"><strong>Nenhuma avaliação encontrada</strong>Tente outro filtro.</div>
+<% } %>
+
+<div class="rev-list" id="lista-avaliacoes">
+  <% avaliacoes.forEach(function (a) {
+    const st = statusInfo[a.status] || statusInfo.pendente
+    const negativa = a.nota <= 3 %>
+    <article class="adm-card rev" id="avaliacao-<%= a.id %>" data-status="<%= a.status %>">
+
+      <header class="rev__top">
+        <div class="rev__who">
+          <span class="adm-avatar" aria-hidden="true"><%= a.cliente.charAt(0).toUpperCase() %></span>
+          <div>
+            <div class="rev__name"><%= a.cliente %></div>
+            <div class="rev__meta"><%= a.data %><% if (a.compraVerificada) { %> · Compra verificada<% } %></div>
+          </div>
+        </div>
+        <div class="rev__badges">
+          <span class="adm-badge adm-badge--<%= st.cor %>"><%= st.rotulo %></span>
+          <% if (negativa) { %><span class="adm-badge adm-badge--red">Negativa</span><% } %>
+          <% if (a.denuncias > 0) { %><span class="adm-badge adm-badge--yellow"><%= a.denuncias %> denúncia<%= a.denuncias > 1 ? 's' : '' %></span><% } %>
+        </div>
+      </header>
+
+      <p class="rev__product">
+        Produto: <a href="/admin/produtos?q=<%= a.sku %>"><%= a.produto %></a> · SKU <%= a.sku %>
+      </p>
+
+      <div class="stars" role="img" aria-label="Nota <%= a.nota %> de 5"><%- estrelas(a.nota) %></div>
+      <% if (a.titulo) { %><h3 class="rev__title"><%= a.titulo %></h3><% } %>
+      <p class="rev__text"><%= a.texto %></p>
+
+      <% if (a.status === 'recusada' && a.motivoRecusa) { %>
+        <div class="rev__flag"><strong>Motivo da recusa:</strong> <%= a.motivoRecusa %></div>
+      <% } %>
+
+      <% if (a.resposta) { %>
+        <div class="rev__reply">
+          <p class="rev__reply-label">Resposta da LuzForte</p>
+          <p><%= a.resposta %></p>
+        </div>
+      <% } %>
+
+      <div class="rev__actions">
+        <% if (a.status !== 'aprovada') { %>
+          <form class="adm-inline" method="post" action="/admin/avaliacoes/<%= a.id %>/aprovar">
+            <button class="adm-btn adm-btn--success adm-btn--sm" type="submit">Aprovar</button>
+          </form>
+        <% } %>
+
+        <% if (a.status !== 'recusada') { %>
+          <button class="adm-btn adm-btn--danger adm-btn--sm" type="button" data-abrir="recusar-<%= a.id %>">Recusar</button>
+        <% } %>
+
+        <% if (negativa || a.resposta) { %>
+          <button class="adm-btn adm-btn--sm" type="button" data-abrir="responder-<%= a.id %>">
+            <%= a.resposta ? 'Editar resposta' : 'Responder' %>
+          </button>
+        <% } %>
+      </div>
+
+      <% if (a.status !== 'recusada') { %>
+        <form class="rev__form" id="recusar-<%= a.id %>" method="post" action="/admin/avaliacoes/<%= a.id %>/recusar">
+          <label for="motivo-<%= a.id %>">Motivo da recusa</label>
+          <select id="motivo-<%= a.id %>" name="motivo" required>
+            <% motivos.forEach(function (m) { %><option value="<%= m %>"><%= m %></option><% }) %>
+          </select>
+          <p class="rev__tip">A avaliação deixa de aparecer na loja. O cliente não é notificado automaticamente.</p>
+          <div class="rev__form-actions">
+            <button class="adm-btn adm-btn--primary adm-btn--sm" type="submit">Confirmar recusa</button>
+            <button class="adm-btn adm-btn--sm" type="button" data-fechar="recusar-<%= a.id %>">Cancelar</button>
+          </div>
+        </form>
+      <% } %>
+
+      <% if (negativa || a.resposta) { %>
+        <form class="rev__form" id="responder-<%= a.id %>" method="post" action="/admin/avaliacoes/<%= a.id %>/responder">
+          <label for="resp-<%= a.id %>">Sua resposta (aparece publicamente abaixo da avaliação)</label>
+          <textarea id="resp-<%= a.id %>" name="resposta" maxlength="500" required data-contador="cont-<%= a.id %>" placeholder="Ex.: Olá! Lamentamos o ocorrido. Entre em contato pelo nosso suporte para resolvermos."><%= a.resposta || '' %></textarea>
+          <div class="rev__form-actions">
+            <button class="adm-btn adm-btn--primary adm-btn--sm" type="submit">Publicar resposta</button>
+            <button class="adm-btn adm-btn--sm" type="button" data-fechar="responder-<%= a.id %>">Cancelar</button>
+            <span class="rev__counter" id="cont-<%= a.id %>">0/500</span>
+          </div>
+        </form>
+      <% } %>
+    </article>
+  <% }) %>
+</div>
+
+<%- include('../partials/admin/admin-rodape', { scripts: ['/js/pages/admin-avaliacoes.js'] }) %>

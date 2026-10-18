@@ -1,0 +1,12 @@
+<%# views/partials/admin/admin-rodape.ejs - fecha main, shell, body e html. Opcionais: scripts (lista de caminhos) e pageScript (nome em /js/pages) %>
+    </main>
+  </div>
+
+  <% (typeof scripts !== 'undefined' && Array.isArray(scripts) ? scripts : []).forEach(function (src) { %>
+    <script src="<%= src %>" defer></script>
+  <% }) %>
+  <% if (typeof pageScript !== 'undefined' && pageScript) { %>
+    <script src="/js/pages/<%= pageScript %>.js" defer></script>
+  <% } %>
+</body>
+</html>

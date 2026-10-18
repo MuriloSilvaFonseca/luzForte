@@ -1,0 +1,70 @@
+<%#
+  views/partials/admin/admin-topo.ejs
+  Variáveis esperadas (todas opcionais, com valor padrão):
+    titulo               -> título da aba
+    pagina               -> id do item ativo no menu (ex.: 'pedidos')
+    avaliacoesPendentes  -> número no selo do menu "Avaliações"
+    usuario              -> objeto com .nome (usado na inicial do avatar)
+  Fecha em: admin-rodape.ejs
+%>
+<%
+  const tituloPagina = locals.titulo || 'Painel';
+  const paginaAtual = locals.pagina || '';
+  const inicial = (locals.usuario && locals.usuario.nome)
+    ? locals.usuario.nome.trim().charAt(0).toUpperCase()
+    : 'A';
+
+  const itensMenu = [
+    { id: 'visao-geral', rotulo: 'Visão geral', href: '/admin' },
+    { id: 'cadastro', rotulo: 'Cadastrar produto', href: '/admin/produtos/novo' },
+    { id: 'produtos', rotulo: 'Produtos cadastrados', href: '/admin/produtos' },
+    { id: 'pedidos', rotulo: 'Pedidos', href: '/admin/pedidos' },
+    { id: 'avaliacoes', rotulo: 'Avaliações', href: '/admin/avaliacoes', contagem: locals.avaliacoesPendentes || 0 },
+    { id: 'usuarios', rotulo: 'Usuários', href: '/admin/usuarios' }
+  ];
+%>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LuzForte | <%= tituloPagina %></title>
+  <link rel="stylesheet" href="/css/base/reset.css">
+  <link rel="stylesheet" href="/css/base/variables.css">
+  <link rel="stylesheet" href="/css/admin/admin-paineis.css">
+</head>
+
+<body class="adm">
+
+  <a class="adm-skip" href="#conteudo">Ir para o conteúdo</a>
+
+  <header class="adm-topbar">
+    <a class="adm-logo" href="/admin">Luz<span>Forte</span></a>
+    <div class="adm-topbar__user">
+      <span class="adm-avatar adm-avatar--light" aria-hidden="true"><%= inicial %></span>
+      <span>Área administrativa</span>
+    </div>
+  </header>
+
+  <div class="adm-shell">
+    <aside class="adm-sidebar">
+      <p class="adm-sidebar__label">Administração</p>
+
+      <nav class="adm-nav" aria-label="Menu do painel">
+        <% itensMenu.forEach(function (item) {
+             const ativo = item.id === paginaAtual; %>
+          <a href="<%= item.href %>"
+             class="adm-nav__link<%= ativo ? ' is-active' : '' %>"
+             <%- ativo ? 'aria-current="page"' : '' %>>
+            <span><%= item.rotulo %></span>
+            <% if (item.contagem > 0) { %>
+              <span class="adm-nav__count" aria-label="<%= item.contagem %> pendentes"><%= item.contagem %></span>
+            <% } %>
+          </a>
+        <% }) %>
+      </nav>
+
+      <a class="adm-sidebar__back" href="/">← Voltar à loja</a>
+    </aside>
+
+    <main class="adm-main" id="conteudo">
