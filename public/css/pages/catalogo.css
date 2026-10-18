@@ -228,6 +228,8 @@
   margin-bottom:10px;
 }
 
+.product-name a { color: inherit; overflow-wrap: anywhere; }
+
 .old-price{
   color:#999;
   text-decoration:line-through;
@@ -246,6 +248,7 @@
 
 .product-info button{
   width:100%;
+  min-height:44px;
   margin-top:auto;
   border:none;
   background:#183b6b;
@@ -253,6 +256,8 @@
   padding:12px;
   border-radius:8px;
   font-weight:600;
+  font-size:14px;
+  line-height:1.4;
   cursor:pointer;
   transition:.3s;
 }
@@ -260,6 +265,9 @@
 .product-info button:hover{
   background:#102a4c;
 }
+
+.product-info button:focus-visible { outline: 2px solid #183b6b; outline-offset: 3px; }
+.product-info button:disabled { opacity: 0.65; cursor: wait; }
 
 .pagination{
   display:flex;
@@ -312,4 +320,15 @@
   .products-grid{
     grid-template-columns:repeat(2, 1fr);
   }
+}
+
+.grid-status{
+  text-align:center;
+  color:#777;
+  font-size:15px;
+  padding:40px 0;
+}
+
+.grid-status.erro{
+  color:#c62828;
 }

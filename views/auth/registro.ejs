@@ -7,8 +7,7 @@
     <link rel="stylesheet" href="/css/base/reset.css">
     <link rel="stylesheet" href="/css/pages/registro.css">
     <link rel="stylesheet" href="/css/components/messages.css">
-    <script src="/js/modules/jquery-4.0.0.min.js"></script>
-    <script src="/js/pages/registro.js"></script>
+    <script src="/js/pages/auth-forms.js" defer></script>
     
 </head>
 <body>
@@ -21,40 +20,37 @@
         <div class="cadastro-container">
          <a class="cadastro-voltar" href="/login" aria-label="Voltar"><img src="/img/icons/de-volta.png" alt="Voltar"></a>
             <h1>Criar nova conta</h1>
-            <button class="google-btn">
+            <button class="google-btn" type="button">
                     <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" height="20"
                         alt="Google" />
                     Continuar com o Google
                 </button>
             <div class="divider"><span>OU</span></div>
 
-            <form class="cadastro-form" action="" method="post">
+            <form class="cadastro-form" action="/registro" method="post">
+                <% if (typeof erro !== 'undefined') { %>
+                    <p class="form-error" role="alert"><%= erro %></p>
+                <% } %>
                 <label class="field">
                     <span class="field-label">Nome completo*</span>
-                    <input type="text" name="nome" placeholder="Digite seu nome completo..." required>
+                    <input type="text" name="nome" placeholder="Digite seu nome completo" autocomplete="name" maxlength="200" required>
                 </label>
 
                 <label class="field">
                     <span class="field-label">E-mail *</span>
-                    <input type="email" name="email" placeholder="Digite seu e-mail..." required>
-                    <span class="campo-error" id="email-error">Por favor, insira um e-mail válido.</span>
+                    <input type="email" name="email" placeholder="Digite seu e-mail" autocomplete="email" maxlength="255" required>
                 </label>
 
                 <label class="field">
                     <span class="field-label">Telefone*</span>
-                    <input type="tel" name="telefone" placeholder="+55 (00) 00000-0000" required>
-                </label>
-
-                <label class="field">
-                    <span class="field-label">CPF</span>
-                    <input type="number" name="cpf" placeholder="000.000.000-00">
+                    <input type="tel" name="telefone" placeholder="(00) 00000-0000" autocomplete="tel-national" inputmode="numeric" maxlength="15" data-mascara="telefone" required>
                 </label>
 
                 <label class="field password-field">
                     <span class="field-label">Senha*</span>
                     <div class="password-row">
-                        <input type="password" name="senha" placeholder="Mínimo 8 caracteres" required>
-                        <button id="mostrarSenha1" type="button" class="show-pass" aria-label="Mostrar senha"><img src="/img/icons/olho-fechado.png" alt="Mostrar senha"></button>
+                        <input type="password" name="senha" placeholder="Mínimo 8 caracteres" autocomplete="new-password" minlength="8" required>
+                        <button type="button" class="show-pass" aria-label="Mostrar senha" aria-pressed="false"><img src="/img/icons/olho-fechado.png" alt=""></button>
                     </div>
                     <small class="hint">Sua senha deve ter no mínimo 8 caracteres</small>
                 </label>
@@ -62,9 +58,8 @@
                 <label class="field password-field">
                     <span class="field-label">Confirmar Senha*</span>
                     <div class="password-row">
-                        <input type="password" name="confirm_senha" placeholder="Digite sua senha novamente..." required>
-                        <span class="campo-error" id="confirm-password-error">As senhas não coincidem</span>
-                    <button id="mostrarSenha2" type="button" class="show-pass" aria-label="Mostrar senha"><img src="/img/icons/olho-fechado.png" alt="Mostrar senha"></button>
+                        <input type="password" name="confirm_senha" placeholder="Digite a senha novamente" autocomplete="new-password" minlength="8" required>
+                        <button type="button" class="show-pass" aria-label="Mostrar senha" aria-pressed="false"><img src="/img/icons/olho-fechado.png" alt=""></button>
                     </div>
                 </label>
 

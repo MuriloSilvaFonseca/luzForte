@@ -11,8 +11,11 @@ router.get('/registro', (req, res) => {
 // ROTA POST PARA CADASTRO DE USUÁRIO
 router.post('/registro', (req, res) => {
   const { nome, email, telefone, senha, confirm_senha } = req.body
+  const nomeUsuario = typeof nome === 'string' ? nome.trim() : ''
+  const emailUsuario = typeof email === 'string' ? email.trim() : ''
+  const telefoneUsuario = typeof telefone === 'string' ? telefone.trim() : ''
 
-  if (!nome || !email || !telefone || !senha) {
+  if (!nomeUsuario || !emailUsuario || !telefoneUsuario || typeof senha !== 'string' || !senha) {
     return res.render('auth/registro', { erro: 'Preencha todos os campos' })
   }
 
@@ -26,7 +29,7 @@ router.post('/registro', (req, res) => {
 
   const sqlSelectEmail = 'SELECT COUNT(*) AS Existe FROM usuario WHERE email = ?'
 
-  conexao.query(sqlSelectEmail, [email], (erro, resultado) => {
+  conexao.query(sqlSelectEmail, [emailUsuario], (erro, resultado) => {
     if(erro) {
       console.log(erro);
       return res.status(500).send('Erro do servidor')
@@ -45,7 +48,7 @@ router.post('/registro', (req, res) => {
 
       const sqlInsert = 'INSERT INTO usuario(nome_usuario, email, telefone, senha) VALUES (?, ?, ?, ?)'
 
-      conexao.query(sqlInsert, [nome, email, telefone, hash], (erroInsert, resultadoInsert) => {
+      conexao.query(sqlInsert, [nomeUsuario, emailUsuario, telefoneUsuario, hash], (erroInsert, resultadoInsert) => {
         if(erroInsert) {
           if(erroInsert.code === 'ER_DUP_ENTRY') {
             return res.render('auth/registro', { erro: 'Esse e-mail já existe' })
@@ -62,6 +65,64 @@ router.post('/registro', (req, res) => {
 
 router.get('/login', (req, res) => {
   res.render('auth/login')
+})
+
+router.post('/login', (req, res) => {
+  const { email, password } = req.body
+  if (typeof email !== 'string' || typeof password !== 'string' || !email || !password || password.length > 256) {
+    return res.status(400).render('auth/login', { erro: 'Informe e-mail e senha.' })
+  }
+
+  const sql = 'SELECT id_usuario, nome_usuario, acesso, senha FROM usuario WHERE email = ? LIMIT 1'
+
+  // Busca a conta pelo e-mail, como no cadastro.
+  conexao.query(sql, [email.trim()], (erro, usuarios) => {
+    if (erro) {
+      console.log(erro)
+      return res.status(500).render('auth/login', { erro: 'Não foi possível entrar. Tente novamente.' })
+    }
+
+    const usuario = usuarios[0]
+    if (!usuario) {
+      return res.status(401).render('auth/login', { erro: 'E-mail ou senha inválidos.' })
+    }
+
+    // Compara a senha digitada com o hash salvo no banco.
+    bcrypt.compare(password, usuario.senha, (erroCompare, senhaValida) => {
+      if (erroCompare) {
+        console.log(erroCompare)
+        return res.status(500).render('auth/login', { erro: 'Não foi possível entrar. Tente novamente.' })
+      }
+
+      if (!senhaValida) {
+        return res.status(401).render('auth/login', { erro: 'E-mail ou senha inválidos.' })
+      }
+
+      // Cria um identificador novo de sessão após o login.
+      req.session.regenerate(erroSessao => {
+        if (erroSessao) {
+          console.log(erroSessao)
+          return res.status(500).render('auth/login', { erro: 'Não foi possível entrar. Tente novamente.' })
+        }
+
+        // Guarda só os dados necessários do usuário; a senha não vai para a sessão.
+        req.session.usuario = {
+          id_usuario: usuario.id_usuario,
+          nome_usuario: usuario.nome_usuario,
+          acesso: usuario.acesso
+        }
+
+        req.session.save(erroSalvar => {
+          if (erroSalvar) {
+            console.log(erroSalvar)
+            return res.status(500).render('auth/login', { erro: 'Não foi possível entrar. Tente novamente.' })
+          }
+
+          return res.redirect('/carrinho')
+        })
+      })
+    })
+  })
 })
 
 router.get('/esqueci-senha', (req, res) => {

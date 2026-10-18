@@ -1,116 +1,50 @@
-// Catalogo Script
-/* ══════════════════════════════════════
-   LUZ FORTE — main.js
-   ══════════════════════════════════════ */
+// Produtos reais e botões do catálogo.
+const escaparTexto = valor => String(valor).replace(/[&<>"']/g, caractere => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+}[caractere]));
 
-// ── Dados dos produtos ──────────────────────────────────────────
-const products = Array.from({ length: 12 }, (_, i) => ({
-  id: i + 1,
-  name: "Fio Elétrico Cabo Flexível 1 via 1,50mm Azul",
-  oldPrice: "R$ 99,99",
-  price: "49",
-  cents: "99",
-  stars: 0,
-}));
-
-// ── Gera SVG do cabo azul (coil) ────────────────────────────────
-function buildCableSVG() {
-  return `
-  <svg width="130" height="115" viewBox="0 0 130 115" xmlns="http://www.w3.org/2000/svg">
-    <!-- sombra base -->
-    <ellipse cx="65" cy="100" rx="44" ry="8" fill="#00000022"/>
-
-    <!-- anéis do carretel — de baixo para cima -->
-    <ellipse cx="65" cy="92" rx="46" ry="12" fill="#0d3d8a"/>
-    <ellipse cx="65" cy="84" rx="46" ry="12" fill="#1048a2"/>
-    <ellipse cx="65" cy="76" rx="46" ry="12" fill="#1250b0"/>
-    <ellipse cx="65" cy="68" rx="46" ry="12" fill="#1558bc"/>
-    <ellipse cx="65" cy="60" rx="46" ry="12" fill="#1760c8"/>
-    <ellipse cx="65" cy="52" rx="46" ry="12" fill="#1a68d0"/>
-    <ellipse cx="65" cy="44" rx="46" ry="12" fill="#1c70d8"/>
-    <ellipse cx="65" cy="36" rx="46" ry="12" fill="#1e78e0"/>
-    <ellipse cx="65" cy="28" rx="46" ry="12" fill="#2080e8"/>
-
-    <!-- divisórias / ranhuras entre anéis -->
-    <ellipse cx="65" cy="92" rx="46" ry="12" fill="none" stroke="#0a2f70" stroke-width="1"/>
-    <ellipse cx="65" cy="84" rx="46" ry="12" fill="none" stroke="#0a2f70" stroke-width="1"/>
-    <ellipse cx="65" cy="76" rx="46" ry="12" fill="none" stroke="#0a2f70" stroke-width="1"/>
-    <ellipse cx="65" cy="68" rx="46" ry="12" fill="none" stroke="#0a2f70" stroke-width="1"/>
-    <ellipse cx="65" cy="60" rx="46" ry="12" fill="none" stroke="#0a2f70" stroke-width="1"/>
-    <ellipse cx="65" cy="52" rx="46" ry="12" fill="none" stroke="#0a2f70" stroke-width="1"/>
-    <ellipse cx="65" cy="44" rx="46" ry="12" fill="none" stroke="#0a2f70" stroke-width="1"/>
-    <ellipse cx="65" cy="36" rx="46" ry="12" fill="none" stroke="#0a2f70" stroke-width="1"/>
-    <ellipse cx="65" cy="28" rx="46" ry="12" fill="none" stroke="#0a2f70" stroke-width="1"/>
-
-    <!-- buraco do centro (topo) -->
-    <ellipse cx="65" cy="28" rx="18" ry="5" fill="#0a2560"/>
-    <ellipse cx="65" cy="28" rx="14" ry="4" fill="#071840"/>
-
-    <!-- reflexo lateral esquerdo -->
-    <ellipse cx="30" cy="55" rx="6" ry="28" fill="#ffffff18"/>
-
-    <!-- ponta de cobre (conector) -->
-    <rect x="107" y="50" width="16" height="9" rx="2.5" fill="#b8730a"/>
-    <rect x="109" y="52" width="11" height="5" rx="1.5" fill="#e8a020"/>
-    <rect x="108" y="51" width="1.5" height="7" rx="1" fill="#c8860d"/>
-
-    <!-- reflexo brilho no topo -->
-    <ellipse cx="50" cy="24" rx="12" ry="3.5" fill="#ffffff22"/>
-  </svg>`.trim();
-}
-
-// ── Renderiza os cards de produto ───────────────────────────────
-function renderProducts() {
-  const grid = document.getElementById("productsGrid");
-  if (!grid) return;
-
-  grid.innerHTML = "";
-
-  products.forEach((p) => {
-    const card = document.createElement("div");
-    card.className = "product-card";
-
-    const starsHTML = Array.from({ length: 5 }, (_, i) =>
-      `<span class="s${i < p.stars ? " on" : ""}">★</span>`
-    ).join("");
-
+function exibirProdutos(produtos) {
+  const lista = document.getElementById('productsGrid');
+  lista.replaceChildren();
+  produtos.forEach(produto => {
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    const [reais, centavos] = Number(produto.preco_produto).toFixed(2).split('.');
+    const nome = escaparTexto(produto.titulo_produto);
     card.innerHTML = `
-      <div class="cable-svg">${buildCableSVG()}</div>
-      <p class="prod-name">${p.name}</p>
-      <div class="prod-stars">${starsHTML}</div>
-      <div class="prod-old">${p.oldPrice}</div>
-      <div class="prod-price">
-        <sup>R$</sup>${p.price}<sub>,${p.cents}</sub>
+      <a href="/produto?id=${produto.sku}"><img src="${escaparTexto(window.imagemProdutoSegura(produto.imagem))}" alt="${nome}"></a>
+      <div class="product-info">
+        <p class="product-name"><a href="/produto?id=${produto.sku}">${nome}</a></p>
+        <h3>R$ ${reais}<span>,${centavos}</span></h3>
+        <button type="button" class="btn-cart" data-id="${produto.sku}">Adicionar ao carrinho</button>
       </div>
-      <button class="btn-cart" data-id="${p.id}">Adicionar ao carrinho</button>
     `;
-
-    grid.appendChild(card);
+    card.querySelector('img').addEventListener('error', evento => {
+      evento.target.src = '/img/icons/icons8-caixa-128.png';
+    }, { once: true });
+    lista.appendChild(card);
   });
+  if (!produtos.length) lista.textContent = 'Nenhum produto encontrado.';
 }
 
-// ── Carrinho (contador) ─────────────────────────────────────────
-let cartCount = 3;
-
-function updateCartBadge() {
-  const badge = document.getElementById("cartBadge");
-  if (badge) badge.textContent = cartCount;
+async function adicionarPeloCatalogo(evento) {
+  const botao = evento.target.closest('.btn-cart');
+  if (botao) await window.adicionarPeloBotao(botao, botao.dataset.id);
 }
 
-function handleAddToCart(e) {
-  const btn = e.target.closest(".btn-cart, .product-info button");
-  if (!btn) return;
-  cartCount++;
-  updateCartBadge();
-
-  // Feedback visual no botão
-  const original = btn.textContent;
-  btn.textContent = "✓ Adicionado!";
-  btn.style.background = "#1a7a3a";
-  setTimeout(() => {
-    btn.textContent = original;
-    btn.style.background = "";
-  }, 1200);
+async function carregarProdutosReais() {
+  const lista = document.getElementById('productsGrid');
+  lista.textContent = 'Carregando produtos...';
+  try {
+    const resposta = await fetch('/api/produtos' + window.location.search);
+    const dados = await resposta.json();
+    if (!resposta.ok) throw new Error(dados.erro);
+    exibirProdutos(dados.produtos);
+    document.querySelector('.prod-count').textContent = 'Produtos encontrados (' + dados.produtos.length + ')';
+    document.querySelector('.title-bar h1').textContent = 'Produtos';
+  } catch (erro) {
+    lista.textContent = erro.message || 'Erro ao carregar produtos.';
+  }
 }
 
 // ── Filtros (accordions) ────────────────────────────────────────
@@ -128,13 +62,17 @@ function initAccordions() {
   });
 }
 
-// ── Ordenação (UI apenas) ───────────────────────────────────────
+// Ordenação consultada no backend.
 function initSort() {
-  const sel = document.getElementById("sortSelect");
-  if (!sel) return;
-  sel.addEventListener("change", () => {
-    // Aqui você conectaria ao backend para reordenar
-    console.log("Ordenar por:", sel.value);
+  const seletorOrdenacao = document.getElementById("sortSelect");
+  if (!seletorOrdenacao) return;
+  seletorOrdenacao.addEventListener("change", () => {
+    const parametros = new URLSearchParams(window.location.search);
+    const ordem = seletorOrdenacao.value === 'Menor preço' ? 'menor' : seletorOrdenacao.value === 'Maior preço' ? 'maior' : '';
+    if (ordem) parametros.set('ordenar', ordem);
+    else parametros.delete('ordenar');
+    window.history.replaceState(null, '', window.location.pathname + '?' + parametros);
+    carregarProdutosReais();
   });
 }
 
@@ -150,11 +88,11 @@ function initPagination() {
 
 // ── Init ────────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
-  updateCartBadge();
+  carregarProdutosReais();
 
   document
     .getElementById("productsGrid")
-    .addEventListener("click", handleAddToCart);
+    .addEventListener("click", adicionarPeloCatalogo);
 
   initAccordions();
   initSort();

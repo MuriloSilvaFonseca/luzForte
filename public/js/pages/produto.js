@@ -1,204 +1,174 @@
 // Script da pagina de detalhes do produto.
 let produtoAtual = null;
 
-function resolveImagePath(path) {
-  return `/${path}`;
+function formatarPreco(valor) {
+  return valor.toFixed(2).replace(".", ",");
 }
 
-function formatPrice(value) {
-  return value.toFixed(2).replace(".", ",");
-}
-
-function renderStars(nota) {
+function exibirEstrelas(nota) {
   return "★".repeat(nota) + "☆".repeat(5 - nota);
 }
 
-function getProdutoFromUrl(produtos) {
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get("id");
-  const slug = params.get("slug");
-
-  if (slug) {
-    const porSlug = produtos.find((p) => p.slug === slug);
-    if (porSlug) return porSlug;
-  }
-
-  if (id) {
-    const porId = produtos.find((p) => String(p.id) === String(id));
-    if (porId) return porId;
-  }
-
-  return produtos.find((p) => p.id === 5) || produtos[0];
+function exibirCaminhoProduto(itens) {
+  const el = document.getElementById('breadcrumbProduto');
+  if (!el) return;
+  el.replaceChildren();
+  itens.forEach((texto, indice) => {
+    if (indice) el.appendChild(document.createTextNode(' / '));
+    const parte = document.createElement('span');
+    parte.textContent = texto;
+    el.appendChild(parte);
+  });
 }
 
-function renderBreadcrumb(items) {
-  const el = document.getElementById("breadcrumbProduto");
-  if (!el || !items?.length) return;
-
-  el.innerHTML = items
-    .map((item, index) => {
-      const isLast = index === items.length - 1;
-      if (isLast) return `<span>${item}</span>`;
-      return `<a href="#">${item}</a>`;
-    })
-    .join(" / ");
-}
-
-function renderGallery(produto) {
-  const mainImg = document.querySelector("#mainImage img");
-  const thumbnailsEl = document.getElementById("thumbnailsProduto");
-  const imagens = produto.imagens?.length ? produto.imagens : [produto.imagemCard];
-
-  if (mainImg && imagens[0]) {
-    mainImg.src = resolveImagePath(imagens[0]);
-    mainImg.alt = produto.nome;
+function exibirImagens(produto) {
+  const principal = document.querySelector('#mainImage img');
+  const lista = document.getElementById('thumbnailsProduto');
+  const imagens = produto.imagens.length ? produto.imagens : ['/img/icons/icons8-caixa-128.png'];
+  function configurar(imagem, caminho) {
+    imagem.src = window.imagemProdutoSegura(caminho);
+    imagem.alt = produto.nome;
+    imagem.onerror = () => { imagem.onerror = null; imagem.src = '/img/icons/icons8-caixa-128.png'; };
   }
-
-  if (!thumbnailsEl) return;
-
-  thumbnailsEl.innerHTML = imagens
-    .map(
-      (img, index) => `
-      <div class="thumbnail_produto${index === 0 ? " active_produto" : ""}" onclick="changeImage(${index})">
-        <img src="${resolveImagePath(img)}" alt="${produto.nome}">
-      </div>
-    `
-    )
-    .join("");
+  configurar(principal, imagens[0]);
+  lista.replaceChildren();
+  imagens.forEach((caminho, indice) => {
+    const miniatura = document.createElement('div');
+    miniatura.className = 'thumbnail_produto' + (indice === 0 ? ' active_produto' : '');
+    const imagem = document.createElement('img');
+    configurar(imagem, caminho);
+    miniatura.appendChild(imagem);
+    miniatura.addEventListener('click', () => changeImage(indice));
+    lista.appendChild(miniatura);
+  });
 }
 
-function renderProductInfo(produto) {
+function exibirInformacoes(produto) {
   document.title = `LuzForte | ${produto.nome}`;
 
-  const classificationEl = document.getElementById("classificationLabel");
-  if (classificationEl) {
+  const classificacao = document.getElementById("classificationLabel");
+  if (classificacao) {
     if (produto.classificacao) {
-      classificationEl.textContent = produto.classificacao;
-      classificationEl.style.display = "";
+      classificacao.textContent = produto.classificacao;
+      classificacao.style.display = "";
     } else {
-      classificationEl.style.display = "none";
+      classificacao.style.display = "none";
     }
   }
 
-  const nameEl = document.getElementById("productName");
-  if (nameEl) nameEl.textContent = produto.nome;
+  const nome = document.getElementById("productName");
+  if (nome) nome.textContent = produto.nome;
 
-  const codeEl = document.getElementById("productCode");
-  if (codeEl) codeEl.textContent = `Cód: ${produto.codigo}`;
+  const codigo = document.getElementById("productCode");
+  if (codigo) codigo.textContent = `Cód: ${produto.codigo}`;
 
-  const starsEl = document.getElementById("productStars");
-  if (starsEl) starsEl.textContent = renderStars(produto.avaliacao.nota);
+  const estrelas = document.getElementById("productStars");
+  if (estrelas) estrelas.textContent = exibirEstrelas(produto.avaliacao.nota);
 
-  const reviewsEl = document.getElementById("productReviews");
-  if (reviewsEl) {
-    reviewsEl.textContent = `(${produto.avaliacao.totalAvaliacoes} avaliações)`;
+  const avaliacoes = document.getElementById("productReviews");
+  if (avaliacoes) {
+    avaliacoes.textContent = `(${produto.avaliacao.totalAvaliacoes} avaliações)`;
   }
 
-  const stockEl = document.getElementById("productStock");
-  if (stockEl) stockEl.textContent = produto.estoque;
+  const estoque = document.getElementById("productStock");
+  if (estoque) estoque.textContent = produto.estoque;
 
-  const oldPriceEl = document.getElementById("productOldPrice");
-  if (oldPriceEl) {
-    oldPriceEl.textContent = `De R$ ${formatPrice(produto.precoAntigo)}`;
-    oldPriceEl.style.display = produto.precoAntigo > produto.precoAtual ? "" : "none";
+  const precoAnterior = document.getElementById("productOldPrice");
+  if (precoAnterior) {
+    precoAnterior.textContent = `De R$ ${formatarPreco(produto.precoAntigo)}`;
+    precoAnterior.style.display = produto.precoAntigo > produto.precoAtual ? "" : "none";
   }
 
-  const currentPriceEl = document.getElementById("productCurrentPrice");
-  if (currentPriceEl) {
-    currentPriceEl.textContent = `R$ ${formatPrice(produto.precoAtual)}`;
+  const precoAtual = document.getElementById("productCurrentPrice");
+  if (precoAtual) {
+    precoAtual.textContent = `R$ ${formatarPreco(produto.precoAtual)}`;
   }
 
-  const installmentsEl = document.getElementById("productInstallments");
-  if (installmentsEl && produto.parcelas) {
+  const parcelamento = document.getElementById("productInstallments");
+  if (parcelamento && produto.parcelas) {
     const { quantidade, valor, semJuros } = produto.parcelas;
     const juros = semJuros ? " sem juros" : "";
-    installmentsEl.textContent = `ou ${quantidade}x de R$ ${formatPrice(valor)}${juros}`;
+    parcelamento.textContent = `ou ${quantidade}x de R$ ${formatarPreco(valor)}${juros}`;
   }
 }
 
-function renderDescription(produto) {
-  const el = document.getElementById("description");
-  if (!el || !produto.descricao) return;
-
-  const { resumo, caracteristicas, textoCompleto } = produto.descricao;
-  const lista = caracteristicas
-    .map((item) => `<li>${item}</li>`)
-    .join("");
-
-  el.innerHTML = `
-    <h2>Descrição do Produto</h2>
-    <p>${resumo}</p>
-    <h3>Características Principais:</h3>
-    <ul>${lista}</ul>
-    <p>${textoCompleto}</p>
-  `;
+function exibirDescricoes(produto) {
+  const el = document.getElementById('description');
+  el.replaceChildren();
+  produto.descricoes.forEach(descricao => {
+    const titulo = document.createElement('h2');
+    titulo.textContent = descricao.nome_descricao;
+    const texto = document.createElement('p');
+    texto.textContent = descricao.texto_descricao;
+    el.append(titulo, texto);
+  });
+  if (!produto.descricoes.length) el.textContent = 'Descrição não cadastrada.';
 }
 
-function renderSpecs(produto) {
-  const el = document.getElementById("specs");
-  if (!el || !produto.especificacoes?.length) return;
-
-  const rows = produto.especificacoes
-    .map(
-      (spec) => `
-      <tr>
-        <td>${spec.label}</td>
-        <td>${spec.valor}</td>
-      </tr>
-    `
-    )
-    .join("");
-
-  el.innerHTML = `
-    <h2>Especificações Técnicas</h2>
-    <table class="specs_table_produto">${rows}</table>
-  `;
+function exibirEspecificacoes(produto) {
+  const el = document.getElementById('specs');
+  el.replaceChildren();
+  const tabela = document.createElement('table');
+  tabela.className = 'specs_table_produto';
+  produto.especificacoes.forEach(spec => {
+    const linha = document.createElement('tr');
+    for (const texto of [spec.nome_especificacao, spec.texto_especificacao]) {
+      const celula = document.createElement('td');
+      celula.textContent = texto;
+      linha.appendChild(celula);
+    }
+    tabela.appendChild(linha);
+  });
+  if (produto.especificacoes.length) el.appendChild(tabela);
+  else el.textContent = 'Especificações não cadastradas.';
 }
 
-function renderInstallation(produto) {
-  const el = document.getElementById("installation");
-  if (!el || !produto.instalacao) return;
-
-  const { aviso, passos, dicas } = produto.instalacao;
-  const passosHtml = passos.map((passo) => `<li>${passo}</li>`).join("");
-  const dicasHtml = dicas.map((dica) => `<li>${dica}</li>`).join("");
-
-  el.innerHTML = `
-    <h2>Instruções de Instalação</h2>
-    <h3>Segurança em Primeiro Lugar</h3>
-    <p><strong>ATENÇÃO:</strong> ${aviso}</p>
-    <h3>Passo a Passo:</h3>
-    <ol>${passosHtml}</ol>
-    <h3>Dicas Importantes:</h3>
-    <ul>${dicasHtml}</ul>
-  `;
+function exibirInstalacao(produto) {
+  const el = document.getElementById('installation');
+  el.replaceChildren();
+  produto.instalacoes.forEach(instalacao => {
+    const titulo = document.createElement('h3');
+    titulo.textContent = instalacao.nome_instalacao;
+    const texto = document.createElement('p');
+    texto.textContent = instalacao.texto_instalacao;
+    el.append(titulo, texto);
+  });
+  if (!produto.instalacoes.length) el.textContent = 'Instruções não cadastradas.';
 }
 
-function renderProduct(produto) {
+function exibirProduto(produto) {
   produtoAtual = produto;
-  renderBreadcrumb(produto.breadcrumb);
-  renderGallery(produto);
-  renderProductInfo(produto);
-  renderDescription(produto);
-  renderSpecs(produto);
-  renderInstallation(produto);
+  exibirCaminhoProduto(produto.breadcrumb);
+  exibirImagens(produto);
+  exibirInformacoes(produto);
+  exibirDescricoes(produto);
+  exibirEspecificacoes(produto);
+  exibirInstalacao(produto);
 }
 
-async function loadProduct() {
+async function carregarProduto() {
   try {
-    const response = await fetch("/data/produtos.json");
-    if (!response.ok) throw new Error("Não foi possível carregar os produtos.");
-
+    const id = new URLSearchParams(window.location.search).get('id');
+    if (!id || !/^\d+$/.test(id)) throw new Error('Produto não encontrado.');
+    const response = await fetch('/api/produtos/' + encodeURIComponent(id));
     const data = await response.json();
-    const produto = getProdutoFromUrl(data.produtos);
-
-    if (!produto) throw new Error("Produto não encontrado.");
-
-    renderProduct(produto);
+    if (!response.ok) throw new Error(data.erro);
+    const registro = data.produto;
+    const produto = {
+      sku: registro.sku, nome: registro.titulo_produto, codigo: registro.sku, classificacao: registro.marca,
+      precoAtual: Number(registro.preco_produto), precoAntigo: Number(registro.preco_produto),
+      estoque: registro.estoque_produto + ' em estoque',
+      avaliacao: { nota: Math.round(Number(data.avaliacao.media)), totalAvaliacoes: data.avaliacao.quantidade },
+      imagens: data.imagens.map(imagem => imagem.url),
+      breadcrumb: [registro.categoria, registro.subcategoria, registro.titulo_produto],
+      descricoes: data.descricoes, especificacoes: data.especificacoes, instalacoes: data.instalacoes
+    };
+    exibirProduto(produto);
+    document.querySelectorAll('.action_buttons_produto button').forEach(botao => { botao.disabled = false; });
   } catch (error) {
     console.error(error);
-    const nameEl = document.getElementById("productName");
-    if (nameEl) nameEl.textContent = "Produto não encontrado";
+    const nome = document.getElementById("productName");
+    if (nome) nome.textContent = "Produto não encontrado";
   }
 }
 
@@ -232,25 +202,21 @@ function decrementQuantity() {
   }
 }
 
-function addToCart() {
-  const quantity = document.getElementById("quantity").value;
-  const notification = document.getElementById("notification");
-
-  notification.style.display = "block";
-
-  setTimeout(() => {
-    notification.style.display = "none";
-  }, 3000);
-
-  console.log(
-    `Adicionado ${quantity} unidade(s) de "${produtoAtual?.nome}" ao carrinho`
-  );
+let adicionandoCarrinho = false;
+async function addToCart() {
+  if (!produtoAtual || adicionandoCarrinho) return false;
+  adicionandoCarrinho = true;
+  try {
+    await window.adicionarProdutoCarrinho(produtoAtual.sku, Number(document.getElementById('quantity').value));
+    const aviso = document.getElementById('notification');
+    aviso.style.display = 'block';
+    setTimeout(() => { aviso.style.display = 'none'; }, 3000);
+    return true;
+  } catch (erro) { alert(erro.message); return false; }
+  finally { adicionandoCarrinho = false; }
 }
-
-function buyNow() {
-  const quantity = document.getElementById("quantity").value;
-  alert(`Comprando ${quantity} unidade(s). Redirecionando para o checkout...`);
-  console.log(`Compra rápida: ${quantity} unidade(s) de "${produtoAtual?.nome}"`);
+async function buyNow() {
+  if (await addToCart()) window.location.href = '/carrinho';
 }
 
 function openTab(tabName, button) {
@@ -265,7 +231,8 @@ function openTab(tabName, button) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadProduct();
+  document.querySelectorAll('.action_buttons_produto button').forEach(botao => { botao.disabled = true; });
+  carregarProduto();
 
   document.querySelectorAll(".tab_btn_produto").forEach((btn) => {
     btn.addEventListener("click", () => {
