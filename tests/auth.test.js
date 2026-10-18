@@ -8,12 +8,13 @@ test('login cria sessão sem expor senha; rejeita senha incorreta e usuário do 
   const hash = await bcrypt.hash('senha-apenas-do-teste', 4)
   const path = require.resolve('../config/database')
   require.cache[path] = { id: path, filename: path, loaded: true, exports: {
-    promise: () => ({ execute: async (sql, args) => {
+    query: (sql, args, callback) => {
       assert.ok(sql.startsWith('SELECT'))
-      if (args[0] === 'seed@example.com') return [[{ id_usuario: 2, nome_usuario: 'Seed', acesso: 'cliente', senha: '!LOGIN_DESABILITADO_SEED!' }]]
-      if (args[0] !== 'teste@example.com') return [[]]
-      return [[{ id_usuario: 1, nome_usuario: 'Teste', acesso: 'cliente', senha: hash }]]
-    } })
+      let usuarios = []
+      if (args[0] === 'seed@example.com') usuarios = [{ id_usuario: 2, nome_usuario: 'Seed', acesso: 'cliente', senha: '!LOGIN_DESABILITADO_SEED!' }]
+      if (args[0] === 'teste@example.com') usuarios = [{ id_usuario: 1, nome_usuario: 'Teste', acesso: 'cliente', senha: hash }]
+      queueMicrotask(() => callback(null, usuarios))
+    }
   } }
   const app = express()
   app.set('view engine', 'ejs')

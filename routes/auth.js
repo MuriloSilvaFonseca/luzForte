@@ -64,25 +64,62 @@ router.get('/login', (req, res) => {
   res.render('auth/login')
 })
 
-router.post('/login', async (req, res) => {
+router.post('/login', (req, res) => {
   const { email, password } = req.body
   if (typeof email !== 'string' || typeof password !== 'string' || !email || !password || password.length > 256) {
     return res.status(400).render('auth/login', { erro: 'Informe e-mail e senha.' })
   }
-  try {
-    const [usuarios] = await conexao.promise().execute('SELECT id_usuario, nome_usuario, acesso, senha FROM usuario WHERE email = ? LIMIT 1', [email.trim()])
+
+  const sql = 'SELECT id_usuario, nome_usuario, acesso, senha FROM usuario WHERE email = ? LIMIT 1'
+
+  // Busca a conta pelo e-mail, como no cadastro.
+  conexao.query(sql, [email.trim()], (erro, usuarios) => {
+    if (erro) {
+      console.log(erro)
+      return res.status(500).render('auth/login', { erro: 'Não foi possível entrar. Tente novamente.' })
+    }
+
     const usuario = usuarios[0]
-    const senhaValida = usuario && await bcrypt.compare(password, usuario.senha)
-    if (!senhaValida) {
+    if (!usuario) {
       return res.status(401).render('auth/login', { erro: 'E-mail ou senha inválidos.' })
     }
-    await new Promise((resolve, reject) => req.session.regenerate(erro => erro ? reject(erro) : resolve()))
-    req.session.usuario = { id_usuario: usuario.id_usuario, nome_usuario: usuario.nome_usuario, acesso: usuario.acesso }
-    await new Promise((resolve, reject) => req.session.save(erro => erro ? reject(erro) : resolve()))
-    return res.redirect('/carrinho')
-  } catch (_) {
-    return res.status(500).render('auth/login', { erro: 'Não foi possível entrar. Tente novamente.' })
-  }
+
+    // Compara a senha digitada com o hash salvo no banco.
+    bcrypt.compare(password, usuario.senha, (erroCompare, senhaValida) => {
+      if (erroCompare) {
+        console.log(erroCompare)
+        return res.status(500).render('auth/login', { erro: 'Não foi possível entrar. Tente novamente.' })
+      }
+
+      if (!senhaValida) {
+        return res.status(401).render('auth/login', { erro: 'E-mail ou senha inválidos.' })
+      }
+
+      // Cria um identificador novo de sessão após o login.
+      req.session.regenerate(erroSessao => {
+        if (erroSessao) {
+          console.log(erroSessao)
+          return res.status(500).render('auth/login', { erro: 'Não foi possível entrar. Tente novamente.' })
+        }
+
+        // Guarda só os dados necessários do usuário; a senha não vai para a sessão.
+        req.session.usuario = {
+          id_usuario: usuario.id_usuario,
+          nome_usuario: usuario.nome_usuario,
+          acesso: usuario.acesso
+        }
+
+        req.session.save(erroSalvar => {
+          if (erroSalvar) {
+            console.log(erroSalvar)
+            return res.status(500).render('auth/login', { erro: 'Não foi possível entrar. Tente novamente.' })
+          }
+
+          return res.redirect('/carrinho')
+        })
+      })
+    })
+  })
 })
 
 router.get('/esqueci-senha', (req, res) => {
