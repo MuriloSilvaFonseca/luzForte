@@ -321,3 +321,14 @@
     grid-template-columns:repeat(2, 1fr);
   }
 }
+
+.grid-status{
+  text-align:center;
+  color:#777;
+  font-size:15px;
+  padding:40px 0;
+}
+
+.grid-status.erro{
+  color:#c62828;
+}
