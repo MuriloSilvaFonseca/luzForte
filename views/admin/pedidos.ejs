@@ -1,0 +1,92 @@
+<%- include('../partials/admin-topo', { pagina: 'pedidos', titulo: 'Pedidos' }) %>
+
+<%
+  const moeda = (v) => 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2 })
+  const abas = [
+    { id: '', rotulo: 'Todos' },
+    { id: 'aguardando', rotulo: 'Aguardando pagamento' },
+    { id: 'pago', rotulo: 'Pagos' },
+    { id: 'enviado', rotulo: 'Enviados' },
+    { id: 'entregue', rotulo: 'Entregues' },
+    { id: 'cancelado', rotulo: 'Cancelados' }
+  ]
+%>
+
+<nav class="adm-breadcrumb" aria-label="Você está em">
+  <a href="/admin">Administração</a>
+  <span>Pedidos</span>
+</nav>
+
+<div class="adm-pagehead">
+  <div>
+    <h1>Pedidos</h1>
+    <p>Acompanhe pagamentos, envios e entregas.</p>
+  </div>
+</div>
+
+<div class="adm-chips" role="tablist" aria-label="Filtrar por status">
+  <% abas.forEach(function (a) { %>
+    <a class="adm-chip<%= (filtros.status || '') === a.id ? ' is-active' : '' %>" href="/admin/pedidos<%= a.id ? '?status=' + a.id : '' %>">
+      <%= a.rotulo %><% if (contagens[a.id || 'todos'] !== undefined) { %><small>(<%= contagens[a.id || 'todos'] %>)</small><% } %>
+    </a>
+  <% }) %>
+</div>
+
+<form class="adm-card adm-filters" method="get" action="/admin/pedidos">
+  <% if (filtros.status) { %><input type="hidden" name="status" value="<%= filtros.status %>"><% } %>
+  <input class="adm-field adm-field--search" type="search" name="q" value="<%= filtros.q %>" placeholder="Buscar por nº do pedido ou cliente">
+  <input class="adm-field" type="date" name="de" value="<%= filtros.de %>" aria-label="Data inicial">
+  <input class="adm-field" type="date" name="ate" value="<%= filtros.ate %>" aria-label="Data final">
+  <button class="adm-btn" type="submit">Filtrar</button>
+</form>
+
+<section class="adm-card">
+  <div class="adm-tablewrap">
+    <table class="adm-table">
+      <thead>
+        <tr>
+          <th>Pedido</th>
+          <th>Data</th>
+          <th>Cliente</th>
+          <th>Pagamento</th>
+          <th>Status</th>
+          <th class="is-num">Itens</th>
+          <th class="is-num">Total</th>
+          <th class="is-actions">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (pedidos.length === 0) { %>
+          <tr><td colspan="8"><div class="adm-empty"><strong>Nenhum pedido encontrado</strong>Tente outro filtro.</div></td></tr>
+        <% } %>
+        <% pedidos.forEach(function (p) { %>
+          <tr id="<%= p.id %>">
+            <td><strong>#<%= p.id %></strong></td>
+            <td><%= p.data %></td>
+            <td>
+              <div class="adm-prod__name"><%= p.cliente %></div>
+              <div class="adm-prod__sub"><%= p.email %></div>
+            </td>
+            <td><%= p.pagamento %></td>
+            <td><span class="adm-badge adm-badge--<%= p.statusCor %>"><%= p.status %></span></td>
+            <td class="is-num"><%= p.itens %></td>
+            <td class="is-num"><strong><%= moeda(p.total) %></strong></td>
+            <td class="is-actions">
+              <a class="adm-btn adm-btn--sm" href="/admin/pedidos/<%= p.id %>">Detalhes</a>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="adm-pagination">
+    <span>Página <%= pagina %> de <%= totalPaginas %></span>
+    <nav aria-label="Paginação">
+      <% if (pagina > 1) { %><a class="adm-btn adm-btn--sm" href="?pagina=<%= pagina - 1 %>">Anterior</a><% } %>
+      <% if (pagina < totalPaginas) { %><a class="adm-btn adm-btn--sm" href="?pagina=<%= pagina + 1 %>">Próxima</a><% } %>
+    </nav>
+  </div>
+</section>
+
+<%- include('../partials/admin-rodape') %>

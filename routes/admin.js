@@ -3,7 +3,7 @@ const conexao = require('../config/database')
 const router = express.Router()
 
 function mostrarErro(res, mensagem) {
-  res.redirect('/admin/produtos/novo?erro=' + encodeURIComponent(mensagem))
+  res.render('/admin/produtos/novo?erro=' + encodeURIComponent(mensagem))
 }
 
 function salvarDetalhes(conexaoBanco, detalhes, indice, callback) {
@@ -34,6 +34,9 @@ function cancelarCadastro(conexaoBanco, res, erro) {
     res.status(500).send('Não foi possível salvar o produto. Confira a conexão e os dados do banco.')
   })
 }
+router.get('/admin', (req, res) => {
+
+})
 
 router.get('/produtos/novo', (req, res) => {
   res.render('admin/cadastro-produto', {
