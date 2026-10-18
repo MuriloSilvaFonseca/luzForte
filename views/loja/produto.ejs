@@ -63,11 +63,150 @@
             <div id="specs" class="tab_content_produto"></div>
             <div id="installation" class="tab_content_produto"></div>
         </div>
+
+        <section class="avaliacoes_produto" id="avaliacoes" aria-labelledby="avaliacoesTitulo">
+    <h2 class="avaliacoes_titulo_produto" id="avaliacoesTitulo">Opiniões do produto</h2>
+
+    <div class="avaliacoes_card_produto">
+
+        <!-- Resumo geral -->
+        <div class="avaliacoes_resumo_produto">
+            <div class="avaliacoes_media_produto">
+                <p class="avaliacoes_nota_produto"><strong>3</strong><span>/5</span></p>
+
+                <p class="avaliacoes_total_produto">
+                    <img class="avaliacoes_estrelas_produto" src="/img/icons/avaliacao-star/3-star.png"
+                         alt="Nota média: 3 de 5 estrelas" width="130" height="22">
+                    <span class="avaliacoes_qtd_produto">(3)</span>
+                </p>
+
+                <p class="avaliacoes_legenda_produto">Avaliação geral</p>
+            </div>
+
+            <span class="avaliacoes_divisor_produto" aria-hidden="true"></span>
+
+            <ul class="avaliacoes_barras_produto" aria-label="Distribuição das notas">
+                <li class="avaliacoes_barra_produto">
+                    <span class="avaliacoes_trilho_produto"><span class="avaliacoes_preenchimento_produto" style="width: 0%"></span></span>
+                    <span class="avaliacoes_barra_estrela_produto" aria-hidden="true">★</span>
+                    <span class="avaliacoes_barra_numero_produto">5</span>
+                </li>
+                <li class="avaliacoes_barra_produto avaliacoes_barra_ativa_produto">
+                    <span class="avaliacoes_trilho_produto"><span class="avaliacoes_preenchimento_produto" style="width: 67%"></span></span>
+                    <span class="avaliacoes_barra_estrela_produto" aria-hidden="true">★</span>
+                    <span class="avaliacoes_barra_numero_produto">4</span>
+                </li>
+                <li class="avaliacoes_barra_produto">
+                    <span class="avaliacoes_trilho_produto"><span class="avaliacoes_preenchimento_produto" style="width: 0%"></span></span>
+                    <span class="avaliacoes_barra_estrela_produto" aria-hidden="true">★</span>
+                    <span class="avaliacoes_barra_numero_produto">3</span>
+                </li>
+                <li class="avaliacoes_barra_produto">
+                    <span class="avaliacoes_trilho_produto"><span class="avaliacoes_preenchimento_produto" style="width: 0%"></span></span>
+                    <span class="avaliacoes_barra_estrela_produto" aria-hidden="true">★</span>
+                    <span class="avaliacoes_barra_numero_produto">2</span>
+                </li>
+                <li class="avaliacoes_barra_produto avaliacoes_barra_ativa_produto">
+                    <span class="avaliacoes_trilho_produto"><span class="avaliacoes_preenchimento_produto" style="width: 33%"></span></span>
+                    <span class="avaliacoes_barra_estrela_produto" aria-hidden="true">★</span>
+                    <span class="avaliacoes_barra_numero_produto">1</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Lista de comentários -->
+        <div class="avaliacoes_lista_produto">
+            <article class="avaliacao_item_produto">
+                <header class="avaliacao_topo_produto">
+                    <img class="avaliacao_estrelas_produto" src="/img/icons/avaliacao-star/4-star.png"
+                         alt="4 de 5 estrelas" width="130" height="22">
+                    <time class="avaliacao_data_produto" datetime="2026-03-14">14/03/2026</time>
+                </header>
+                <p class="avaliacao_texto_produto">Bom cabo, material de qualidade e fácil de manusear na instalação. O isolamento parece resistente e atendeu bem para circuito de iluminação.</p>
+            </article>
+
+            <article class="avaliacao_item_produto">
+                <header class="avaliacao_topo_produto">
+                    <img class="avaliacao_estrelas_produto" src="/img/icons/avaliacao-star/4-star.png"
+                         alt="4 de 5 estrelas" width="130" height="22">
+                    <time class="avaliacao_data_produto" datetime="2026-01-08">08/01/2026</time>
+                </header>
+                <p class="avaliacao_texto_produto">Produto cumpre o que promete. O fio é flexível e facilitou bastante a passagem pelo conduíte. Entrega foi rápida.</p>
+            </article>
+
+            <article class="avaliacao_item_produto">
+                <header class="avaliacao_topo_produto">
+                    <img class="avaliacao_estrelas_produto" src="/img/icons/avaliacao-star/1-star.png"
+                         alt="1 de 5 estrelas" width="130" height="22">
+                    <time class="avaliacao_data_produto" datetime="2026-02-11">11/02/2026</time>
+                </header>
+                <p class="avaliacao_texto_produto">Não fiquei muito satisfeito com o produto. O cabo funciona, porém achei o isolamento um pouco mais fino do que esperava e tive dificuldade para passar em um conduíte já ocupado.</p>
+            </article>
+        </div>
+
     </div>
+    <div class="avaliar_produto" id="avaliar">
+    <h3 class="avaliar_titulo_produto">Deixe sua avaliação</h3>
+
+    <% if (locals.usuario) { %>
+        <form class="avaliar_form_produto" id="formAvaliar" action="/avaliacoes" method="post">
+            <input type="hidden" name="sku" id="avaliacaoSku">
+
+            <fieldset class="avaliar_nota_produto">
+                <legend class="avaliar_label_produto">Sua nota <span class="avaliar_obrigatorio_produto">*</span></legend>
+                <div class="avaliar_estrelas_produto">
+                    <input type="radio" id="nota5" name="nota" value="5" required>
+                    <label for="nota5"><span class="avaliar_sr_produto">5 estrelas</span>★</label>
+                    <input type="radio" id="nota4" name="nota" value="4">
+                    <label for="nota4"><span class="avaliar_sr_produto">4 estrelas</span>★</label>
+                    <input type="radio" id="nota3" name="nota" value="3">
+                    <label for="nota3"><span class="avaliar_sr_produto">3 estrelas</span>★</label>
+                    <input type="radio" id="nota2" name="nota" value="2">
+                    <label for="nota2"><span class="avaliar_sr_produto">2 estrelas</span>★</label>
+                    <input type="radio" id="nota1" name="nota" value="1">
+                    <label for="nota1"><span class="avaliar_sr_produto">1 estrela</span>★</label>
+                </div>
+            </fieldset>
+
+            <div class="avaliar_campo_produto">
+                <label class="avaliar_label_produto" for="avaliacaoTitulo">Título <span class="avaliar_opcional_produto">(opcional)</span></label>
+                <input class="avaliar_input_produto" id="avaliacaoTitulo" name="titulo" type="text" maxlength="80" placeholder="Ex.: Ótimo custo-benefício">
+            </div>
+
+            <div class="avaliar_campo_produto">
+                <label class="avaliar_label_produto" for="avaliacaoTexto">Seu comentário <span class="avaliar_obrigatorio_produto">*</span></label>
+                <textarea class="avaliar_input_produto avaliar_textarea_produto" id="avaliacaoTexto" name="texto"
+                          rows="4" minlength="10" maxlength="500" required
+                          placeholder="Conte como foi sua experiência com o produto"></textarea>
+                <span class="avaliar_contador_produto" id="avaliacaoContador">0/500</span>
+            </div>
+
+            <div class="avaliar_rodape_produto">
+                <p class="avaliar_aviso_produto">Sua avaliação será publicada após análise da nossa equipe.</p>
+                <button class="btn_produto btn_primary_produto avaliar_botao_produto" type="submit">Enviar avaliação</button>
+            </div>
+
+            <p class="avaliar_mensagem_produto" id="avaliacaoMensagem" role="status" hidden>
+                ✓ Obrigado! Recebemos sua avaliação e ela será publicada após análise.
+            </p>
+        </form>
+    <% } else { %>
+        <p class="avaliar_aviso_produto">
+            Para avaliar este produto, <a class="avaliar_link_produto" href="/login">entre na sua conta</a>.
+        </p>
+    <% } %>
+</div>
+</section>
+
+
+    </div>
+
+
 
     <div class="notification_produto" id="notification">
         ✓ Produto adicionado ao carrinho!
     </div>
+    
 
     <script src="/js/pages/produto.js"></script>
 <%- include("../partials/footer") %>

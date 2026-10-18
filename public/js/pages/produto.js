@@ -283,3 +283,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+const formAvaliar = document.getElementById('formAvaliar');
+if (formAvaliar) {
+    // Use aqui o mesmo SKU que você já usa para montar a página
+    document.getElementById('avaliacaoSku').value = produto.sku;
+
+    const texto = document.getElementById('avaliacaoTexto');
+    const contador = document.getElementById('avaliacaoContador');
+    texto.addEventListener('input', () => {
+        contador.textContent = `${texto.value.length}/${texto.maxLength}`;
+    });
+
+    // Depois do envio, a rota volta para a página com ?avaliado=1
+    if (new URLSearchParams(location.search).get('avaliado') === '1') {
+        document.getElementById('avaliacaoMensagem').hidden = false;
+        formAvaliar.reset();
+    }
+}

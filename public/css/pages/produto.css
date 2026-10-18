@@ -133,3 +133,213 @@
     from { transform: translateX(400px); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
 }
+
+/* =========================================================
+   Avaliações do produto
+   ========================================================= */
+.avaliacoes_produto {
+    --avaliacao-azul: #1E3F6D;
+    --avaliacao-amarelo: #fdc94f;
+    --avaliacao-cinza: #d9d9d9;
+    margin-top: 3rem;
+}
+
+.avaliacoes_titulo_produto {
+    margin-bottom: 1.25rem;
+    color: var(--avaliacao-azul);
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.avaliacoes_card_produto {
+    display: grid;
+    grid-template-columns: minmax(0, 480px) minmax(0, 1fr);
+    gap: 3.5rem;
+    padding: 3.5rem 2.5rem;
+    border-radius: 28px;
+    background: #fcfcfc;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, .18);
+}
+
+/* ---------- Ícones de estrela (suas imagens, 130x22) ---------- */
+.avaliacoes_estrelas_produto,
+.avaliacao_estrelas_produto {
+    display: block;
+    height: auto;
+    max-width: 100%;
+}
+.avaliacoes_estrelas_produto { width: 130px; }
+.avaliacao_estrelas_produto { width: 110px; }
+
+/* ---------- Resumo ---------- */
+.avaliacoes_resumo_produto {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    align-self: start;
+    padding: 1.6rem 1.75rem;
+    border: 2px solid #b8b8b8;
+    border-radius: 20px;
+}
+
+.avaliacoes_media_produto { text-align: center; }
+
+.avaliacoes_nota_produto { line-height: 1; }
+.avaliacoes_nota_produto strong { color: var(--avaliacao-azul); font-size: 2.5rem; font-weight: 700; }
+.avaliacoes_nota_produto span { color: #8a8a8a; font-size: 1.1rem; font-weight: 700; }
+
+.avaliacoes_total_produto {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.9rem;
+}
+.avaliacoes_qtd_produto { color: #8a8a8a; font-size: 0.9rem; font-weight: 700; }
+
+.avaliacoes_legenda_produto { margin-top: 0.25rem; color: #333; font-size: 0.75rem; font-weight: 700; }
+
+.avaliacoes_divisor_produto {
+    flex: 0 0 2px;
+    height: 44px;
+    background: #222;
+}
+
+/* ---------- Barras 5 → 1 ---------- */
+.avaliacoes_barras_produto { display: grid; flex: 1; gap: 0.5rem; list-style: none; }
+
+.avaliacoes_barra_produto {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 16px 12px;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+}
+
+.avaliacoes_trilho_produto {
+    display: block;
+    height: 6px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--avaliacao-cinza);
+}
+.avaliacoes_preenchimento_produto { display: block; height: 100%; background: var(--avaliacao-amarelo); }
+
+.avaliacoes_barra_estrela_produto { color: var(--avaliacao-cinza); font-size: 1rem; line-height: 1; }
+.avaliacoes_barra_ativa_produto .avaliacoes_barra_estrela_produto { color: var(--avaliacao-amarelo); }
+.avaliacoes_barra_numero_produto { color: #333; font-weight: 700; }
+
+/* ---------- Lista de comentários ---------- */
+.avaliacoes_lista_produto { display: grid; align-content: start; gap: 1.9rem; }
+
+.avaliacao_topo_produto {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+.avaliacao_data_produto { color: #000; font-size: 0.75rem; font-weight: 700; }
+
+.avaliacao_texto_produto {
+    margin-top: 0.9rem;
+    color: #444;
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 900px) {
+    .avaliacoes_card_produto { grid-template-columns: 1fr; gap: 2rem; padding: 1.75rem 1.25rem; }
+    .avaliacoes_resumo_produto { flex-wrap: wrap; justify-content: center; }
+    .avaliacoes_barras_produto { flex: 1 1 220px; }
+}
+
+/* =========================================================
+   Formulário de avaliação
+   ========================================================= */
+.avaliar_produto {
+    margin-top: 1.5rem;
+    padding: 2rem 2.5rem;
+    border-radius: 20px;
+    background: #fcfcfc;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, .18);
+}
+
+.avaliar_titulo_produto { margin-bottom: 1.25rem; color: var(--avaliacao-azul); font-size: 1.3rem; }
+
+.avaliar_form_produto { display: grid; gap: 1.25rem; max-width: 640px; }
+
+.avaliar_label_produto { display: block; margin-bottom: 0.4rem; color: #333; font-size: 0.85rem; font-weight: 700; }
+.avaliar_obrigatorio_produto { color: #c0392b; }
+.avaliar_opcional_produto { color: #8a8a8a; font-weight: 400; }
+
+/* ---------- Nota por estrelas (radios) ---------- */
+.avaliar_nota_produto { border: 0; }
+.avaliar_estrelas_produto { display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 4px; }
+
+.avaliar_estrelas_produto input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+.avaliar_estrelas_produto label {
+    color: var(--avaliacao-cinza);
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.15s;
+}
+.avaliar_estrelas_produto input:checked ~ label,
+.avaliar_estrelas_produto label:hover,
+.avaliar_estrelas_produto label:hover ~ label { color: var(--avaliacao-amarelo); }
+.avaliar_estrelas_produto input:focus-visible + label { outline: 2px solid var(--avaliacao-azul); outline-offset: 2px; border-radius: 4px; }
+
+.avaliar_sr_produto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+/* ---------- Campos ---------- */
+.avaliar_campo_produto { position: relative; }
+
+.avaliar_input_produto {
+    width: 100%;
+    padding: 0.75rem 0.9rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fff;
+    color: #333;
+    font: inherit;
+    font-size: 0.95rem;
+    transition: border-color 0.3s;
+}
+.avaliar_input_produto:focus { border-color: #2a5298; outline: none; }
+.avaliar_textarea_produto { min-height: 110px; resize: vertical; }
+
+.avaliar_contador_produto { display: block; margin-top: 0.25rem; color: #8a8a8a; font-size: 0.75rem; text-align: right; }
+
+.avaliar_rodape_produto { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.avaliar_aviso_produto { color: #666; font-size: 0.8rem; }
+.avaliar_botao_produto { flex: 0 0 auto; padding: 0.8rem 1.6rem; }
+
+.avaliar_link_produto { color: #2a5298; font-weight: 600; }
+.avaliar_link_produto:hover { text-decoration: underline; }
+
+.avaliar_mensagem_produto {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    background: #e8f5e9;
+    color: #1e6b3a;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 900px) {
+    .avaliar_produto { padding: 1.5rem 1.25rem; }
+}
