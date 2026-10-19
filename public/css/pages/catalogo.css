@@ -332,3 +332,14 @@
 .grid-status.erro{
   color:#c62828;
 }
+
+.btn-filtrar {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: #183b6b;
+  color: white;
+  cursor: pointer;
+}

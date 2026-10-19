@@ -5,22 +5,27 @@ const conexao = require('../config/database')
 const { userEstaLogado } = require('../middlewares/auth')
 const { carregarCheckout, finalizarPedido, buscarPedidoFinalizado } = require('../services/pedido')
 
-router.get('/teste-banco', (req, res) => {
-  conexao.query('SELECT COUNT(*) AS total FROM produto', (erro, resultado) => {
-    if (erro) {
-      console.log(erro)
-      return res.send('Erro ao conectar: ' + erro.message)
-    }
-    res.send('Conectou! Produtos no banco: ' + resultado[0].total)
-  })
-})
-
 router.get('/', (req, res) => {
   res.render('loja/home')
 })
 
 router.get('/catalogo', (req, res) => {
-  res.render('loja/catalogo')
+  conexao.query('SELECT id_marca, nome FROM marca ORDER BY nome', (erro, marcas) => {
+    if (erro) {
+      console.log(erro)
+      return res.status(500).send('Erro no servidor')
+    }
+
+    res.render('loja/catalogo', {
+      marcas,
+      filtros: {
+        categoria: req.query.categoria,
+        marca: req.query.marca,
+        busca: req.query.q,
+        ordenar: req.query.ordenar
+      }
+    })
+  })
 })
 
 router.get('/produto', (req, res) => {
