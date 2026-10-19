@@ -343,3 +343,4 @@
 @media (max-width: 900px) {
     .avaliar_produto { padding: 1.5rem 1.25rem; }
 }
+.estrelas { height: 18px; width: auto; vertical-align: middle; }

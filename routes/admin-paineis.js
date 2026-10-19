@@ -1,7 +1,8 @@
-// Rotas das páginas do painel. Os dados abaixo são FICTÍCIOS (ficam em memória e
-// voltam ao normal quando o servidor reinicia). Troque cada bloco por consultas
-// ao banco (conexao.query) quando for ligar de verdade.
+// Rotas das páginas do painel.
+// AVALIAÇÕES já usam o banco de dados. Produtos, pedidos, usuários e a visão geral
+// ainda usam dados FICTÍCIOS (em memória; voltam ao normal quando o servidor reinicia).
 const express = require('express')
+const conexao = require('../config/database')
 const router = express.Router()
 
 const POR_PAGINA = 10
@@ -21,15 +22,6 @@ const motivosRecusa = [
   'Não se refere ao produto',
   'Contém dados pessoais',
   'Outro motivo'
-]
-
-const avaliacoes = [
-  { id: 1, cliente: 'Carlos Menezes', data: '16/10/2026', compraVerificada: true, produto: 'Lâmpada LED 9W branca', sku: 1001, nota: 1, titulo: 'Queimou em uma semana', texto: 'Comprei 4 e duas queimaram em menos de uma semana. Decepcionado.', status: 'pendente', denuncias: 0, resposta: '', motivoRecusa: '' },
-  { id: 2, cliente: 'Ana Paula', data: '15/10/2026', compraVerificada: true, produto: 'Fita LED 5m RGB', sku: 1002, nota: 5, titulo: 'Excelente', texto: 'Cores lindas e instalação fácil. Recomendo!', status: 'pendente', denuncias: 0, resposta: '', motivoRecusa: '' },
-  { id: 3, cliente: 'Usuário 4821', data: '14/10/2026', compraVerificada: false, produto: 'Refletor LED 50W', sku: 1003, nota: 1, titulo: '', texto: '(comentário com xingamentos)', status: 'pendente', denuncias: 3, resposta: '', motivoRecusa: '' },
-  { id: 4, cliente: 'Marina Souza', data: '12/10/2026', compraVerificada: true, produto: 'Refletor LED 50W', sku: 1003, nota: 2, titulo: 'Chegou com a caixa amassada', texto: 'O produto funciona, mas a embalagem veio bem danificada.', status: 'aprovada', denuncias: 0, resposta: 'Olá, Marina! Pedimos desculpas pela embalagem. Já repassamos o caso à transportadora.', motivoRecusa: '' },
-  { id: 5, cliente: 'Rafael Lima', data: '10/10/2026', compraVerificada: true, produto: 'Lâmpada LED 9W branca', sku: 1001, nota: 4, titulo: 'Bom custo-benefício', texto: 'Ilumina bem e gasta pouco.', status: 'aprovada', denuncias: 0, resposta: '', motivoRecusa: '' },
-  { id: 6, cliente: 'Visitante', data: '08/10/2026', compraVerificada: false, produto: 'Fita LED 5m RGB', sku: 1002, nota: 1, titulo: 'Spam', texto: 'Compre em outro site: www.exemplo-spam.com', status: 'recusada', denuncias: 1, resposta: '', motivoRecusa: 'Spam ou propaganda' }
 ]
 
 const produtos = [
@@ -54,7 +46,6 @@ const usuarios = [
 // ---------- Auxiliares ----------
 const minusculo = (v) => String(v || '').trim().toLowerCase()
 const paraISO = (br) => br.split('/').reverse().join('-') // 17/10/2026 -> 2026-10-17
-const contarPendentes = () => avaliacoes.filter(a => a.status === 'pendente').length
 
 function paginar(lista, paginaPedida) {
   const totalPaginas = Math.max(1, Math.ceil(lista.length / POR_PAGINA))
@@ -64,8 +55,16 @@ function paginar(lista, paginaPedida) {
 }
 
 // Disponibiliza o número do menu "Avaliações" em todas as telas do admin
-router.use((req, res, next) => {
-  res.locals.avaliacoesPendentes = contarPendentes()
+router.use(async (req, res, next) => {
+  res.locals.avaliacoesPendentes = 0
+  try {
+    const [[linha]] = await conexao.promise().query(
+      "SELECT COUNT(*) AS n FROM avaliacao_produto WHERE status = 'pendente'")
+    res.locals.avaliacoesPendentes = Number(linha.n)
+  } catch (erro) {
+    // O menu não deve derrubar as outras telas se o banco falhar.
+    console.error('Falha ao contar avaliações pendentes:', erro.code || erro.message)
+  }
   next()
 })
 
@@ -79,7 +78,7 @@ router.get('/', (req, res) => {
       faturamentoMes: 18452.9,
       produtosAtivos: 124,
       estoqueBaixo: baixo.length,
-      avaliacoesPendentes: contarPendentes()
+      avaliacoesPendentes: res.locals.avaliacoesPendentes
     },
     ultimosPedidos: pedidos.slice(0, 3),
     estoqueBaixoLista: baixo.map(p => ({ titulo: p.titulo, sku: p.sku, estoque: p.estoque }))
@@ -195,56 +194,140 @@ function alterarSituacao(situacao) {
 router.post('/usuarios/:id/bloquear', alterarSituacao('bloqueado'))
 router.post('/usuarios/:id/desbloquear', alterarSituacao('ativo'))
 
-// ---------- Avaliações ----------
-router.get('/avaliacoes', (req, res) => {
-  const { status = '', nota = '', q = '', produto = '' } = req.query
-  let lista = avaliacoes.slice()
-  if (status === 'negativas') lista = lista.filter(a => a.nota <= 3 && !a.resposta)
-  else if (status) lista = lista.filter(a => a.status === status)
-  if (nota) lista = lista.filter(a => a.nota === Number(nota))
-  if (produto) lista = lista.filter(a => String(a.sku) === produto)
-  if (q) lista = lista.filter(a => minusculo(a.texto + ' ' + a.cliente + ' ' + a.produto).includes(minusculo(q)))
+// ---------- Avaliações (lidas e moderadas direto no banco) ----------
+// Requer a migração database/migracao_avaliacoes_moderacao.sql
+const STATUS_AVALIACAO = ['pendente', 'aprovada', 'rejeitada']
+const SEM_RESPOSTA = "(a.resposta IS NULL OR a.resposta = '')"
+const LIMITE_AVALIACOES = 100
 
-  const dist = {}
-  avaliacoes.forEach(a => { dist[a.nota] = (dist[a.nota] || 0) + 1 })
-  const media = avaliacoes.length ? avaliacoes.reduce((s, a) => s + a.nota, 0) / avaliacoes.length : 0
+const comoTexto = (v) => (typeof v === 'string' ? v.trim() : '')
+const comoInteiro = (v, min, max) => {
+  const n = Number(v)
+  return /^\d+$/.test(String(v)) && n >= min && n <= max ? String(n) : ''
+}
+const dataBR = (d) => new Date(d).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })
 
-  res.render('admin/avaliacoes', {
-    avaliacoes: lista,
-    filtros: { status, nota, q, produto },
-    resumo: { media, total: avaliacoes.length, distribuicao: dist },
-    contagens: {
-      todas: avaliacoes.length,
-      pendente: contarPendentes(),
-      aprovada: avaliacoes.filter(a => a.status === 'aprovada').length,
-      recusada: avaliacoes.filter(a => a.status === 'recusada').length,
-      negativasSemResposta: avaliacoes.filter(a => a.nota <= 3 && !a.resposta).length
+router.get('/avaliacoes', async (req, res) => {
+  const status = comoTexto(req.query.status)
+  const filtros = {
+    status: [...STATUS_AVALIACAO, 'negativas'].includes(status) ? status : '',
+    nota: comoInteiro(req.query.nota, 1, 5),
+    produto: comoInteiro(req.query.produto, 1, 2147483647),
+    q: comoTexto(req.query.q).slice(0, 200)
+  }
+
+  const where = []
+  const valores = []
+  if (filtros.status === 'negativas') where.push('a.nota <= 3 AND ' + SEM_RESPOSTA)
+  else if (filtros.status) { where.push('a.status = ?'); valores.push(filtros.status) }
+  if (filtros.nota) { where.push('a.nota = ?'); valores.push(Number(filtros.nota)) }
+  if (filtros.produto) { where.push('a.produto_sku = ?'); valores.push(Number(filtros.produto)) }
+  if (filtros.q) {
+    const termo = '%' + filtros.q.replace(/[\\%_]/g, '\\$&') + '%'
+    where.push('(a.comentario LIKE ? OR u.nome_usuario LIKE ? OR p.titulo_produto LIKE ?)')
+    valores.push(termo, termo, termo)
+  }
+
+  try {
+    const banco = conexao.promise()
+    const [linhas] = await banco.execute(`
+      SELECT a.id_avaliacao_produto AS id, a.nota, a.comentario, a.data_criacao, a.status,
+             a.resposta, a.motivo_rejeicao, a.produto_sku AS sku,
+             p.titulo_produto AS produto, u.nome_usuario AS cliente,
+             EXISTS (SELECT 1 FROM produto_pedido pp
+                     JOIN pedido pe ON pe.id_pedido = pp.pedido_id
+                     WHERE pe.usuario_id = a.usuario_id AND pp.produto_sku = a.produto_sku
+                       AND pe.status IN ('aprovado', 'finalizado')) AS compra_verificada
+      FROM avaliacao_produto a
+      JOIN usuario u ON u.id_usuario = a.usuario_id
+      JOIN produto p ON p.sku = a.produto_sku
+      ${where.length ? 'WHERE ' + where.join(' AND ') : ''}
+      ORDER BY a.data_criacao DESC, a.id_avaliacao_produto DESC
+      LIMIT ${LIMITE_AVALIACOES}`, valores)
+
+    // Resumo e contagens olham TODAS as avaliações, independente do filtro aplicado.
+    const [[totais]] = await banco.query(`
+      SELECT COUNT(*) AS total,
+             COALESCE(AVG(nota), 0) AS media,
+             COALESCE(SUM(status = 'pendente'), 0) AS pendente,
+             COALESCE(SUM(status = 'aprovada'), 0) AS aprovada,
+             COALESCE(SUM(status = 'rejeitada'), 0) AS rejeitada,
+             COALESCE(SUM(nota <= 3 AND (resposta IS NULL OR resposta = '')), 0) AS negativasSemResposta
+      FROM avaliacao_produto`)
+    const [linhasDistribuicao] = await banco.query(
+      'SELECT nota, COUNT(*) AS qtd FROM avaliacao_produto GROUP BY nota')
+
+    const distribuicao = {}
+    linhasDistribuicao.forEach(l => { distribuicao[l.nota] = Number(l.qtd) })
+
+    res.render('admin/avaliacoes', {
+      avaliacoes: linhas.map(l => ({
+        id: l.id,
+        cliente: l.cliente,
+        data: dataBR(l.data_criacao),
+        compraVerificada: Boolean(l.compra_verificada),
+        produto: l.produto,
+        sku: l.sku,
+        nota: l.nota,
+        titulo: '',      // a tabela não tem título; o formulário da loja só envia nota e comentário
+        texto: l.comentario || '',
+        status: l.status,
+        denuncias: 0,    // ainda não existe denúncia no banco
+        resposta: l.resposta || '',
+        motivoRecusa: l.motivo_rejeicao || ''
+      })),
+      filtros,
+      resumo: { media: Number(totais.media), total: Number(totais.total), distribuicao },
+      contagens: {
+        todas: Number(totais.total),
+        pendente: Number(totais.pendente),
+        aprovada: Number(totais.aprovada),
+        rejeitada: Number(totais.rejeitada),
+        negativasSemResposta: Number(totais.negativasSemResposta)
+      }
+    })
+  } catch (erro) {
+    console.error('Erro ao listar avaliações:', erro)
+    res.status(500).send('Não foi possível carregar as avaliações.')
+  }
+})
+
+// Ações de moderação: cada uma monta um UPDATE com SET fixo (nunca vindo do cliente).
+const idAvaliacao = (valor) => {
+  const n = Number(valor)
+  return /^\d+$/.test(String(valor)) && n > 0 && n <= 2147483647 ? n : null
+}
+const voltarPara = (id) => '/admin/avaliacoes' + (id ? '#avaliacao-' + id : '')
+
+async function atualizarAvaliacao(req, res, montar) {
+  const id = idAvaliacao(req.params.id)
+  if (!id) return res.redirect(voltarPara())
+  const alteracao = montar(req.body || {})
+  if (alteracao) {
+    try {
+      await conexao.promise().execute(
+        `UPDATE avaliacao_produto SET ${alteracao.set} WHERE id_avaliacao_produto = ?`,
+        [...alteracao.valores, id])
+    } catch (erro) {
+      console.error('Erro ao atualizar avaliação:', erro)
+      return res.status(500).send('Não foi possível atualizar a avaliação.')
     }
-  })
-})
+  }
+  res.redirect(voltarPara(id))
+}
 
-// Ações de moderação (no projeto real: UPDATE avaliacao SET ... WHERE id = ?)
-const acharAvaliacao = (id) => avaliacoes.find(a => a.id === Number(id))
-const voltarPara = (a) => '/admin/avaliacoes' + (a ? '#avaliacao-' + a.id : '')
+router.post('/avaliacoes/:id/aprovar', (req, res) =>
+  atualizarAvaliacao(req, res, () => ({ set: "status = 'aprovada', motivo_rejeicao = NULL", valores: [] })))
 
-router.post('/avaliacoes/:id/aprovar', (req, res) => {
-  const a = acharAvaliacao(req.params.id)
-  if (a) { a.status = 'aprovada'; a.motivoRecusa = '' }
-  res.redirect(voltarPara(a))
-})
+router.post('/avaliacoes/:id/recusar', (req, res) =>
+  atualizarAvaliacao(req, res, (corpo) => motivosRecusa.includes(corpo.motivo)
+    ? { set: "status = 'rejeitada', motivo_rejeicao = ?", valores: [corpo.motivo] }
+    : null))
 
-router.post('/avaliacoes/:id/recusar', (req, res) => {
-  const a = acharAvaliacao(req.params.id)
-  const motivo = (req.body || {}).motivo
-  if (a && motivosRecusa.includes(motivo)) { a.status = 'recusada'; a.motivoRecusa = motivo }
-  res.redirect(voltarPara(a))
-})
-
-router.post('/avaliacoes/:id/responder', (req, res) => {
-  const a = acharAvaliacao(req.params.id)
-  const resposta = String((req.body || {}).resposta || '').trim().slice(0, 500)
-  if (a && resposta) a.resposta = resposta
-  res.redirect(voltarPara(a))
-})
+router.post('/avaliacoes/:id/responder', (req, res) =>
+  atualizarAvaliacao(req, res, (corpo) => {
+    const resposta = String(corpo.resposta || '').trim().slice(0, 500)
+    return resposta ? { set: 'resposta = ?, data_resposta = NOW()', valores: [resposta] } : null
+  }))
 
 module.exports = router

@@ -9,4 +9,14 @@ const conexao = mysql.createPool({
     connectionLimit: 10
 })
 
+// Testa a conexão ao iniciar e avisa no terminal
+conexao.getConnection((erro, con) => {
+    if (erro) {
+        console.error('❌ Erro ao conectar no MySQL:', erro.code, '-', erro.message)
+        return
+    }
+    console.log('Banco conectado com sucesso')
+    con.release()
+})
+
 module.exports = conexao
