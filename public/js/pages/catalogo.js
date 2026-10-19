@@ -62,30 +62,6 @@ function initAccordions() {
   });
 }
 
-// Ordenação consultada no backend.
-function initSort() {
-  const seletorOrdenacao = document.getElementById("sortSelect");
-  if (!seletorOrdenacao) return;
-  seletorOrdenacao.addEventListener("change", () => {
-    const parametros = new URLSearchParams(window.location.search);
-    const ordem = seletorOrdenacao.value === 'Menor preço' ? 'menor' : seletorOrdenacao.value === 'Maior preço' ? 'maior' : '';
-    if (ordem) parametros.set('ordenar', ordem);
-    else parametros.delete('ordenar');
-    window.history.replaceState(null, '', window.location.pathname + '?' + parametros);
-    carregarProdutosReais();
-  });
-}
-
-// ── Paginação ───────────────────────────────────────────────────
-function initPagination() {
-  document.querySelectorAll(".pg-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".pg-btn").forEach((b) => b.classList.remove("active"));
-      if (!btn.querySelector("svg")) btn.classList.add("active");
-    });
-  });
-}
-
 // ── Init ────────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   carregarProdutosReais();
@@ -95,6 +71,4 @@ document.addEventListener("DOMContentLoaded", () => {
     .addEventListener("click", adicionarPeloCatalogo);
 
   initAccordions();
-  initSort();
-  initPagination();
 });
