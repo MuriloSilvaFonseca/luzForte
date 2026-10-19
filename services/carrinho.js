@@ -1,3 +1,4 @@
+const criptografia = require('node:crypto')
 const banco = require('../config/database')
 const LIMITE_INTEIRO_MYSQL = 2147483647 // Maior valor positivo do tipo INT.
 
@@ -116,4 +117,93 @@ async function executarCarrinho(identidade, operacao, dados = {}) {
   }
 }
 
-module.exports = { executarCarrinho, inteiroPositivo }
+// ---------------------------------------------------------------------------
+// Transferência do carrinho do visitante para a conta, no momento do login.
+//
+// Por que existe: o carrinho do visitante fica ligado ao token da sessão.
+// No login a sessão é recriada (req.session.regenerate), o token se perde e o
+// carrinho "sumiria". Por isso o login chama esta função ANTES de perder o token.
+//
+// Regras:
+// - Visitante sem carrinho: não faz nada.
+// - Usuário sem carrinho aberto: o carrinho do visitante passa a ser do usuário.
+// - Usuário com carrinho aberto: os itens são juntados no carrinho do usuário.
+//   Produto que já existe nos dois tem as quantidades SOMADAS (mantém o preço
+//   já registrado no carrinho do usuário). O carrinho do visitante é apagado.
+// Tudo acontece numa transação: ou a transferência inteira dá certo, ou nada muda.
+// ---------------------------------------------------------------------------
+async function transferirCarrinhoVisitante(usuarioId, tokenVisitante) {
+  // Sem token válido não existe carrinho de visitante para transferir
+  if (typeof tokenVisitante !== 'string' || !/^[a-f0-9]{64}$/.test(tokenVisitante)) return
+  if (!inteiroPositivo(usuarioId)) throw erroCarrinho(400, 'Usuário inválido.')
+
+  // No banco fica só o hash do token (mesma regra do middleware identificar-carrinho)
+  const visitanteHash = criptografia.createHash('sha256').update(tokenVisitante).digest('hex')
+  const donoUsuario = { usuarioId, valor: usuarioId, filtro: 'usuario_id = ?' }
+
+  const conexao = await banco.promise().getConnection()
+  let transacao = false
+  try {
+    await conexao.beginTransaction()
+    transacao = true
+
+    // 1. Procura o carrinho do visitante
+    const [visitante] = await conexao.execute(
+      "SELECT id_pedido FROM pedido WHERE usuario_id IS NULL AND visitante_token_hash = ? AND status = 'carrinho' FOR UPDATE",
+      [visitanteHash])
+
+    if (visitante.length > 0) {
+      const pedidoVisitante = visitante[0].id_pedido
+
+      // 2. Procura o carrinho aberto do usuário (também confere se o usuário existe)
+      const pedidoUsuario = await buscarPedido(conexao, donoUsuario)
+
+      if (!pedidoUsuario) {
+        // 3a. Usuário sem carrinho: o carrinho do visitante passa a ser dele
+        await conexao.execute(
+          'UPDATE pedido SET usuario_id = ?, visitante_token_hash = NULL WHERE id_pedido = ?',
+          [usuarioId, pedidoVisitante])
+      } else {
+        // 3b. Usuário já tem carrinho: junta os itens
+        const [itensVisitante] = await conexao.execute(
+          'SELECT produto_sku, quantidade FROM produto_pedido WHERE pedido_id = ?', [pedidoVisitante])
+
+        for (const item of itensVisitante) {
+          const [jaExiste] = await conexao.execute(
+            'SELECT quantidade FROM produto_pedido WHERE pedido_id = ? AND produto_sku = ?',
+            [pedidoUsuario, item.produto_sku])
+
+          if (jaExiste.length > 0) {
+            // Mesmo produto nos dois carrinhos: soma as quantidades
+            await definirQuantidade(conexao, pedidoUsuario, item.produto_sku, jaExiste[0].quantidade + item.quantidade)
+          } else {
+            // Produto só no carrinho do visitante: move a linha para o carrinho do usuário
+            await conexao.execute(
+              'UPDATE produto_pedido SET pedido_id = ? WHERE pedido_id = ? AND produto_sku = ?',
+              [pedidoUsuario, pedidoVisitante, item.produto_sku])
+          }
+        }
+
+        // O carrinho do visitante não é mais usado (os itens restantes saem junto: ON DELETE CASCADE)
+        await conexao.execute('DELETE FROM pedido WHERE id_pedido = ?', [pedidoVisitante])
+
+        // Recalcula o valor do carrinho do usuário
+        await conexao.execute(
+          "UPDATE pedido SET valor_produtos = (SELECT COALESCE(SUM(subtotal), 0) FROM produto_pedido WHERE pedido_id = ?), total = valor_produtos WHERE id_pedido = ? AND usuario_id = ? AND status = 'carrinho'",
+          [pedidoUsuario, pedidoUsuario, usuarioId])
+      }
+    }
+
+    await conexao.commit()
+    transacao = false
+  } catch (erro) {
+    if (transacao) {
+      try { await conexao.rollback() } catch (_) { /* a conexão é liberada abaixo */ }
+    }
+    throw erro
+  } finally {
+    conexao.release()
+  }
+}
+
+module.exports = { executarCarrinho, inteiroPositivo, transferirCarrinhoVisitante }
