@@ -72,9 +72,15 @@ subtotal e totais, sem custos internos ou dados pessoais.
   carrinho; nao confirma compra nem altera status.
 - A sessao atual fica na memoria do servidor e o cookie dura 30 minutos.
   Reiniciar o servidor ou perder a sessao pode perder acesso ao carrinho de
-  visitante; os registros permanecem no MySQL. Nao ha mesclagem automatica
-  de carrinho visitante com carrinho de usuario ao fazer login. Cada identidade
-  tem seu proprio carrinho. Persistencia de sessoes e mesclagem sao etapas separadas.
+  visitante; os registros permanecem no MySQL. Persistencia de sessoes e uma
+  etapa separada.
+- Login transfere o carrinho do visitante (services/carrinho.js,
+  transferirCarrinhoVisitante): se o usuario nao tem carrinho aberto, o carrinho
+  do visitante passa a ser dele; se ja tem, os itens sao juntados e produtos
+  repetidos tem as quantidades somadas (mantendo o preco ja registrado no
+  carrinho do usuario). Falha na transferencia nao impede o login e fica no log.
+- A estrutura de visitante (visitante_token_hash, usuario_id NULL e
+  chk_pedido_proprietario) agora faz parte do database/Luz_ForteDB.sql.
 - As consultas de marca, imagens e detalhes de origin/catalogo-banco foram
   adaptadas para a API existente, sem merge ou mudanca no CSS/navbar. Imagens
   ausentes do seed usam o icone de caixa existente como alternativa.
