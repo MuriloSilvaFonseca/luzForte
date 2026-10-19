@@ -67,83 +67,9 @@
         <section class="avaliacoes_produto" id="avaliacoes" aria-labelledby="avaliacoesTitulo">
     <h2 class="avaliacoes_titulo_produto" id="avaliacoesTitulo">Opiniões do produto</h2>
 
-    <div class="avaliacoes_card_produto">
-
-        <!-- Resumo geral -->
-        <div class="avaliacoes_resumo_produto">
-            <div class="avaliacoes_media_produto">
-                <p class="avaliacoes_nota_produto"><strong>3</strong><span>/5</span></p>
-
-                <p class="avaliacoes_total_produto">
-                    <img class="avaliacoes_estrelas_produto" src="/img/icons/avaliacao-star/3-star.png"
-                         alt="Nota média: 3 de 5 estrelas" width="130" height="22">
-                    <span class="avaliacoes_qtd_produto">(3)</span>
-                </p>
-
-                <p class="avaliacoes_legenda_produto">Avaliação geral</p>
-            </div>
-
-            <span class="avaliacoes_divisor_produto" aria-hidden="true"></span>
-
-            <ul class="avaliacoes_barras_produto" aria-label="Distribuição das notas">
-                <li class="avaliacoes_barra_produto">
-                    <span class="avaliacoes_trilho_produto"><span class="avaliacoes_preenchimento_produto" style="width: 0%"></span></span>
-                    <span class="avaliacoes_barra_estrela_produto" aria-hidden="true">★</span>
-                    <span class="avaliacoes_barra_numero_produto">5</span>
-                </li>
-                <li class="avaliacoes_barra_produto avaliacoes_barra_ativa_produto">
-                    <span class="avaliacoes_trilho_produto"><span class="avaliacoes_preenchimento_produto" style="width: 67%"></span></span>
-                    <span class="avaliacoes_barra_estrela_produto" aria-hidden="true">★</span>
-                    <span class="avaliacoes_barra_numero_produto">4</span>
-                </li>
-                <li class="avaliacoes_barra_produto">
-                    <span class="avaliacoes_trilho_produto"><span class="avaliacoes_preenchimento_produto" style="width: 0%"></span></span>
-                    <span class="avaliacoes_barra_estrela_produto" aria-hidden="true">★</span>
-                    <span class="avaliacoes_barra_numero_produto">3</span>
-                </li>
-                <li class="avaliacoes_barra_produto">
-                    <span class="avaliacoes_trilho_produto"><span class="avaliacoes_preenchimento_produto" style="width: 0%"></span></span>
-                    <span class="avaliacoes_barra_estrela_produto" aria-hidden="true">★</span>
-                    <span class="avaliacoes_barra_numero_produto">2</span>
-                </li>
-                <li class="avaliacoes_barra_produto avaliacoes_barra_ativa_produto">
-                    <span class="avaliacoes_trilho_produto"><span class="avaliacoes_preenchimento_produto" style="width: 33%"></span></span>
-                    <span class="avaliacoes_barra_estrela_produto" aria-hidden="true">★</span>
-                    <span class="avaliacoes_barra_numero_produto">1</span>
-                </li>
-            </ul>
-        </div>
-
-        <!-- Lista de comentários -->
-        <div class="avaliacoes_lista_produto">
-            <article class="avaliacao_item_produto">
-                <header class="avaliacao_topo_produto">
-                    <img class="avaliacao_estrelas_produto" src="/img/icons/avaliacao-star/4-star.png"
-                         alt="4 de 5 estrelas" width="130" height="22">
-                    <time class="avaliacao_data_produto" datetime="2026-03-14">14/03/2026</time>
-                </header>
-                <p class="avaliacao_texto_produto">Bom cabo, material de qualidade e fácil de manusear na instalação. O isolamento parece resistente e atendeu bem para circuito de iluminação.</p>
-            </article>
-
-            <article class="avaliacao_item_produto">
-                <header class="avaliacao_topo_produto">
-                    <img class="avaliacao_estrelas_produto" src="/img/icons/avaliacao-star/4-star.png"
-                         alt="4 de 5 estrelas" width="130" height="22">
-                    <time class="avaliacao_data_produto" datetime="2026-01-08">08/01/2026</time>
-                </header>
-                <p class="avaliacao_texto_produto">Produto cumpre o que promete. O fio é flexível e facilitou bastante a passagem pelo conduíte. Entrega foi rápida.</p>
-            </article>
-
-            <article class="avaliacao_item_produto">
-                <header class="avaliacao_topo_produto">
-                    <img class="avaliacao_estrelas_produto" src="/img/icons/avaliacao-star/1-star.png"
-                         alt="1 de 5 estrelas" width="130" height="22">
-                    <time class="avaliacao_data_produto" datetime="2026-02-11">11/02/2026</time>
-                </header>
-                <p class="avaliacao_texto_produto">Não fiquei muito satisfeito com o produto. O cabo funciona, porém achei o isolamento um pouco mais fino do que esperava e tive dificuldade para passar em um conduíte já ocupado.</p>
-            </article>
-        </div>
-
+       <div class="avaliacoes_card_produto">
+        <div class="avaliacoes_resumo_produto" id="avaliacoesResumo"></div>
+        <div class="avaliacoes_lista_produto" id="avaliacoesLista"></div>
     </div>
     <div class="avaliar_produto" id="avaliar">
     <h3 class="avaliar_titulo_produto">Deixe sua avaliação</h3>
@@ -168,10 +94,7 @@
                 </div>
             </fieldset>
 
-            <div class="avaliar_campo_produto">
-                <label class="avaliar_label_produto" for="avaliacaoTitulo">Título <span class="avaliar_opcional_produto">(opcional)</span></label>
-                <input class="avaliar_input_produto" id="avaliacaoTitulo" name="titulo" type="text" maxlength="80" placeholder="Ex.: Ótimo custo-benefício">
-            </div>
+            
 
             <div class="avaliar_campo_produto">
                 <label class="avaliar_label_produto" for="avaliacaoTexto">Seu comentário <span class="avaliar_obrigatorio_produto">*</span></label>

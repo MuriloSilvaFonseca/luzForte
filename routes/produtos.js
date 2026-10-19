@@ -53,17 +53,32 @@ router.get('/:sku', async (req, res) => {
       JOIN categoria c ON c.id_categoria = s.categoria_id
       WHERE p.sku = ? AND p.ativo = 'ativo'`, [sku])
     if (!produtos.length) return res.status(404).json({ erro: 'Produto não encontrado.' })
-    const [[imagens], [descricoes], [especificacoes], [instalacoes], [avaliacoes]] = await Promise.all([
+        const [[imagens], [descricoes], [especificacoes], [instalacoes], [resumo], [distribuicao], [lista]] = await Promise.all([
       banco.execute('SELECT url FROM imagem_produto WHERE produto_sku = ? ORDER BY ordem', [sku]),
       banco.execute('SELECT nome_descricao, texto_descricao FROM descricao WHERE produto_sku = ?', [sku]),
       banco.execute('SELECT nome_especificacao, texto_especificacao FROM especificacao WHERE produto_sku = ?', [sku]),
       banco.execute('SELECT nome_instalacao, texto_instalacao FROM instalacao WHERE produto_sku = ?', [sku]),
-      banco.execute('SELECT COUNT(*) AS quantidade, COALESCE(AVG(nota), 0) AS media FROM avaliacao_produto WHERE produto_sku = ?', [sku])
+      banco.execute("SELECT COUNT(*) AS quantidade, COALESCE(AVG(nota), 0) AS media FROM avaliacao_produto WHERE produto_sku = ? AND status = 'aprovada'", [sku]),
+      banco.execute("SELECT nota, COUNT(*) AS qtd FROM avaliacao_produto WHERE produto_sku = ? AND status = 'aprovada' GROUP BY nota", [sku]),
+      banco.execute(`SELECT a.nota, a.comentario, a.data_criacao, u.nome_usuario
+                     FROM avaliacao_produto a
+                     JOIN usuario u ON u.id_usuario = a.usuario_id
+                     WHERE a.produto_sku = ? AND a.status = 'aprovada'
+                     ORDER BY a.data_criacao DESC LIMIT 20`, [sku])
     ])
-    res.json({ produto: produtos[0], imagens, descricoes, especificacoes, instalacoes, avaliacao: avaliacoes[0] })
-  } catch (_) {
+    res.json({
+      produto: produtos[0], imagens, descricoes, especificacoes, instalacoes,
+      avaliacao: { quantidade: resumo[0].quantidade, media: Number(resumo[0].media) },
+      distribuicao, lista
+    })
+    
+  } catch (erro) {
+    console.error('Erro em /api/produtos/:sku:', erro)
     res.status(500).json({ erro: 'Não foi possível carregar o produto.' })
-  }
-})
+    }
+    })
+  
+    
+  
 
 module.exports = router

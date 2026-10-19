@@ -22,6 +22,8 @@ app.use((req, res, next) => {
   res.locals.usuario = req.session.usuario || null
   next()
 })
+const { userAdmin } = require('./middlewares/auth')
+// ...
 
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
@@ -29,12 +31,16 @@ app.use(express.static('public'))
 app.use('/api/carrinho', require('./routes/carrinho'))
 app.use('/api/produtos', require('./routes/produtos'))
 
+
 app.use(require('./middlewares/navbar'))
 
 app.use('/', rotasLoja)
 app.use('/', rotasAutenticacao)
 app.use('/', produtosApi)
+app.use('/', require('./routes/avaliacao'))
 app.use('/admin', rotasAdmin)
+
+
 
 // Nenhuma rota respondeu: página não existe
 app.use((req, res) => {

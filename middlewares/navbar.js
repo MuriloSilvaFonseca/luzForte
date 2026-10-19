@@ -21,18 +21,23 @@ async function carregarNavbar(req, res, next) {
   res.locals.navbarIndisponivel = false
   try {
     const banco = conexao.promise()
+
+    
     const [categorias] = await banco.query({ sql: categoriasSql, timeout: 5000 })
     const [subcategorias] = await banco.query({ sql: subcategoriasSql, timeout: 5000 })
+
+  
+
     const categoriasComSubcategorias = categorias.map(categoria => ({
       ...categoria,
-      subcategorias: subcategorias.filter(sub => sub.categoria_id === categoria.id_categoria)
+      subcategorias: subcategorias.filter(sub => Number(sub.categoria_id) === Number(categoria.id_categoria))
     }))
     res.locals.navbarPrincipais = categoriasComSubcategorias.slice(0, 5)
     res.locals.navbarCategorias = [...categoriasComSubcategorias].sort((a, b) =>
       a.nome.localeCompare(b.nome, 'pt-BR') || a.id_categoria - b.id_categoria)
   } catch (erro) {
     res.locals.navbarIndisponivel = true
-    console.error('Falha ao carregar navbar:', erro.code || 'ERRO_BANCO')
+    console.error('Falha ao carregar navbar:', erro)
   }
   next()
 }

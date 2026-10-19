@@ -402,3 +402,19 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2026-10-13 22:13:06
+
+
+-- Moderação de avaliações: acrescenta o que FALTA em avaliacao_produto.
+-- A coluna `status` (pendente / aprovada / rejeitada) já existe no banco, então não é criada aqui.
+-- No Workbench: abra este arquivo e execute TUDO (raio sem cursor, ou Ctrl+Shift+Enter).
+
+USE luz_forte;
+
+ALTER TABLE avaliacao_produto
+  ADD COLUMN motivo_rejeicao VARCHAR(100) NULL,
+  ADD COLUMN resposta TEXT NULL,
+  ADD COLUMN data_resposta TIMESTAMP NULL;
+
+-- Acelera a contagem de pendentes e o filtro por status do painel.
+CREATE INDEX idx_avaliacao_status ON avaliacao_produto (status, data_criacao);
+

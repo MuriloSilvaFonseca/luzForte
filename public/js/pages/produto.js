@@ -5,8 +5,30 @@ function formatarPreco(valor) {
   return valor.toFixed(2).replace(".", ",");
 }
 
-function exibirEstrelas(nota) {
-  return "★".repeat(nota) + "☆".repeat(5 - nota);
+const ESTRELAS = {
+  0:   '0 star.png',
+  0.5: '0.5 star.png',
+  1:   '1-star.png',
+  1.5: '1.5 star.png',
+  2:   '2-star.png',
+  2.5: '2.5-star.png',
+  3:   '3-star.png',
+  3.5: '3.5-star.png',
+  4:   '4-star.png',
+  4.5: '4.5-star.png',
+  5:   '5-star.png'
+}
+
+function criarEstrelas(nota) {
+  let valor = Number(nota);
+  if (!Number.isFinite(valor)) valor = 0;
+  valor = Math.min(5, Math.max(0, Math.round(valor * 2) / 2));
+
+  const img = document.createElement('img');
+  img.src = '/img/icons/avaliacao-star/' + encodeURIComponent(ESTRELAS[valor]);
+  img.alt = `Nota ${valor} de 5`;
+  img.className = 'estrelas';
+  return img;
 }
 
 function exibirCaminhoProduto(itens) {
@@ -63,11 +85,12 @@ function exibirInformacoes(produto) {
   if (codigo) codigo.textContent = `Cód: ${produto.codigo}`;
 
   const estrelas = document.getElementById("productStars");
-  if (estrelas) estrelas.textContent = exibirEstrelas(produto.avaliacao.nota);
+  if (estrelas) estrelas.replaceChildren(criarEstrelas(produto.avaliacao.nota));
 
   const avaliacoes = document.getElementById("productReviews");
   if (avaliacoes) {
-    avaliacoes.textContent = `(${produto.avaliacao.totalAvaliacoes} avaliações)`;
+    const total = produto.avaliacao.totalAvaliacoes;
+    avaliacoes.textContent = `(${total} ${total === 1 ? 'avaliação' : 'avaliações'})`;
   }
 
   const estoque = document.getElementById("productStock");
@@ -136,7 +159,47 @@ function exibirInstalacao(produto) {
   if (!produto.instalacoes.length) el.textContent = 'Instruções não cadastradas.';
 }
 
+function renderAvaliacoes(data) {
+  const { avaliacao, lista } = data;
+  const resumo = document.getElementById('avaliacoesResumo');
+  const listaEl = document.getElementById('avaliacoesLista');
+  if (!resumo || !listaEl) return;
+
+  if (avaliacao.quantidade === 0) {
+    resumo.textContent = 'Este produto ainda não tem avaliações.';
+    listaEl.replaceChildren();
+    return;
+  }
+
+resumo.replaceChildren(
+  criarEstrelas(avaliacao.media),
+  document.createTextNode(` ${avaliacao.media.toFixed(1)}/5 (${avaliacao.quantidade} ${avaliacao.quantidade === 1 ? 'avaliação' : 'avaliações'})`)
+);
+
+  listaEl.replaceChildren();
+  lista.forEach(a => {
+    const item = document.createElement('article');
+    item.className = 'avaliacao_item_produto';
+
+    const topo = document.createElement('header');
+    topo.className = 'avaliacao_topo_produto';
+    topo.replaceChildren(
+      criarEstrelas(a.nota),
+      document.createTextNode(' · ' + a.nome_usuario.split(' ')[0] + ' · ' +
+    new Date(a.data_criacao).toLocaleDateString('pt-BR'))
+    );
+
+    const texto = document.createElement('p');
+    texto.className = 'avaliacao_texto_produto';
+    texto.textContent = a.comentario || '';
+
+    item.append(topo, texto);
+    listaEl.appendChild(item);
+  });
+}
+
 function exibirProduto(produto) {
+  
   produtoAtual = produto;
   exibirCaminhoProduto(produto.breadcrumb);
   exibirImagens(produto);
@@ -164,12 +227,53 @@ async function carregarProduto() {
       descricoes: data.descricoes, especificacoes: data.especificacoes, instalacoes: data.instalacoes
     };
     exibirProduto(produto);
+    renderAvaliacoes(data);
+    document.querySelectorAll('.action_buttons_produto button').forEach(botao => { botao.disabled = false; });
     document.querySelectorAll('.action_buttons_produto button').forEach(botao => { botao.disabled = false; });
   } catch (error) {
     console.error(error);
     const nome = document.getElementById("productName");
     if (nome) nome.textContent = "Produto não encontrado";
   }
+}
+
+function renderizarResumo(media, total) {
+  const resumo = document.getElementById('avaliacoesResumo')
+  if (!resumo) return
+
+  const nota = document.createElement('p')
+  nota.textContent = `${Number(media).toFixed(1)}/5`
+
+  const qtd = document.createElement('span')
+  qtd.textContent = `(${total} ${total === 1 ? 'avaliação' : 'avaliações'})`
+
+  resumo.replaceChildren(nota, criarEstrelas(media), qtd)
+}
+
+function renderizarLista(avaliacoes) {
+  const lista = document.getElementById('avaliacoesLista')
+  if (!lista) return
+
+  if (!avaliacoes.length) {
+    lista.textContent = 'Este produto ainda não tem avaliações.'
+    return
+  }
+
+  lista.replaceChildren(...avaliacoes.map(a => {
+    const item = document.createElement('article')
+
+    const cabecalho = document.createElement('p')
+    cabecalho.replaceChildren(
+      criarEstrelas(a.nota),
+      document.createTextNode(` · ${a.nome} · ${a.data}`)
+    )
+
+    const texto = document.createElement('p')
+    texto.textContent = a.comentario
+
+    item.append(cabecalho, texto)
+    return item
+}))
 }
 
 function changeImage(index) {
@@ -254,8 +358,7 @@ document.addEventListener("DOMContentLoaded", () => {
 const formAvaliar = document.getElementById('formAvaliar');
 if (formAvaliar) {
     // Use aqui o mesmo SKU que você já usa para montar a página
-    document.getElementById('avaliacaoSku').value = produto.sku;
-
+    document.getElementById('avaliacaoSku').value = new URLSearchParams(location.search).get('id');
     const texto = document.getElementById('avaliacaoTexto');
     const contador = document.getElementById('avaliacaoContador');
     texto.addEventListener('input', () => {
