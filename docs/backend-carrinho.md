@@ -66,7 +66,7 @@ subtotal e totais, sem custos internos ou dados pessoais.
   reais e chamam a API do carrinho. Catalogo aceita categoria/subcategoria
   enviados pela navbar. O layout e as classes da navbar foram preservados.
 - Carrinho usa carrinho-integrado.js e um template com as classes existentes.
-  O arquivo antigo carrinho.js foi preservado, mas nao e mais carregado.
+  O arquivo antigo carrinho.js (dados de teste) foi removido.
   Cupom demonstrativo nao altera valores reais; o botao informa indisponibilidade.
   Continuar compra esta desabilitado. Comprar Agora apenas adiciona e abre o
   carrinho; nao confirma compra nem altera status.

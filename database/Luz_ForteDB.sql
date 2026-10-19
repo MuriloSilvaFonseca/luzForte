@@ -341,6 +341,28 @@ LOCK TABLES `produto_pedido` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `redefinicao_senha`
+-- Guarda o código de "esqueci a senha" (só o hash), com validade e tentativas.
+-- Um código ativo por usuário (UNIQUE em usuario_id).
+--
+
+DROP TABLE IF EXISTS `redefinicao_senha`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `redefinicao_senha` (
+  `id_redefinicao` int NOT NULL AUTO_INCREMENT,
+  `usuario_id` int NOT NULL,
+  `codigo_hash` char(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `expira_em` datetime NOT NULL,
+  `tentativas` int NOT NULL DEFAULT '0',
+  `enviado_em` datetime NOT NULL,
+  PRIMARY KEY (`id_redefinicao`),
+  UNIQUE KEY `uq_redefinicao_usuario` (`usuario_id`),
+  CONSTRAINT `fk_redefinicao_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `subcategoria`
 --
 
