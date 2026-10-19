@@ -5,13 +5,14 @@ const sessao = require('express-session')
 const rotasLoja = require('./routes/loja')
 const rotasAutenticacao = require('./routes/auth')
 const rotasAdmin = require('./routes/admin-paineis')
-const produtosApi = require('./routes/api-produtos')
+// Neon (futuro): exige DATABASE_URL no .env e migração das consultas.
+// const produtosApi = require('./routes/api-produtos')
 const app = express()
 const porta = 3000
 
 app.use(express.urlencoded({ extended: true }))
 
-app.use(sessao({
+app.use( sessao({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
@@ -38,6 +39,8 @@ app.use('/', rotasLoja)
 app.use('/', rotasAutenticacao)
 app.use('/', produtosApi)
 app.use('/', require('./routes/avaliacao'))
+// Neon (futuro): adaptar as respostas e substituir a API MySQL de /api/produtos.
+// app.use('/', produtosApi)
 app.use('/admin', rotasAdmin)
 
 

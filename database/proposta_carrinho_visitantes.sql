@@ -1,3 +1,8 @@
+-- ATENCAO: estas alteracoes ja fazem parte do database/Luz_ForteDB.sql.
+-- Quem importar o Luz_ForteDB.sql atualizado NAO precisa rodar este arquivo.
+-- Use-o somente em um banco criado com a versao antiga do Luz_ForteDB.sql
+-- (sem a coluna visitante_token_hash). Rodar duas vezes da erro de coluna duplicada.
+--
 -- Migracao aplicada no banco local luz_forte; aplicacao em outros ambientes nao confirmada.
 -- Aplicar apenas depois de revisar backup, versao e estrutura do banco de destino.
 -- Nao cria usuarios ficticios. Preserva usuarios e pedidos existentes.

@@ -1,6 +1,7 @@
 const express = require('express')
 const bcrypt = require('bcryptjs')
 const conexao = require('../config/database')
+const { transferirCarrinhoVisitante } = require('../services/carrinho')
 const router = express.Router()
 
 router.get('/registro', (req, res) => {
@@ -98,6 +99,10 @@ router.post('/login', (req, res) => {
         return res.status(401).render('auth/login', { erro: 'E-mail ou senha inválidos.' })
       }
 
+      // Guarda o token do carrinho do visitante ANTES de recriar a sessão:
+      // o regenerate apaga tudo o que estava na sessão antiga.
+      const tokenVisitante = req.session.tokenCarrinhoVisitante
+
       // Cria um identificador novo de sessão após o login.
       req.session.regenerate(erroSessao => {
         if (erroSessao) {
@@ -112,14 +117,20 @@ router.post('/login', (req, res) => {
           acesso: usuario.acesso
         }
 
-        req.session.save(erroSalvar => {
-          if (erroSalvar) {
-            console.log(erroSalvar)
-            return res.status(500).render('auth/login', { erro: 'Não foi possível entrar. Tente novamente.' })
-          }
+        // Leva o carrinho montado como visitante para a conta (junta com o carrinho que já existir).
+        // Se a transferência falhar, o login continua: o erro fica registrado no terminal.
+        transferirCarrinhoVisitante(usuario.id_usuario, tokenVisitante)
+          .catch(erroCarrinho => console.log(erroCarrinho))
+          .then(() => {
+            req.session.save(erroSalvar => {
+              if (erroSalvar) {
+                console.log(erroSalvar)
+                return res.status(500).render('auth/login', { erro: 'Não foi possível entrar. Tente novamente.' })
+              }
 
-          return res.redirect('/carrinho')
-        })
+              return res.redirect('/carrinho')
+            })
+          })
       })
     })
   })

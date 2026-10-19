@@ -245,13 +245,16 @@ CREATE TABLE `pedido` (
   `observacoes` text,
   `status` enum('carrinho','solicitado','aprovado','finalizado','cancelado') NOT NULL,
   `data_criacao` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `usuario_id` int NOT NULL,
+  `usuario_id` int DEFAULT NULL,
   `forma_pagamento_id` int DEFAULT NULL,
+  `visitante_token_hash` char(64) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
   PRIMARY KEY (`id_pedido`),
+  UNIQUE KEY `uq_pedido_visitante_token_hash` (`visitante_token_hash`),
   KEY `fk_pedido_usuario` (`usuario_id`),
   KEY `fk_pedido_forma_pagamento` (`forma_pagamento_id`),
   CONSTRAINT `fk_pedido_forma_pagamento` FOREIGN KEY (`forma_pagamento_id`) REFERENCES `forma_pagamento` (`id_forma_pagamento`) ON DELETE RESTRICT,
   CONSTRAINT `fk_pedido_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE RESTRICT,
+  CONSTRAINT `chk_pedido_proprietario` CHECK ((((`usuario_id` is not null) and (`visitante_token_hash` is null)) or ((`usuario_id` is null) and (`visitante_token_hash` is not null) and (`status` = _utf8mb4'carrinho')))),
   CONSTRAINT `chk_pedido_total` CHECK ((`total` >= 0)),
   CONSTRAINT `chk_pedido_valor_produtos` CHECK ((`valor_produtos` >= 0))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

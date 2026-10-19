@@ -7,14 +7,15 @@ router.get('/', async (req, res) => {
   const filtros = ["p.ativo = 'ativo'"]
   const valores = []
   for (const [parametro, coluna] of [['categoria', 's.categoria_id'], ['subcategoria', 'p.subcategoria_id'], ['marca', 'p.marca_id']]) {
-    if (req.query[parametro] !== undefined) {
+    // Valor vazio (opção "Todas" do formulário) significa: sem esse filtro
+    if (req.query[parametro] !== undefined && req.query[parametro] !== '') {
       const valor = Number(req.query[parametro])
       if (!Number.isSafeInteger(valor) || valor <= 0) return res.status(400).json({ erro: 'Filtro inválido.' })
       filtros.push(coluna + ' = ?')
       valores.push(valor)
     }
   }
-  if (req.query.q !== undefined) {
+  if (req.query.q !== undefined && req.query.q !== '') {
     if (typeof req.query.q !== 'string' || req.query.q.length > 200) return res.status(400).json({ erro: 'Busca inválida.' })
     filtros.push('p.titulo_produto LIKE ?')
     valores.push('%' + req.query.q + '%')
@@ -33,7 +34,8 @@ router.get('/', async (req, res) => {
       LEFT JOIN imagem_produto i ON i.produto_sku = p.sku AND i.ordem = 1
       WHERE ${filtros.join(' AND ')} ORDER BY ${ordem}`, valores)
     res.json({ produtos })
-  } catch (_) {
+  } catch (erro) {
+    console.log(erro)
     res.status(500).json({ erro: 'Não foi possível carregar os produtos.' })
   }
 })
@@ -71,9 +73,11 @@ router.get('/:sku', async (req, res) => {
       avaliacao: { quantidade: resumo[0].quantidade, media: Number(resumo[0].media) },
       distribuicao, lista
     })
-    
   } catch (erro) {
     console.error('Erro em /api/produtos/:sku:', erro)
+    res.status(500).json({ erro: 'Não foi possível carregar o produto.' })
+  }
+})
     res.status(500).json({ erro: 'Não foi possível carregar o produto.' })
     }
     })

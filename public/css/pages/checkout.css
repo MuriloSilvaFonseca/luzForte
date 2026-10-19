@@ -166,3 +166,16 @@
     align-items: flex-start;
   }
 }
+
+/* Link "Voltar ao carrinho" no topo do checkout */
+.checkout-voltar {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: #1a6be8;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.checkout-voltar:hover {
+  text-decoration: underline;
+}

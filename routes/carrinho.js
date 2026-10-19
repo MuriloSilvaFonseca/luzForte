@@ -20,6 +20,8 @@ async function responderCarrinho(req, res, operacao) {
     const dados = { sku, quantidade: req.body?.quantidade }
     res.json(await executarCarrinho(identidade, operacao, dados))
   } catch (erro) {
+    // Erros inesperados (sem status) ficam registrados no terminal para investigação
+    if (!erro.status) console.log(erro)
     const limite = ['ER_WARN_DATA_OUT_OF_RANGE', 'ER_DATA_OUT_OF_RANGE'].includes(erro.code)
     const status = erro.status || (limite ? 400 : 500)
     let mensagem = 'Não foi possível atualizar ou consultar o carrinho.'
