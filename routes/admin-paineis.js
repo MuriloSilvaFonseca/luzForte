@@ -1,5 +1,5 @@
 // Rotas das páginas do painel.
-// AVALIAÇÕES já usam o banco de dados. Produtos, pedidos, usuários e a visão geral
+// Pedidos e avaliações já usam o banco de dados. Produtos, usuários e a visão geral
 // ainda usam dados FICTÍCIOS (em memória; voltam ao normal quando o servidor reinicia).
 const express = require('express')
 const conexao = require('../config/database')
@@ -45,7 +45,6 @@ const usuarios = [
 
 // ---------- Auxiliares ----------
 const minusculo = (v) => String(v || '').trim().toLowerCase()
-const paraISO = (br) => br.split('/').reverse().join('-') // 17/10/2026 -> 2026-10-17
 
 function paginar(lista, paginaPedida) {
   const totalPaginas = Math.max(1, Math.ceil(lista.length / POR_PAGINA))
@@ -53,6 +52,77 @@ function paginar(lista, paginaPedida) {
   const inicio = (pagina - 1) * POR_PAGINA
   return { itens: lista.slice(inicio, inicio + POR_PAGINA), pagina, totalPaginas }
 }
+
+// ---------- Pedidos ----------
+const statusInfo = {
+  carrinho: { rotulo: 'Carrinho', cor: 'gray' },
+  solicitado: { rotulo: 'Solicitado', cor: 'yellow' },
+  aprovado: { rotulo: 'Aprovado', cor: 'blue' },
+  finalizado: { rotulo: 'Finalizado', cor: 'green' },
+  cancelado: { rotulo: 'Cancelado', cor: 'red' }
+}
+
+function dataPedidoValida(valor) {
+  if (!valor) return true
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(valor)) return false
+  const data = new Date(valor + 'T00:00:00Z')
+  return !Number.isNaN(data.getTime()) && data.toISOString().slice(0, 10) === valor
+}
+
+router.get('/pedidos', async (req, res) => {
+  const { status = '', q = '', de = '', ate = '', pagina: paginaPedida = '1' } = req.query
+  if (![status, q, de, ate, paginaPedida].every(valor => typeof valor === 'string')) {
+    return res.status(400).send('Filtros de pedidos inválidos.')
+  }
+  if ((status && !Object.hasOwn(statusInfo, status)) || !dataPedidoValida(de) || !dataPedidoValida(ate) ||
+      (de && ate && de > ate) || !/^\d+$/.test(paginaPedida) ||
+      !Number.isSafeInteger(Number(paginaPedida)) || Number(paginaPedida) < 1) {
+    return res.status(400).send('Filtros de pedidos inválidos.')
+  }
+
+  const filtros = { status, q: q.trim(), de, ate }
+  const condicoes = []
+  const valores = []
+  if (status) { condicoes.push('p.status = ?'); valores.push(status) }
+  if (filtros.q) {
+    condicoes.push("(CAST(p.id_pedido AS CHAR) LIKE CONCAT('%', ?, '%') OR u.nome_usuario LIKE CONCAT('%', ?, '%'))")
+    valores.push(filtros.q.replace(/^#/, ''), filtros.q)
+  }
+  if (de) { condicoes.push('p.data_criacao >= ?'); valores.push(de) }
+  if (ate) { condicoes.push('p.data_criacao < DATE_ADD(?, INTERVAL 1 DAY)'); valores.push(ate) }
+  const where = condicoes.length ? 'WHERE ' + condicoes.join(' AND ') : ''
+
+  try {
+    const banco = conexao.promise()
+    const [[contagem]] = await banco.query(`
+      SELECT COUNT(*) AS total FROM pedido p
+      LEFT JOIN usuario u ON u.id_usuario = p.usuario_id
+      ${where}`, valores)
+    const totalPaginas = Math.max(1, Math.ceil(Number(contagem.total) / POR_PAGINA))
+    const pagina = Math.min(Number(paginaPedida), totalPaginas)
+    const [pedidos] = await banco.query(`
+      SELECT p.id_pedido AS id, DATE_FORMAT(p.data_criacao, '%d/%m/%Y') AS data,
+             u.nome_usuario AS cliente, u.email, f.nome_pagamento AS pagamento, p.status, p.total,
+             COALESCE((SELECT SUM(pp.quantidade) FROM produto_pedido pp WHERE pp.pedido_id = p.id_pedido), 0) AS itens
+      FROM pedido p
+      LEFT JOIN usuario u ON u.id_usuario = p.usuario_id
+      LEFT JOIN forma_pagamento f ON f.id_forma_pagamento = p.forma_pagamento_id
+      ${where}
+      ORDER BY p.data_criacao DESC, p.id_pedido DESC
+      LIMIT ? OFFSET ?`, [...valores, POR_PAGINA, (pagina - 1) * POR_PAGINA])
+    const [totaisStatus] = await banco.query('SELECT status, COUNT(*) AS total FROM pedido GROUP BY status')
+    const contagens = { todos: 0 }
+    totaisStatus.forEach(linha => {
+      contagens[linha.status] = Number(linha.total)
+      contagens.todos += Number(linha.total)
+    })
+
+    return res.render('admin/pedidos', { pedidos, filtros, pagina, totalPaginas, contagens, statusInfo })
+  } catch (erro) {
+    console.error('Erro ao listar pedidos:', erro.code || erro.message)
+    return res.status(500).send('Não foi possível carregar os dados dos pedidos.')
+  }
+})
 
 // Disponibiliza o número do menu "Avaliações" em todas as telas do admin
 router.use(async (req, res, next) => {
@@ -143,29 +213,6 @@ router.post('/produtos/novo', (req, res) => {
     imagem: String(b.imagem_url || '')
   })
   res.redirect('/admin/produtos/novo?salvo=1')
-})
-
-// ---------- Pedidos ----------
-router.get('/pedidos', (req, res) => {
-  const { status = '', q = '', de = '', ate = '' } = req.query
-  let lista = pedidos.slice()
-  if (status) lista = lista.filter(p => p.chave === status)
-  if (q) lista = lista.filter(p => minusculo(p.id + ' ' + p.cliente).includes(minusculo(q).replace('#', '')))
-  if (de) lista = lista.filter(p => paraISO(p.data) >= de)
-  if (ate) lista = lista.filter(p => paraISO(p.data) <= ate)
-
-  const contagens = { todos: pedidos.length }
-  ;['aguardando', 'pago', 'enviado', 'entregue', 'cancelado'].forEach(s => {
-    contagens[s] = pedidos.filter(p => p.chave === s).length
-  })
-
-  const { itens, pagina, totalPaginas } = paginar(lista, req.query.pagina)
-  res.render('admin/pedidos', {
-    pagina, totalPaginas,
-    filtros: { status, q, de, ate },
-    contagens,
-    pedidos: itens
-  })
 })
 
 // ---------- Usuários ----------
