@@ -80,5 +80,7 @@ setInterval(nextSlide, 4000);
       });
       card.addEventListener('click', evento => { if (!evento.target.closest('button')) window.location.href = '/produto?id=' + produto.sku; });
     });
-  } catch (_) { cards.forEach(card => { card.querySelector('.product-name').textContent = 'Produtos indisponíveis no momento.'; }); }
+  } catch (erro) {
+    console.error('Erro ao carregar os produtos da home:', erro);
+    cards.forEach(card => { card.querySelector('.product-name').textContent = 'Produtos indisponíveis no momento.'; }); }
 })();
