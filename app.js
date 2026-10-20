@@ -5,6 +5,7 @@ const sessao = require('express-session')
 const rotasLoja = require('./routes/loja')
 const rotasAutenticacao = require('./routes/auth')
 const rotasAdmin = require('./routes/admin-paineis')
+const produtosApi = require('./routes/api-produtos')
 // Neon (futuro): exige DATABASE_URL no .env e migração das consultas.
 // const produtosApi = require('./routes/api-produtos')
 const app = express()

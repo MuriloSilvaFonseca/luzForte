@@ -78,9 +78,7 @@ router.get('/:sku', async (req, res) => {
     res.status(500).json({ erro: 'Não foi possível carregar o produto.' })
   }
 })
-    res.status(500).json({ erro: 'Não foi possível carregar o produto.' })
-    }
-    })
+  
   
     
   
