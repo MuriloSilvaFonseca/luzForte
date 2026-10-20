@@ -5,12 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LuzForte | Recuperar senha</title>
-    <!-- APIs -->
-      <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<!-- Scripts -->
-    <script src="/js/modules/jquery-4.0.0.min.js" defer></script>
-    <script src="/js/pages/forgot-password.js" defer></script>
-    
 <!-- CSS -->
     <link rel="stylesheet" href="/css/base/reset.css">
     <link rel="stylesheet" href="/css/pages/forgot-password.css">
@@ -23,51 +17,66 @@
             <a class="cadastro-voltar" href="/login" aria-label="Voltar">←</a>
             <img class="forgot-password-logo" src="/img/logos/logo.png" alt="LuzForte Logo">
             <h1>Recuperar senha</h1>
-            <p>Complete as etapas abaixo para redefinir sua senha com segurança.</p>
 
-            <form class="forgot-password-form" action="#" method="post" novalidate>
-                <div class="step" id="step-1">
-                    <h2>Digite seu e-mail</h2>
-                    <label for="email" style="font-weight: bolder; font-size: 16px;">E-mail</label>
-                    <input type="email" id="email" name="email" placeholder="seu@email.com" required>
-                    <span class="campo-error" id="email-error">Por favor, insira um e-mail válido.</span>
-                    <span class="campo-sucesso" id="email-success">E-mail válido!</span>
-                    <button class="step-btn" type="button">Continuar</button>
+            <!-- A etapa vem da rota (routes/auth.js): email, codigo, nova-senha ou concluido -->
+
+            <% if (erro) { %>
+                <p class="redefinir-erro" role="alert"><%= erro %></p>
+            <% } %>
+            <% if (aviso) { %>
+                <p class="redefinir-aviso"><%= aviso %></p>
+            <% } %>
+
+            <% if (etapa === 'email') { %>
+                <p>Complete as etapas abaixo para redefinir sua senha com segurança.</p>
+                <form class="forgot-password-form" action="/esqueci-senha" method="post">
+                    <div class="step">
+                        <h2>Digite seu e-mail</h2>
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" name="email" placeholder="seu@email.com" required>
+                        <button class="step-btn" type="submit">Enviar código</button>
+                    </div>
+                </form>
+            <% } %>
+
+            <% if (etapa === 'codigo') { %>
+                <form class="forgot-password-form" action="/esqueci-senha/codigo" method="post">
+                    <div class="step">
+                        <h2>Código de confirmação</h2>
+                        <p>Insira o código de 6 dígitos que chegou no seu e-mail. Ele vale por 15 minutos.</p>
+                        <label for="codigo">Código</label>
+                        <input type="text" id="codigo" name="codigo" placeholder="000000" maxlength="6"
+                               inputmode="numeric" pattern="[0-9]{6}" autocomplete="one-time-code" required>
+                        <button class="step-btn" type="submit">Continuar</button>
+                    </div>
+                </form>
+                <p class="redefinir-link">Não recebeu ou digitou o e-mail errado? <a href="/esqueci-senha?recomecar=1">Começar de novo</a></p>
+            <% } %>
+
+            <% if (etapa === 'nova-senha') { %>
+                <form class="forgot-password-form" action="/esqueci-senha/nova-senha" method="post">
+                    <div class="step">
+                        <h2>Nova senha</h2>
+                        <p>Crie uma nova senha e confirme para concluir a recuperação.</p>
+                        <label for="senha">Nova senha</label>
+                        <input type="password" id="senha" name="senha" placeholder="Mínimo 8 caracteres" minlength="8" required>
+                        <label for="confirmar_senha">Confirmar nova senha</label>
+                        <input type="password" id="confirmar_senha" name="confirmar_senha" placeholder="Repita a nova senha" minlength="8" required>
+                        <button class="step-btn" type="submit">Redefinir senha</button>
+                    </div>
+                </form>
+            <% } %>
+
+            <% if (etapa === 'concluido') { %>
+                <div class="done-section">
+                    <p class="done-title">Tudo certo!</p>
+                    <img class="done-icon" src="/img/icons/verificar.png" alt="Ícone de sucesso">
+                    <p class="done-text">Sua senha foi redefinida com sucesso.</p>
+                    <a class="done-btn" href="/login">Voltar para o login</a>
                 </div>
-
-                <div class="step" id="step-2">
-                    <h2>Código de confirmação</h2>
-                    <p>Insira o código que chegou no seu e-mail.</p>
-                    <label for="code">Código</label>
-                    <input type="text" id="code" name="code" placeholder="000000" maxlength="6" required>
-                    <span class="campo-sucesso" id="code-success">Código válido!</span>
-                     <span class="campo-error" id="code-error">Código inválido.</span>
-                    <button class="step-btn" type="button">Continuar</button>
-                </div>
-
-                <div class="step" id="step-3">
-                    <h2>Nova senha</h2>
-                    <p>Crie uma nova senha e confirme para concluir a recuperação.</p>
-                    <label for="new-password">Nova senha</label>
-                    <input type="password" id="new-password" name="new-password" placeholder="Mínimo 8 caracteres" required>
-                    <label for="confirm-password">Confirmar nova senha</label>
-                    <input type="password" id="confirm-password" name="confirm-password" placeholder="Repita a nova senha" required>
-                    <span class="campo-error" id="confirm-password-error">As senhas não coincidem</span>
-                    <button class="step-btn" type="button">Redefinir senha</button>
-                </div>
-            </form>
-
-            <div class="done-section" id="done-section">
-                <p class="done-title">Tudo certo!</p>
-                <img class="done-icon" src="/img/icons/verificar.png" alt="Ícone de sucesso">
-                <p class="done-text">Sua senha foi redefinida com sucesso.</p>
-                <button class="done-btn"> <a href="/login">Voltar para o login</a></button>
-            </div>
+            <% } %>
         </div>
     </main>
-    <script type="text/javascript"
-        src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
-</script>
 </body>
 
 </html>
