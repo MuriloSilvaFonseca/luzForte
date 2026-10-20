@@ -4,6 +4,7 @@ const router = express.Router()
 const conexao = require('../config/database')
 const { userEstaLogado } = require('../middlewares/auth')
 const { carregarCheckout, finalizarPedido, buscarPedidoFinalizado } = require('../services/pedido')
+const { montarLinkWhatsApp } = require('../services/whatsapp')
 
 router.get('/', (req, res) => {
   res.render('loja/home')
@@ -52,11 +53,15 @@ router.get('/checkout', userEstaLogado, async (req, res) => {
       const pedidoFinalizado = await buscarPedidoFinalizado(req.session.usuario.id_usuario, pedidoId)
       if (!pedidoFinalizado) return res.status(404).send('Pedido não encontrado.')
 
-      return res.render('loja/checkout', { pedidoFinalizado })
+      // Link do WhatsApp com a mensagem do pedido pronta (null se WHATSAPP_LOJA não estiver no .env)
+      const linkWhatsApp = montarLinkWhatsApp(pedidoFinalizado)
+
+      return res.render('loja/checkout', { pedidoFinalizado, linkWhatsApp })
     }
 
     const checkout = await carregarCheckout(req.session.usuario.id_usuario)
-    return res.render('loja/checkout', { ...checkout, pedidoFinalizado: null, erro: null })
+    // whatsappAtivo: muda o texto do modal de confirmação (só avisa do WhatsApp se o número estiver no .env)
+    return res.render('loja/checkout', { ...checkout, pedidoFinalizado: null, erro: null, whatsappAtivo: Boolean(process.env.WHATSAPP_LOJA) })
   } catch (erro) {
     console.log(erro)
     return res.status(500).send('Não foi possível abrir o checkout.')
@@ -75,7 +80,8 @@ router.post('/checkout', userEstaLogado, async (req, res) => {
       return res.status(erro.status || 500).render('loja/checkout', {
         ...checkout,
         pedidoFinalizado: null,
-        erro: erro.status ? erro.message : 'Não foi possível finalizar o pedido. Tente novamente.'
+        erro: erro.status ? erro.message : 'Não foi possível finalizar o pedido. Tente novamente.',
+        whatsappAtivo: Boolean(process.env.WHATSAPP_LOJA)
       })
     } catch (_) {
       return res.status(500).send('Não foi possível finalizar o pedido.')

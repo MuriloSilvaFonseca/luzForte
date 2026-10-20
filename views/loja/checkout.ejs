@@ -1,12 +1,18 @@
 <%- include("../partials/head") %>
 
 <link rel="stylesheet" href="/css/pages/checkout.css">
+<!-- SweetAlert2: modais de confirmação (versão fixa) -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.all.min.js" defer></script>
+<script src="/js/pages/checkout.js" defer></script>
 
 <%- include("../partials/header") %>
 
 <main class="checkout-page">
     <% if (pedidoFinalizado) { %>
-        <section class="checkout-card checkout-confirmacao">
+        <!-- data-*: o checkout.js lê o link e o número do pedido para abrir o WhatsApp sozinho -->
+        <section class="checkout-card checkout-confirmacao" id="confirmacao-pedido"
+                 data-pedido="<%= pedidoFinalizado.id_pedido %>"
+                 data-link-whatsapp="<%= locals.linkWhatsApp || '' %>">
             <p class="checkout-selo">Pedido enviado</p>
             <h1>Obrigado pela sua compra!</h1>
             <p>Seu pedido <strong>#<%= pedidoFinalizado.id_pedido %></strong> foi registrado.</p>
@@ -14,6 +20,16 @@
             <p>Forma de pagamento: <strong><%= pedidoFinalizado.nome_pagamento %></strong></p>
             <p class="checkout-total">Total: <%= Number(pedidoFinalizado.total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></p>
             <p class="checkout-aviso">O pagamento não é processado pelo site. A equipe combinará os próximos passos.</p>
+
+            <% if (locals.linkWhatsApp) { %>
+                <!-- Abre o WhatsApp com a mensagem do pedido pronta para a loja; o cliente só aperta "enviar" -->
+                <p class="checkout-whatsapp-texto">O WhatsApp não abriu? Envie o pedido para a loja por aqui:</p>
+                <a class="checkout-botao checkout-botao-whatsapp" href="<%= linkWhatsApp %>" target="_blank" rel="noopener">
+                    <img src="/img/icons/icons8-whatsapp-50.png" alt="" width="22" height="22">
+                    Enviar pedido pelo WhatsApp
+                </a>
+            <% } %>
+
             <a class="checkout-botao" href="/catalogo">Continuar comprando</a>
         </section>
     <% } else { %>
@@ -47,7 +63,9 @@
                 <p class="checkout-total">Total: <%= Number(total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></p>
 
                 <% if (formasPagamento.length) { %>
-                    <form action="/checkout" method="post">
+                    <!-- O checkout.js intercepta o envio e mostra o modal de confirmação -->
+                    <form action="/checkout" method="post" id="form-checkout"
+                          data-whatsapp="<%= locals.whatsappAtivo ? 'sim' : 'nao' %>">
                         <label for="forma_pagamento_id">Forma de pagamento</label>
                         <select id="forma_pagamento_id" name="forma_pagamento_id" required>
                             <option value="">Selecione uma opção</option>

@@ -179,3 +179,18 @@
 .checkout-voltar:hover {
   text-decoration: underline;
 }
+
+/* Botão "Enviar pedido pelo WhatsApp" (tela de confirmação) */
+.checkout-whatsapp-texto {
+  margin-top: 16px;
+}
+
+.checkout-botao-whatsapp {
+  gap: 8px;
+  margin: 0 8px 8px 0;
+  background: #25d366;
+}
+
+.checkout-botao-whatsapp:hover {
+  background: #1da851;
+}
