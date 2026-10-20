@@ -5,7 +5,7 @@ const sessao = require('express-session')
 const rotasLoja = require('./routes/loja')
 const rotasAutenticacao = require('./routes/auth')
 const rotasAdmin = require('./routes/admin-paineis')
-const produtosApi = require('./routes/api-produtos')
+//const produtosApi = require('./routes/api-produtos')
 // Neon (futuro): exige DATABASE_URL no .env e migração das consultas.
 // const produtosApi = require('./routes/api-produtos')
 const app = express()
@@ -38,7 +38,7 @@ app.use(require('./middlewares/navbar'))
 
 app.use('/', rotasLoja)
 app.use('/', rotasAutenticacao)
-app.use('/', produtosApi)
+//app.use('/', produtosApi)
 app.use('/', require('./routes/avaliacao'))
 // Neon (futuro): adaptar as respostas e substituir a API MySQL de /api/produtos.
 // app.use('/', produtosApi)
