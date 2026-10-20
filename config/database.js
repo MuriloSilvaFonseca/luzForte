@@ -20,3 +20,5 @@ conexao.getConnection((erro, con) => {
 })
 
 module.exports = conexao
+
+

@@ -17,4 +17,8 @@
   border: 1px solid #52c41a;
   border-radius: 4px;
   padding: 6px 10px;
+ z-index: 10;
+  position: absolute;
+  top: 50px;   /* Distância do topo */
+  left: 50px;
 }
