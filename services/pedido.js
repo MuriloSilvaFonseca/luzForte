@@ -86,14 +86,28 @@ async function finalizarPedido(usuarioId, formaPagamentoId) {
 }
 
 async function buscarPedidoFinalizado(usuarioId, pedidoId) {
-  const [pedidos] = await banco.promise().execute(
-    `SELECT p.id_pedido, p.total, p.status, fp.nome_pagamento
+  const conexao = banco.promise()
+  const [pedidos] = await conexao.execute(
+    `SELECT p.id_pedido, p.total, p.status, fp.nome_pagamento, u.nome_usuario AS nome_cliente
      FROM pedido p
+     JOIN usuario u ON u.id_usuario = p.usuario_id
      LEFT JOIN forma_pagamento fp ON fp.id_forma_pagamento = p.forma_pagamento_id
      WHERE p.id_pedido = ? AND p.usuario_id = ? AND p.status = 'solicitado'`,
     [pedidoId, usuarioId]
   )
-  return pedidos[0] || null
+  if (!pedidos.length) return null
+
+  // Itens do pedido, usados na mensagem do WhatsApp
+  const [itens] = await conexao.execute(
+    `SELECT p.titulo_produto, pp.quantidade, pp.subtotal
+     FROM produto_pedido pp
+     JOIN produto p ON p.sku = pp.produto_sku
+     WHERE pp.pedido_id = ?
+     ORDER BY p.titulo_produto`,
+    [pedidoId]
+  )
+
+  return { ...pedidos[0], itens }
 }
 
 module.exports = { carregarCheckout, finalizarPedido, buscarPedidoFinalizado }
