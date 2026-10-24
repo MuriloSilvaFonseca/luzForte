@@ -189,11 +189,22 @@
   background: #15265c;
 }
 
+.btn-cta:disabled {
+  opacity: .7;
+  cursor: wait;
+}
+
 .terms {
   margin-top: 12px;
   color: #667085;
   font-size: 12px;
   text-align: center;
+}
+
+.terms a {
+  color: #1e3f6d;
+  font-weight: 700;
+  text-decoration: underline;
 }
 
 .form-error {

@@ -6,6 +6,10 @@ const { transferirCarrinhoVisitante } = require('../services/carrinho')
 const { enviarCodigoRedefinicao } = require('../services/email')
 const router = express.Router()
 
+function renderizarRegistro(res, erro, valores = {}, status = 200) {
+  return res.status(status).render('auth/registro', { erro, valores })
+}
+
 router.get('/registro', (req, res) => {
   if (req.session.usuario) return res.redirect('/')
   res.render('auth/registro')
@@ -20,17 +24,18 @@ router.post('/registro', (req, res) => {
   const nomeUsuario = typeof nome === 'string' ? nome.trim() : ''
   const emailUsuario = typeof email === 'string' ? email.trim() : ''
   const telefoneUsuario = typeof telefone === 'string' ? telefone.trim() : ''
+  const valores = { nome: nomeUsuario, email: emailUsuario, telefone: telefoneUsuario }
 
   if (!nomeUsuario || !emailUsuario || !telefoneUsuario || typeof senha !== 'string' || !senha) {
-    return res.render('auth/registro', { erro: 'Preencha todos os campos' })
+    return renderizarRegistro(res, 'Preencha todos os campos', valores)
   }
 
   if (senha.length < 8) {
-    return res.render('auth/registro', { erro: 'A senha precisa ter no mínimo 8 caracteres' })
+    return renderizarRegistro(res, 'A senha precisa ter no mínimo 8 caracteres', valores)
   }
 
   if (senha !== confirm_senha) {
-    return res.render('auth/registro', {  erro: 'As senhas não conferem'  })
+    return renderizarRegistro(res, 'As senhas não conferem', valores)
   }
 
   const sqlSelectEmail = 'SELECT COUNT(*) AS Existe FROM usuario WHERE email = ?'
@@ -38,18 +43,18 @@ router.post('/registro', (req, res) => {
   conexao.query(sqlSelectEmail, [emailUsuario], (erro, resultado) => {
     if(erro) {
       console.log(erro);
-      return res.status(500).send('Erro do servidor')
+      return renderizarRegistro(res, 'Não foi possível criar a conta. Tente novamente.', valores, 500)
     }
 
     if(resultado[0].Existe > 0) {
-      return res.render('auth/registro', { erro: 'Esse e-mail já existe' })
+      return renderizarRegistro(res, 'Esse e-mail já existe', valores)
     }
 
     // AQUI É GERADO O HASH PARA PROTEGER A SENHA
     bcrypt.hash(senha, 10, (erro, hash) => {
       if(erro) {
         console.log(erro);
-        return res.status(500).send('Erro do servidor')
+        return renderizarRegistro(res, 'Não foi possível criar a conta. Tente novamente.', valores, 500)
       }
 
       const sqlInsert = 'INSERT INTO usuario(nome_usuario, email, telefone, senha) VALUES (?, ?, ?, ?)'
@@ -57,10 +62,10 @@ router.post('/registro', (req, res) => {
       conexao.query(sqlInsert, [nomeUsuario, emailUsuario, telefoneUsuario, hash], (erroInsert, resultadoInsert) => {
         if(erroInsert) {
           if(erroInsert.code === 'ER_DUP_ENTRY') {
-            return res.render('auth/registro', { erro: 'Esse e-mail já existe' })
+            return renderizarRegistro(res, 'Esse e-mail já existe', valores)
           }
           console.log(erroInsert);
-          return res.status(500).send('Erro do servidor')
+          return renderizarRegistro(res, 'Não foi possível criar a conta. Tente novamente.', valores, 500)
         }
 
         return res.redirect('/login')
