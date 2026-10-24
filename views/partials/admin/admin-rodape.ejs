@@ -2,6 +2,7 @@
     </main>
   </div>
 
+  <script src="/js/modules/account-menu.js" defer></script>
   <% (typeof scripts !== 'undefined' && Array.isArray(scripts) ? scripts : []).forEach(function (src) { %>
     <script src="<%= src %>" defer></script>
   <% }) %>

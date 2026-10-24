@@ -17,7 +17,7 @@
     display: flex;
     align-items: center;
     gap: 5px;
-    width: 200px;
+    width: auto;
     justify-content: center;
     color: white;
 }
@@ -156,7 +156,7 @@
     display: flex;
     align-items: center;
     gap: 5px;
-    width: 200px;
+    width: auto;
     justify-content: center;
 }
 

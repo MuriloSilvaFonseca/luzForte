@@ -17,6 +17,7 @@ app.use( sessao({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
+  rolling: true,
   cookie: { maxAge: 1000 * 60 * 60 * 0.5 }
 }))
 
@@ -24,9 +25,6 @@ app.use((req, res, next) => {
   res.locals.usuario = req.session.usuario || null
   next()
 })
-const { userAdmin } = require('./middlewares/auth')
-// ...
-
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
 

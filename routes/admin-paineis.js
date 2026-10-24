@@ -3,7 +3,10 @@
 // ainda usam dados FICTÍCIOS (em memória; voltam ao normal quando o servidor reinicia).
 const express = require('express')
 const conexao = require('../config/database')
+const { userEstaLogado, userAdmin } = require('../middlewares/auth')
 const router = express.Router()
+
+router.use(userEstaLogado, userAdmin)
 
 const POR_PAGINA = 10
 const ESTOQUE_BAIXO = 5
