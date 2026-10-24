@@ -1,6 +1,9 @@
 const express = require('express')
 const banco = require('../config/database').promise()
+const { userEstaLogado, userAdmin } = require('../middlewares/auth')
 const router = express.Router()
+
+router.use(userEstaLogado, userAdmin)
 
 const POR_PAGINA = 10
 const ESTOQUE_BAIXO = 5

@@ -7,12 +7,15 @@ const { enviarCodigoRedefinicao } = require('../services/email')
 const router = express.Router()
 
 router.get('/registro', (req, res) => {
+  if (req.session.usuario) return res.redirect('/')
   res.render('auth/registro')
 })
 
 
 // ROTA POST PARA CADASTRO DE USUÁRIO
 router.post('/registro', (req, res) => {
+  if (req.session.usuario) return res.redirect('/')
+
   const { nome, email, telefone, senha, confirm_senha } = req.body
   const nomeUsuario = typeof nome === 'string' ? nome.trim() : ''
   const emailUsuario = typeof email === 'string' ? email.trim() : ''
@@ -67,10 +70,13 @@ router.post('/registro', (req, res) => {
 })
 
 router.get('/login', (req, res) => {
+  if (req.session.usuario) return res.redirect('/')
   res.render('auth/login')
 })
 
 router.post('/login', (req, res) => {
+  if (req.session.usuario) return res.redirect('/')
+
   const { email, password } = req.body
   if (typeof email !== 'string' || typeof password !== 'string' || !email || !password || password.length > 256) {
     return res.status(400).render('auth/login', { erro: 'Informe e-mail e senha.' })
@@ -135,6 +141,19 @@ router.post('/login', (req, res) => {
           })
       })
     })
+  })
+})
+
+router.post('/logout', (req, res) => {
+  const caminhoCookie = req.session.cookie.path || '/'
+  req.session.destroy(erro => {
+    if (erro) {
+      console.error('Não foi possível encerrar a sessão:', erro)
+      return res.status(500).send('Não foi possível sair. Tente novamente.')
+    }
+
+    res.clearCookie('connect.sid', { path: caminhoCookie })
+    return res.redirect('/')
   })
 })
 
