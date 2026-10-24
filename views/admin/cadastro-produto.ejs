@@ -31,7 +31,7 @@
   <p class="admin-produto-mensagem admin-produto-mensagem-sucesso" role="status"><%= emEdicao ? 'Produto atualizado com sucesso.' : 'Produto cadastrado com sucesso.' %></p>
 <% } %>
 
-<form class="admin-produto-formulario" action="<%= acaoFormulario %>" method="post">
+<form class="admin-produto-formulario" action="<%= acaoFormulario %>" method="post" enctype="multipart/form-data">
 
   <!-- 1. Identificação -->
   <section class="admin-produto-secao" aria-labelledby="admin-produto-identificacao">
@@ -162,20 +162,32 @@
     </div>
   </section>
 
-  <!-- 5. Imagem -->
+  <!-- 5. Imagens -->
   <section class="admin-produto-secao" aria-labelledby="admin-produto-imagem">
     <div class="admin-produto-secao-cabecalho">
       <span class="admin-produto-numero" aria-hidden="true">5</span>
       <div>
-        <h2 class="admin-produto-secao-titulo" id="admin-produto-imagem">Imagem</h2>
-        <p class="admin-produto-secao-texto">Adicione o endereço da imagem principal do produto.</p>
+        <h2 class="admin-produto-secao-titulo" id="admin-produto-imagem">Imagens do produto</h2>
+        <p class="admin-produto-secao-texto">Envie até 5 imagens para a galeria do produto.</p>
       </div>
     </div>
 
     <div class="admin-produto-campo">
-      <label class="admin-produto-label" for="imagem-produto">URL da imagem</label>
-      <input class="admin-produto-input" id="imagem-produto" name="imagem_url" type="text" maxlength="500" value="<%= valoresFormulario.imagem_url || '' %>" placeholder="https://exemplo.com/imagem.jpg ou /img/products/lampada.png">
-      <small class="admin-produto-ajuda">Use um endereço http(s) ou o caminho de uma imagem da loja, começando com /.</small>
+      <% if (emEdicao && Array.isArray(valoresFormulario.imagens) && valoresFormulario.imagens.length) { %>
+        <p class="admin-produto-label">Imagens atuais</p>
+        <div class="admin-produto-imagens-atuais">
+          <% valoresFormulario.imagens.forEach(function (imagem) { %>
+            <figure class="admin-produto-imagem-atual">
+              <img src="<%= imagem.url %>" alt="Imagem <%= imagem.ordem %> de <%= valoresFormulario.titulo_produto || 'produto' %>" loading="lazy">
+              <figcaption>Imagem <%= imagem.ordem %></figcaption>
+            </figure>
+          <% }) %>
+        </div>
+        <small class="admin-produto-ajuda">Enviar novas imagens substituirá as atuais. Se não selecionar arquivos, as imagens atuais serão mantidas.</small>
+      <% } %>
+      <label class="admin-produto-label" for="imagens-produto">Selecionar imagens</label>
+      <input class="admin-produto-input admin-produto-input-arquivo" id="imagens-produto" name="imagens" type="file" accept="image/jpeg,image/png,image/webp" multiple data-max-arquivos="5">
+      <small class="admin-produto-ajuda" id="imagens-produto-ajuda">PNG, JPG ou WebP; até 5 imagens de no máximo 5 MB cada.</small>
     </div>
   </section>
 
@@ -190,4 +202,4 @@
 
 </form>
 
-<%- include('../partials/admin/admin-rodape') %>
+<%- include('../partials/admin/admin-rodape', { scripts: ['/js/pages/admin-produto-imagens.js'] }) %>

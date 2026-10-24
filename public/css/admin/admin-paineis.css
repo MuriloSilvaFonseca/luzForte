@@ -633,6 +633,11 @@
 }
 .admin-produto-input:focus { border-color: #477fbd; outline: 2px solid #dce9f7; }
 .admin-produto-ajuda { display: block; margin-top: 5px; }
+.admin-produto-input-arquivo { min-height: auto; padding: 12px; background: #f8fafc; }
+.admin-produto-imagens-atuais { display: flex; flex-wrap: wrap; gap: 12px; margin: 8px 0 10px; }
+.admin-produto-imagem-atual { width: 112px; margin: 0; padding: 6px; border: 1px solid #dce2e9; border-radius: 6px; color: #697586; font-size: 11px; }
+.admin-produto-imagem-atual img { display: block; width: 100%; height: 88px; object-fit: contain; background: #f3f5f8; }
+.admin-produto-imagem-atual figcaption { margin-top: 5px; text-align: center; }
 
 .admin-produto-status { display: flex; align-items: center; gap: 12px; margin: 0; padding: 0; border: 0; }
 .admin-produto-status .admin-produto-label { width: 100%; }
