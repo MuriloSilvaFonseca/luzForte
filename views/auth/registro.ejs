@@ -4,13 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LuzForte | Registro</title>
+    <link rel="icon" type="image/png" href="/img/faviconLuzForte.png">
     <link rel="stylesheet" href="/css/base/reset.css">
     <link rel="stylesheet" href="/css/pages/registro.css">
     <link rel="stylesheet" href="/css/components/messages.css">
+    <link rel="stylesheet" href="/css/components/footer.css">
     <script src="/js/pages/auth-forms.js" defer></script>
     
 </head>
 <body>
+    <% const valoresRegistro = typeof valores !== 'undefined' ? valores : {} %>
 
     <header class="registro-header">
         <img class="registro-logo" src="/img/logos/logo.png" alt="LuzForte Logo">
@@ -33,17 +36,17 @@
                 <% } %>
                 <label class="field">
                     <span class="field-label">Nome completo*</span>
-                    <input type="text" name="nome" placeholder="Digite seu nome completo" autocomplete="name" maxlength="200" required>
+                    <input type="text" name="nome" placeholder="Digite seu nome completo" autocomplete="name" maxlength="200" value="<%= valoresRegistro.nome || '' %>" required>
                 </label>
 
                 <label class="field">
                     <span class="field-label">E-mail *</span>
-                    <input type="email" name="email" placeholder="Digite seu e-mail" autocomplete="email" maxlength="255" required>
+                    <input type="email" name="email" placeholder="Digite seu e-mail" autocomplete="email" maxlength="255" value="<%= valoresRegistro.email || '' %>" required>
                 </label>
 
                 <label class="field">
                     <span class="field-label">Telefone*</span>
-                    <input type="tel" name="telefone" placeholder="(00) 00000-0000" autocomplete="tel-national" inputmode="numeric" maxlength="15" data-mascara="telefone" required>
+                    <input type="tel" name="telefone" placeholder="(00) 00000-0000" autocomplete="tel-national" inputmode="numeric" maxlength="15" data-mascara="telefone" value="<%= valoresRegistro.telefone || '' %>" required>
                 </label>
 
                 <label class="field password-field">
@@ -65,13 +68,9 @@
 
                 <button class="btn-cta" type="submit">Criar conta</button>
 
-                <p class="terms">Ao clicar em Criar, você concorda com os Termos de Uso e a Política de Privacidade.</p>
+                <p class="terms">Ao clicar em Criar, você concorda com os Termos de Uso e a <a href="/politica-de-privacidade">Política de Privacidade</a>.</p>
             </form>
         </div>
     </main>
 
-
-    
-   
-</body>
-</html>
+    <%- include('../partials/footer') %>

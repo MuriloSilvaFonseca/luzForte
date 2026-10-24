@@ -106,5 +106,9 @@ router.get('/contato', (req, res) => {
   res.render('loja/contato')
 })
 
+router.get('/politica-de-privacidade', (req, res) => {
+  res.render('loja/privacidade')
+})
+
 
 module.exports = router
