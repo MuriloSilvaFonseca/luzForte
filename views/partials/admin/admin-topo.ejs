@@ -10,9 +10,10 @@
 <%
   const tituloPagina = locals.titulo || 'Painel';
   const paginaAtual = locals.pagina || '';
-  const inicial = (locals.usuario && locals.usuario.nome)
-    ? locals.usuario.nome.trim().charAt(0).toUpperCase()
-    : 'A';
+  const nomeUsuario = locals.usuario && locals.usuario.nome_usuario
+    ? locals.usuario.nome_usuario
+    : 'Administrador';
+  const inicial = nomeUsuario.trim().charAt(0).toUpperCase();
 
   const itensMenu = [
     { id: 'visao-geral', rotulo: 'Visão geral', href: '/admin' },
@@ -29,9 +30,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LuzForte | <%= tituloPagina %></title>
+  <link rel="icon" type="image/png" href="/img/faviconLuzForte.png">
   <link rel="stylesheet" href="/css/base/reset.css">
   <link rel="stylesheet" href="/css/base/variables.css">
   <link rel="stylesheet" href="/css/admin/admin-paineis.css">
+  <link rel="stylesheet" href="/css/components/account-menu.css">
 </head>
 
 <body class="adm">
@@ -41,8 +44,12 @@
   <header class="adm-topbar">
     <a class="adm-logo" href="/admin">Luz<span>Forte</span></a>
     <div class="adm-topbar__user">
-      <span class="adm-avatar adm-avatar--light" aria-hidden="true"><%= inicial %></span>
-      <span>Área administrativa</span>
+      <button class="account-menu-trigger" type="button" data-account-menu-trigger
+              aria-haspopup="menu" aria-controls="account-menu" aria-expanded="false">
+        <span class="adm-avatar adm-avatar--light" aria-hidden="true"><%= inicial %></span>
+        <span>Olá, <%= nomeUsuario %></span>
+      </button>
+      <%- include('../account-menu') %>
     </div>
   </header>
 

@@ -1,0 +1,15 @@
+<%- include("../partials/head", { tituloPagina: tituloPagina }) %>
+<link rel="stylesheet" href="/css/pages/erro.css">
+
+<%- include("../partials/header") %>
+
+<main class="pagina-erro">
+  <section class="pagina-erro__cartao" aria-labelledby="titulo-erro">
+    <p class="pagina-erro__codigo"><%= codigo %></p>
+    <h1 id="titulo-erro"><%= titulo %></h1>
+    <p class="pagina-erro__mensagem"><%= mensagem %></p>
+    <a class="pagina-erro__link" href="/">Voltar para a página inicial</a>
+  </section>
+</main>
+
+<%- include("../partials/footer") %>

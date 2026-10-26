@@ -1,16 +1,115 @@
 const express = require('express')
+const fs = require('node:fs/promises')
+const path = require('node:path')
+const { randomUUID } = require('node:crypto')
+const { Transform } = require('node:stream')
 const banco = require('../config/database').promise()
+const { userEstaLogado, userAdmin } = require('../middlewares/auth')
 const router = express.Router()
+
+router.use(userEstaLogado, userAdmin)
 
 const POR_PAGINA = 10
 const ESTOQUE_BAIXO = 5
 const INT_MAXIMO = 2147483647
+const MAX_IMAGENS_PRODUTO = 5
+const MAX_BYTES_POR_IMAGEM = 5 * 1024 * 1024
+const MAX_BYTES_UPLOAD = MAX_IMAGENS_PRODUTO * MAX_BYTES_POR_IMAGEM + 1024 * 1024
+const DIRETORIO_IMAGENS = path.resolve(__dirname, '..', 'public', 'img', 'products')
 const statusPermitidos = ['ativo', 'desativado', 'oculto']
 const camposProduto = [
   'titulo_produto', 'sku', 'GTIN_EAN', 'ativo', 'marca_id', 'subcategoria_id',
   'custo_produto', 'preco_produto', 'estoque_produto', 'descricao',
-  'especificacao', 'instalacao', 'imagem_url'
+  'especificacao', 'instalacao'
 ]
+
+function analisarFormularioMultipart(req, res, next) {
+  const tipoConteudo = String(req.headers['content-type'] || '').toLowerCase()
+  req.files = []
+  if (!tipoConteudo.startsWith('multipart/form-data;')) return next()
+
+  let bytesRecebidos = 0
+  const limite = new Transform({
+    transform(chunk, encoding, callback) {
+      bytesRecebidos += chunk.length
+      if (bytesRecebidos > MAX_BYTES_UPLOAD) {
+        const erro = new Error('O envio ultrapassa o limite total permitido.')
+        erro.uploadStatus = 413
+        return callback(erro)
+      }
+      callback(null, chunk)
+    }
+  })
+
+  req.pipe(limite)
+  new Request('http://localhost/upload', {
+    method: 'POST',
+    headers: req.headers,
+    body: limite,
+    duplex: 'half'
+  }).formData().then(formulario => {
+    const corpo = {}
+    const arquivos = []
+    for (const [chave, valor] of formulario.entries()) {
+      if (typeof valor === 'string') {
+        if (Object.hasOwn(corpo, chave)) {
+          corpo[chave] = Array.isArray(corpo[chave]) ? [...corpo[chave], valor] : [corpo[chave], valor]
+        } else {
+          corpo[chave] = valor
+        }
+      } else if (chave === 'imagens' && valor.name && valor.size) {
+        arquivos.push(valor)
+      } else if (valor.name && valor.size) {
+        req.uploadError = { status: 400, mensagem: 'Envie os arquivos no campo de imagens do produto.' }
+      }
+    }
+    req.body = corpo
+    req.files = arquivos
+    if (arquivos.length > MAX_IMAGENS_PRODUTO) {
+      req.uploadError = { status: 400, mensagem: `Selecione no máximo ${MAX_IMAGENS_PRODUTO} imagens.` }
+    }
+    next()
+  }).catch(erro => {
+    req.body = {}
+    req.files = []
+    req.uploadError = {
+      status: erro.uploadStatus || 400,
+      mensagem: erro.uploadStatus === 413
+        ? 'O envio ficou muito grande. Cada imagem pode ter até 5 MB e o formulário aceita até 5 imagens.'
+        : 'Não foi possível ler as imagens enviadas. Confira os arquivos e tente novamente.'
+    }
+    next()
+  })
+}
+
+function tipoImagem(buffer) {
+  if (buffer.length >= 8 && buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) return 'png'
+  if (buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) return 'jpg'
+  if (buffer.length >= 12 && buffer.toString('ascii', 0, 4) === 'RIFF' && buffer.toString('ascii', 8, 12) === 'WEBP') return 'webp'
+  return null
+}
+
+async function gravarImagemProduto(buffer, sku, ordem, extensao) {
+  await fs.mkdir(DIRETORIO_IMAGENS, { recursive: true })
+  const nomeArquivo = `produto-${sku}-${ordem}-${randomUUID()}.${extensao}`
+  const caminhoArquivo = path.join(DIRETORIO_IMAGENS, nomeArquivo)
+  await fs.writeFile(caminhoArquivo, buffer, { flag: 'wx' })
+  return { caminhoArquivo, url: `/img/products/${nomeArquivo}` }
+}
+
+async function removerImagemLocalSeNaoUsada(url) {
+  const prefixo = '/img/products/'
+  if (typeof url !== 'string' || !url.startsWith(prefixo)) return
+  const nomeArquivo = url.slice(prefixo.length)
+  if (!nomeArquivo || path.basename(nomeArquivo) !== nomeArquivo) return
+
+  try {
+    const [usos] = await banco.query('SELECT COUNT(*) AS total FROM imagem_produto WHERE url = ?', [url])
+    if (Number(usos[0].total) === 0) await fs.unlink(path.join(DIRETORIO_IMAGENS, nomeArquivo))
+  } catch (erro) {
+    if (erro.code !== 'ENOENT') console.error('Falha ao limpar imagem antiga:', erro.code)
+  }
+}
 
 async function mostrarFormulario(res, { erro = '', valores = {}, status = 200, salvo = false, editando = false } = {}) {
   let marcas = []
@@ -25,6 +124,13 @@ async function mostrarFormulario(res, { erro = '', valores = {}, status = 200, s
       ORDER BY c.nome, s.nome, s.id_subcategoria
     `)
     subcategorias = listaSubcategorias
+    if (editando && !Array.isArray(valores.imagens) && valores.sku) {
+      const [imagens] = await banco.query(
+        'SELECT ordem, url FROM imagem_produto WHERE produto_sku = ? ORDER BY ordem',
+        [Number(valores.sku)]
+      )
+      valores.imagens = imagens
+    }
   } catch (falha) {
     console.error('Falha ao carregar formulário de produto:', falha.code)
     status = 500
@@ -40,19 +146,6 @@ function inteiroValido(valor, minimo) {
 
 function dinheiroValido(valor) {
   return /^\d+(\.\d{1,2})?$/.test(valor) && Number(valor) <= 99999999.99
-}
-
-function imagemValida(valor) {
-  if (!valor) return true
-  if (valor.startsWith('/') && !valor.startsWith('//') && !valor.includes('\\')) return true
-  if (!/^https?:\/\//i.test(valor)) return false
-
-  try {
-    const endereco = new URL(valor)
-    return ['http:', 'https:'].includes(endereco.protocol) && Boolean(endereco.hostname)
-  } catch (_) {
-    return false
-  }
 }
 
 async function salvarTexto(conexaoBanco, tabela, nome, texto, sku, editando) {
@@ -153,8 +246,7 @@ router.get('/produtos/:sku/editar', async (req, res) => {
         (SELECT texto_especificacao FROM especificacao WHERE produto_sku = p.sku ORDER BY id_especificacao LIMIT 1) AS especificacao,
         (SELECT nome_especificacao FROM especificacao WHERE produto_sku = p.sku ORDER BY id_especificacao LIMIT 1) AS nome_especificacao,
         (SELECT texto_instalacao FROM instalacao WHERE produto_sku = p.sku ORDER BY id_instalacao LIMIT 1) AS instalacao,
-        (SELECT nome_instalacao FROM instalacao WHERE produto_sku = p.sku ORDER BY id_instalacao LIMIT 1) AS nome_instalacao,
-        (SELECT url FROM imagem_produto WHERE produto_sku = p.sku AND ordem = 1) AS imagem_url
+        (SELECT nome_instalacao FROM instalacao WHERE produto_sku = p.sku ORDER BY id_instalacao LIMIT 1) AS nome_instalacao
       FROM produto p WHERE p.sku = ?
     `, [Number(req.params.sku)])
     if (!produtos.length) return res.status(404).send('Produto não encontrado.')
@@ -165,7 +257,7 @@ router.get('/produtos/:sku/editar', async (req, res) => {
   }
 })
 
-router.post(['/produtos/novo', '/produtos/:sku/editar'], async (req, res) => {
+router.post(['/produtos/novo', '/produtos/:sku/editar'], analisarFormularioMultipart, async (req, res) => {
   const editando = req.params.sku !== undefined
   if (editando && !inteiroValido(req.params.sku, 1)) return res.status(400).send('SKU inválido.')
   const corpo = req.body && typeof req.body === 'object' && !Array.isArray(req.body) ? req.body : {}
@@ -176,6 +268,15 @@ router.post(['/produtos/novo', '/produtos/:sku/editar'], async (req, res) => {
     valores[campo] = typeof corpo[campo] === 'string' ? corpo[campo].trim() : ''
   }
   if (!valores.estoque_produto) valores.estoque_produto = '0'
+  if (req.uploadError) {
+    if (editando) valores.sku = req.params.sku
+    return mostrarFormulario(res, {
+      erro: req.uploadError.mensagem,
+      valores,
+      editando,
+      status: req.uploadError.status
+    })
+  }
 
   let mensagem = ''
   if (editando && valores.sku !== req.params.sku) mensagem = 'O SKU não pode ser alterado na edição.'
@@ -187,8 +288,28 @@ router.post(['/produtos/novo', '/produtos/:sku/editar'], async (req, res) => {
   else if (!dinheiroValido(valores.custo_produto) || !dinheiroValido(valores.preco_produto)) mensagem = 'Informe custo e preço entre 0 e 99999999,99, com até duas casas decimais.'
   else if (!inteiroValido(valores.estoque_produto, 0)) mensagem = 'Informe um estoque inteiro entre 0 e 2147483647.'
   else if (Array.from(valores.GTIN_EAN).length > 14) mensagem = 'O código EAN deve ter até 14 caracteres.'
-  else if (Array.from(valores.imagem_url).length > 500 || !imagemValida(valores.imagem_url)) mensagem = 'Use uma imagem com endereço http://, https:// ou caminho iniciado por /, com até 500 caracteres.'
   else if (['descricao', 'especificacao', 'instalacao'].some(campo => Buffer.byteLength(valores[campo], 'utf8') > 65535)) mensagem = 'Descrição, especificações e instalação devem ter até 65535 bytes cada.'
+
+  const arquivosCarregados = req.files || []
+  const imagensEnviadas = []
+  if (!mensagem && arquivosCarregados.length > MAX_IMAGENS_PRODUTO) {
+    mensagem = `Selecione no máximo ${MAX_IMAGENS_PRODUTO} imagens.`
+  }
+  if (!mensagem) {
+    for (const arquivo of arquivosCarregados) {
+      if (arquivo.size > MAX_BYTES_POR_IMAGEM) {
+        mensagem = 'Cada imagem pode ter no máximo 5 MB.'
+        break
+      }
+      const buffer = Buffer.from(await arquivo.arrayBuffer())
+      const extensao = tipoImagem(buffer)
+      if (!extensao) {
+        mensagem = 'Use imagens PNG, JPG ou WebP válidas.'
+        break
+      }
+      imagensEnviadas.push({ buffer, extensao })
+    }
+  }
 
   if (mensagem) {
     if (editando) valores.sku = req.params.sku
@@ -198,6 +319,8 @@ router.post(['/produtos/novo', '/produtos/:sku/editar'], async (req, res) => {
   const skuNumero = Number(valores.sku)
   let conexaoBanco
   let falha
+  const arquivosCriados = []
+  let imagensAnteriores = []
   try {
     conexaoBanco = await banco.getConnection()
     await conexaoBanco.beginTransaction()
@@ -212,6 +335,11 @@ router.post(['/produtos/novo', '/produtos/:sku/editar'], async (req, res) => {
         await conexaoBanco.rollback()
         return res.status(404).send('Produto não encontrado.')
       }
+      const [imagens] = await conexaoBanco.query(
+        'SELECT ordem, url FROM imagem_produto WHERE produto_sku = ? ORDER BY ordem FOR UPDATE',
+        [skuNumero]
+      )
+      imagensAnteriores = imagens
       await conexaoBanco.query(`
         UPDATE produto SET titulo_produto = ?, estoque_produto = ?, preco_produto = ?,
           custo_produto = ?, ativo = ?, GTIN_EAN = ?, marca_id = ?, subcategoria_id = ?
@@ -228,19 +356,21 @@ router.post(['/produtos/novo', '/produtos/:sku/editar'], async (req, res) => {
     await salvarTexto(conexaoBanco, 'especificacao', 'Especificações', valores.especificacao, skuNumero, editando)
     await salvarTexto(conexaoBanco, 'instalacao', 'Orientações de instalação', valores.instalacao, skuNumero, editando)
 
-    let imagens = []
-    if (editando) {
-      const [listaImagens] = await conexaoBanco.query('SELECT id_imagem_produto AS id FROM imagem_produto WHERE produto_sku = ? AND ordem = 1', [skuNumero])
-      imagens = listaImagens
-    }
-    if (imagens.length) {
-      if (valores.imagem_url) {
-        await conexaoBanco.query('UPDATE imagem_produto SET url = ? WHERE id_imagem_produto = ? AND produto_sku = ?', [valores.imagem_url, imagens[0].id, skuNumero])
-      } else {
-        await conexaoBanco.query('DELETE FROM imagem_produto WHERE id_imagem_produto = ? AND produto_sku = ?', [imagens[0].id, skuNumero])
+    if (imagensEnviadas.length) {
+      const novasImagens = []
+      for (const [indice, imagem] of imagensEnviadas.entries()) {
+        const gravada = await gravarImagemProduto(imagem.buffer, skuNumero, indice + 1, imagem.extensao)
+        arquivosCriados.push(gravada.caminhoArquivo)
+        novasImagens.push({ ordem: indice + 1, url: gravada.url })
       }
-    } else if (valores.imagem_url) {
-      await conexaoBanco.query('INSERT INTO imagem_produto (ordem, url, produto_sku) VALUES (?, ?, ?)', [1, valores.imagem_url, skuNumero])
+
+      await conexaoBanco.query('DELETE FROM imagem_produto WHERE produto_sku = ?', [skuNumero])
+      for (const imagem of novasImagens) {
+        await conexaoBanco.query(
+          'INSERT INTO imagem_produto (ordem, url, produto_sku) VALUES (?, ?, ?)',
+          [imagem.ordem, imagem.url, skuNumero]
+        )
+      }
     }
     await conexaoBanco.commit()
   } catch (erro) {
@@ -254,6 +384,12 @@ router.post(['/produtos/novo', '/produtos/:sku/editar'], async (req, res) => {
     }
   } finally {
     if (conexaoBanco) conexaoBanco.release()
+  }
+
+  if (falha) {
+    await Promise.all(arquivosCriados.map(caminho => fs.unlink(caminho).catch(() => {})))
+  } else if (imagensEnviadas.length) {
+    await Promise.all(imagensAnteriores.map(imagem => removerImagemLocalSeNaoUsada(imagem.url)))
   }
 
   if (falha) {

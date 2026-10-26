@@ -6,6 +6,15 @@ const { userEstaLogado } = require('../middlewares/auth')
 const { carregarCheckout, finalizarPedido, buscarPedidoFinalizado } = require('../services/pedido')
 const { montarLinkWhatsApp } = require('../services/whatsapp')
 
+function renderizarErroInterno(res) {
+  return res.status(500).render('loja/erro', {
+    tituloPagina: 'Erro no servidor',
+    codigo: '500',
+    titulo: 'Tivemos um problema por aqui',
+    mensagem: 'Não foi possível concluir sua solicitação agora. Tente novamente em instantes.'
+  })
+}
+
 router.get('/', (req, res) => {
   res.render('loja/home')
 })
@@ -14,7 +23,7 @@ router.get('/catalogo', (req, res) => {
   conexao.query('SELECT id_marca, nome FROM marca ORDER BY nome', (erro, marcas) => {
     if (erro) {
       console.log(erro)
-      return res.status(500).send('Erro no servidor')
+      return renderizarErroInterno(res)
     }
 
     res.render('loja/catalogo', {
@@ -64,7 +73,7 @@ router.get('/checkout', userEstaLogado, async (req, res) => {
     return res.render('loja/checkout', { ...checkout, pedidoFinalizado: null, erro: null, whatsappAtivo: Boolean(process.env.WHATSAPP_LOJA) })
   } catch (erro) {
     console.log(erro)
-    return res.status(500).send('Não foi possível abrir o checkout.')
+    return renderizarErroInterno(res)
   }
 })
 
@@ -84,7 +93,7 @@ router.post('/checkout', userEstaLogado, async (req, res) => {
         whatsappAtivo: Boolean(process.env.WHATSAPP_LOJA)
       })
     } catch (_) {
-      return res.status(500).send('Não foi possível finalizar o pedido.')
+      return renderizarErroInterno(res)
     }
   }
 })
@@ -95,6 +104,10 @@ router.get('/sobre-nos', (req, res) => {
 
 router.get('/contato', (req, res) => {
   res.render('loja/contato')
+})
+
+router.get('/politica-de-privacidade', (req, res) => {
+  res.render('loja/privacidade')
 })
 
 

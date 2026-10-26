@@ -1,0 +1,57 @@
+.pagina-erro {
+  min-height: 48vh;
+  display: grid;
+  place-items: center;
+  padding: 64px 24px;
+  background: var(--color-background, #f7f7f7);
+  font-family: 'Poppins', Arial, sans-serif;
+}
+
+.pagina-erro__cartao {
+  width: min(100%, 680px);
+  padding: clamp(32px, 7vw, 64px);
+  text-align: center;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 12px 36px rgb(31 41 51 / 10%);
+}
+
+.pagina-erro__codigo {
+  margin-bottom: 12px;
+  color: var(--color-primary, #f2b705);
+  font-size: clamp(3rem, 10vw, 5.5rem);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.pagina-erro h1 {
+  color: var(--color-secondary, #1f2933);
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+}
+
+.pagina-erro__mensagem {
+  margin: 16px 0 28px;
+  color: #5e6670;
+  line-height: 1.7;
+}
+
+.pagina-erro__link {
+  display: inline-block;
+  padding: 13px 24px;
+  border-radius: 8px;
+  background: var(--color-primary, #f2b705);
+  color: var(--color-secondary, #1f2933);
+  font-weight: 600;
+  text-decoration: none;
+  transition: filter .2s ease, transform .2s ease;
+}
+
+.pagina-erro__link:hover {
+  filter: brightness(.95);
+  transform: translateY(-1px);
+}
+
+.pagina-erro__link:focus-visible {
+  outline: 3px solid var(--color-secondary, #1f2933);
+  outline-offset: 3px;
+}

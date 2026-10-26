@@ -42,11 +42,19 @@
 
                     <!-- Usuário -->
                     <div class="user">
-                        <a href="/login">
-                            <img classe="it" src="/img/icons/icons8-usuário-homem-com-círculo-48.png"
-                            alt="Usuário" class="icon">
-                        <span><%= usuario ? 'Olá, ' + usuario.nome_usuario : 'Entre na sua conta' %></span>
-                        </a>
+                        <% if (usuario) { %>
+                            <button class="account-menu-trigger" type="button" data-account-menu-trigger
+                                    aria-haspopup="menu" aria-controls="account-menu" aria-expanded="false">
+                                <img src="/img/icons/icons8-usuário-homem-com-círculo-48.png" alt="" class="icon">
+                                <span>Olá, <%= usuario.nome_usuario %></span>
+                            </button>
+                            <%- include("./account-menu") %>
+                        <% } else { %>
+                            <a href="/login">
+                                <img src="/img/icons/icons8-usuário-homem-com-círculo-48.png" alt="" class="icon">
+                                <span>Entre na sua conta</span>
+                            </a>
+                        <% } %>
                     </div>
 
                     <!-- Carrinho -->
@@ -116,3 +124,4 @@
     </header>
     <script src="/js/modules/navbar.js" defer></script>
     <script src="/js/modules/carrinho-api.js" defer></script>
+    <% if (usuario) { %><script src="/js/modules/account-menu.js" defer></script><% } %>

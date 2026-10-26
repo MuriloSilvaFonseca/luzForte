@@ -169,6 +169,11 @@
     background: #15265c;
 }
 
+.login-button:disabled {
+    opacity: .7;
+    cursor: wait;
+}
+
 .google-btn {
     margin: 12px 0;
     border: 1px solid #dadce0;

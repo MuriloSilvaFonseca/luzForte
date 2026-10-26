@@ -45,3 +45,31 @@ document.querySelectorAll('form').forEach(formulario => {
     if (email) email.value = email.value.trim()
   })
 })
+
+// Evita envios duplicados no login e no cadastro enquanto o servidor responde.
+const formulariosDeAutenticacao = document.querySelectorAll('#login-form, .cadastro-form')
+formulariosDeAutenticacao.forEach(formulario => {
+  const botaoEnviar = formulario.querySelector('button[type="submit"]')
+  if (!botaoEnviar) return
+
+  const textoOriginal = botaoEnviar.textContent
+  formulario.addEventListener('submit', evento => {
+    if (formulario.dataset.enviando === 'true') {
+      evento.preventDefault()
+      return
+    }
+
+    formulario.dataset.enviando = 'true'
+    formulario.setAttribute('aria-busy', 'true')
+    botaoEnviar.disabled = true
+    botaoEnviar.textContent = 'Enviando...'
+  })
+
+  // Reabilita o botão se o navegador restaurar a página pelo histórico.
+  window.addEventListener('pageshow', () => {
+    delete formulario.dataset.enviando
+    formulario.removeAttribute('aria-busy')
+    botaoEnviar.disabled = false
+    botaoEnviar.textContent = textoOriginal
+  })
+})
