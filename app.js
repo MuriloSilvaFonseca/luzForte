@@ -10,6 +10,8 @@ const rotasAdmin = require('./routes/admin-paineis')
 const app = express()
 const porta = 3000
 
+ 
+
 app.use(express.urlencoded({ extended: true }))
 
 app.use( sessao({

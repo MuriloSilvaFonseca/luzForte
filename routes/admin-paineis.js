@@ -1,20 +1,18 @@
 // Rotas das páginas do painel.
-// AVALIAÇÕES já usam o banco de dados. Produtos, pedidos, usuários e a visão geral
-// ainda usam dados FICTÍCIOS (em memória; voltam ao normal quando o servidor reinicia).
+// Visão geral, pedidos e avaliações usam o banco (PostgreSQL).
+// Produtos ficam em routes/admin-produtos.js.
+// Usuários ainda usam dados FICTÍCIOS (em memória).
 const express = require('express')
 const conexao = require('../config/database')
 const router = express.Router()
 
 const POR_PAGINA = 10
 const ESTOQUE_BAIXO = 5
+const LIMITE_AVALIACOES = 100
+const INT_MAXIMO = 2147483647
 
-// ---------- Dados fictícios ----------
-const marcas = [{ id: 1, nome: 'Philips' }, { id: 2, nome: 'Osram' }]
-const subcategorias = [
-  { id: 1, nome: 'Lâmpadas > LED' },
-  { id: 2, nome: 'Fitas' },
-  { id: 3, nome: 'Refletores' }
-]
+const STATUS_PEDIDO = ['carrinho', 'solicitado', 'aprovado', 'finalizado', 'cancelado']
+const STATUS_AVALIACAO = ['pendente', 'aprovada', 'rejeitada']
 
 const motivosRecusa = [
   'Linguagem ofensiva ou discriminatória',
@@ -24,18 +22,15 @@ const motivosRecusa = [
   'Outro motivo'
 ]
 
-const produtos = [
-  { sku: 1001, ean: '7891000100103', titulo: 'Lâmpada LED 9W branca', subcategoria: 'Lâmpadas > LED', marcaId: 1, marca: 'Philips', custo: 6.5, preco: 14.9, estoque: 120, ativo: 'ativo', imagem: '' },
-  { sku: 1002, ean: '7891000100202', titulo: 'Fita LED 5m RGB', subcategoria: 'Fitas', marcaId: 2, marca: 'Osram', custo: 32, preco: 79.9, estoque: 4, ativo: 'ativo', imagem: '' },
-  { sku: 1003, ean: '7891000100301', titulo: 'Refletor LED 50W', subcategoria: 'Refletores', marcaId: 1, marca: 'Philips', custo: 48, preco: 119.9, estoque: 2, ativo: 'oculto', imagem: '' }
-]
+const statusInfo = {
+  carrinho: { rotulo: 'Carrinho', cor: 'gray' },
+  solicitado: { rotulo: 'Solicitado', cor: 'yellow' },
+  aprovado: { rotulo: 'Aprovado', cor: 'blue' },
+  finalizado: { rotulo: 'Finalizado', cor: 'green' },
+  cancelado: { rotulo: 'Cancelado', cor: 'red' }
+}
 
-// "chave" é o id do status usado nos chips; "status" é o texto mostrado na tela
-const pedidos = [
-  { id: 2041, data: '17/10/2026', cliente: 'Carlos Menezes', email: 'carlos@email.com', pagamento: 'Pix', chave: 'pago', status: 'Pago', statusCor: 'green', itens: 3, total: 289.9 },
-  { id: 2040, data: '17/10/2026', cliente: 'Ana Paula', email: 'ana@email.com', pagamento: 'Boleto', chave: 'aguardando', status: 'Aguardando pagamento', statusCor: 'yellow', itens: 1, total: 89.5 },
-  { id: 2039, data: '16/10/2026', cliente: 'Marina Souza', email: 'marina@email.com', pagamento: 'Cartão', chave: 'enviado', status: 'Enviado', statusCor: 'blue', itens: 5, total: 412 }
-]
+const corStatus = status => (statusInfo[status] ? statusInfo[status].cor : 'gray')
 
 const usuarios = [
   { id: 1, nome: 'Administrador', email: 'admin@luzforte.com', perfil: 'admin', situacao: 'ativo', cadastro: '01/08/2026', pedidos: 0, avaliacoes: 0 },
@@ -44,8 +39,35 @@ const usuarios = [
 ]
 
 // ---------- Auxiliares ----------
-const minusculo = (v) => String(v || '').trim().toLowerCase()
-const paraISO = (br) => br.split('/').reverse().join('-') // 17/10/2026 -> 2026-10-17
+const minusculo = v => String(v || '').trim().toLowerCase()
+
+const comoTexto = v => (typeof v === 'string' ? v.trim() : '')
+
+// Retorna inteiro dentro do intervalo ou null
+function comoInteiro(v, minimo = 1, maximo = INT_MAXIMO) {
+  const texto = typeof v === 'number' ? String(v) : comoTexto(v)
+  if (!/^\d+$/.test(texto)) return null
+  const n = Number(texto)
+  return Number.isSafeInteger(n) && n >= minimo && n <= maximo ? n : null
+}
+
+const paginacao = v => comoInteiro(v, 1) || 1
+
+const escaparLike = v => String(v).replace(/[\\%_]/g, '\\$&')
+
+const montarWhere = condicoes => (condicoes.length ? `WHERE ${condicoes.join(' AND ')}` : '')
+
+function dataValida(valor) {
+  if (!valor) return true
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(valor)) return false
+  const data = new Date(valor + 'T00:00:00Z')
+  return !Number.isNaN(data.getTime()) && data.toISOString().slice(0, 10) === valor
+}
+
+function erroServidor(res, mensagem, erro) {
+  console.error('[admin]', mensagem, erro && (erro.code || erro.message))
+  return res.status(500).send(mensagem)
+}
 
 function paginar(lista, paginaPedida) {
   const totalPaginas = Math.max(1, Math.ceil(lista.length / POR_PAGINA))
@@ -57,118 +79,128 @@ function paginar(lista, paginaPedida) {
 // Disponibiliza o número do menu "Avaliações" em todas as telas do admin
 router.use(async (req, res, next) => {
   res.locals.avaliacoesPendentes = 0
+
   try {
-    const [[linha]] = await conexao.promise().query(
-      "SELECT COUNT(*) AS n FROM avaliacao_produto WHERE status = 'pendente'")
-    res.locals.avaliacoesPendentes = Number(linha.n)
+    const resultado = await conexao.query(`
+      SELECT COUNT(*)::int AS total
+      FROM avaliacao_produto
+      WHERE status = 'pendente'
+    `)
+    res.locals.avaliacoesPendentes = resultado.rows[0].total
   } catch (erro) {
-    // O menu não deve derrubar as outras telas se o banco falhar.
     console.error('Falha ao contar avaliações pendentes:', erro.code || erro.message)
   }
+
   next()
 })
 
-// ---------- Visão geral ----------
-router.get('/', (req, res) => {
-  const baixo = produtos.filter(p => p.estoque <= ESTOQUE_BAIXO)
-  res.render('admin/visao-geral', {
-    resumo: {
-      pedidosHoje: 7,
-      pedidosAguardando: 3,
-      faturamentoMes: 18452.9,
-      produtosAtivos: 124,
-      estoqueBaixo: baixo.length,
-      avaliacoesPendentes: res.locals.avaliacoesPendentes
-    },
-    ultimosPedidos: pedidos.slice(0, 3),
-    estoqueBaixoLista: baixo.map(p => ({ titulo: p.titulo, sku: p.sku, estoque: p.estoque }))
-  })
-})
+/* =========================================================
+   VISÃO GERAL
+========================================================= */
 
-// ---------- Produtos ----------
-router.get('/produtos', (req, res) => {
-  const { q = '', status = '', marca = '', estoque = '' } = req.query
-  let lista = produtos.slice()
-  if (q) lista = lista.filter(p => minusculo(p.titulo + ' ' + p.sku + ' ' + p.ean).includes(minusculo(q)))
-  if (status) lista = lista.filter(p => p.ativo === status)
-  if (marca) lista = lista.filter(p => p.marcaId === Number(marca))
-  if (estoque === 'baixo') lista = lista.filter(p => p.estoque <= ESTOQUE_BAIXO)
+router.get('/', async (req, res) => {
+  try {
+    const [
+      resultadoPedidos,
+      resultadoProdutos,
+      resultadoEstoque,
+      resultadoAvaliacoes,
+      resultadoUltimosPedidos,
+      resultadoEstoqueBaixo
+    ] = await Promise.all([
+      conexao.query(`
+        SELECT
+          COUNT(*) FILTER (
+            WHERE data_criacao >= CURRENT_DATE
+              AND data_criacao < CURRENT_DATE + INTERVAL '1 day'
+              AND status <> 'carrinho'
+          )::int AS pedidos_hoje,
+          COUNT(*) FILTER (WHERE status = 'solicitado')::int AS pedidos_aguardando,
+          COALESCE(
+            SUM(total) FILTER (
+              WHERE status IN ('aprovado', 'finalizado')
+                AND data_criacao >= DATE_TRUNC('month', CURRENT_DATE)
+                AND data_criacao < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month'
+            ),
+            0
+          ) AS faturamento_mes
+        FROM pedido
+      `),
 
-  const { itens, pagina, totalPaginas } = paginar(lista, req.query.pagina)
-  res.render('admin/produtos', {
-    total: lista.length, pagina, totalPaginas,
-    filtros: { q, status, marca, estoque },
-    marcas,
-    produtos: itens
-  })
-})
+      conexao.query(`SELECT COUNT(*)::int AS total FROM produto WHERE ativo = 'ativo'`),
 
-router.get('/produtos/novo', (req, res) => {
-  res.render('admin/cadastro-produto', {
-    marcas, subcategorias,
-    erro: '',
-    salvo: req.query.salvo === '1'
-  })
-})
+      conexao.query(`
+        SELECT COUNT(*)::int AS total
+        FROM produto
+        WHERE estoque_produto <= $1 AND ativo = 'ativo'
+      `, [ESTOQUE_BAIXO]),
 
-router.post('/produtos/novo', (req, res) => {
-  const b = req.body || {}
-  const sku = Number(b.sku)
-  const marca = marcas.find(m => m.id === Number(b.marca_id))
-  const subcategoria = subcategorias.find(s => s.id === Number(b.subcategoria_id))
+      conexao.query(`
+        SELECT COUNT(*)::int AS total
+        FROM avaliacao_produto
+        WHERE status = 'pendente'
+      `),
 
-  let erro = ''
-  if (!minusculo(b.titulo_produto)) erro = 'Informe o nome do produto.'
-  else if (!Number.isInteger(sku) || sku < 1) erro = 'Informe um SKU válido.'
-  else if (produtos.some(p => p.sku === sku)) erro = 'Já existe um produto com esse SKU.'
-  else if (!marca || !subcategoria) erro = 'Selecione a marca e a subcategoria.'
-  else if (!(Number(b.custo_produto) >= 0) || !(Number(b.preco_produto) >= 0)) erro = 'Informe custo e preço válidos.'
+      conexao.query(`
+        SELECT
+          p.id_pedido AS id,
+          TO_CHAR(p.data_criacao, 'DD/MM/YYYY') AS data,
+          COALESCE(u.nome_usuario, 'Visitante') AS cliente,
+          u.email,
+          f.nome_pagamento AS pagamento,
+          p.status AS chave,
+          p.status,
+          p.total,
+          COALESCE(itens.quantidade, 0)::int AS itens
+        FROM pedido p
+        LEFT JOIN usuario u ON u.id_usuario = p.usuario_id
+        LEFT JOIN forma_pagamento f ON f.id_forma_pagamento = p.forma_pagamento_id
+        LEFT JOIN (
+          SELECT pedido_id, SUM(quantidade) AS quantidade
+          FROM produto_pedido
+          GROUP BY pedido_id
+        ) itens ON itens.pedido_id = p.id_pedido
+        WHERE p.status <> 'carrinho'
+        ORDER BY p.data_criacao DESC, p.id_pedido DESC
+        LIMIT 5
+      `),
 
-  if (erro) {
-    return res.status(400).render('admin/cadastro-produto', { marcas, subcategorias, erro, salvo: false })
+      conexao.query(`
+        SELECT p.sku, p.titulo_produto AS titulo, p.estoque_produto AS estoque
+        FROM produto p
+        WHERE p.estoque_produto <= $1 AND p.ativo = 'ativo'
+        ORDER BY p.estoque_produto ASC, p.titulo_produto ASC
+        LIMIT 10
+      `, [ESTOQUE_BAIXO])
+    ])
+
+    const pedidos = resultadoPedidos.rows[0]
+
+    res.render('admin/visao-geral', {
+      resumo: {
+        pedidosHoje: Number(pedidos.pedidos_hoje),
+        pedidosAguardando: Number(pedidos.pedidos_aguardando),
+        faturamentoMes: Number(pedidos.faturamento_mes),
+        produtosAtivos: resultadoProdutos.rows[0].total,
+        estoqueBaixo: resultadoEstoque.rows[0].total,
+        avaliacoesPendentes: resultadoAvaliacoes.rows[0].total
+      },
+      ultimosPedidos: resultadoUltimosPedidos.rows.map(p => ({
+        ...p,
+        total: Number(p.total),
+        statusCor: corStatus(p.status)
+      })),
+      estoqueBaixoLista: resultadoEstoqueBaixo.rows
+    })
+  } catch (erro) {
+    return erroServidor(res, 'Não foi possível carregar a visão geral.', erro)
   }
-
-  // No projeto real: INSERT INTO produto ...
-  produtos.unshift({
-    sku,
-    ean: String(b.GTIN_EAN || ''),
-    titulo: String(b.titulo_produto).trim(),
-    subcategoria: subcategoria.nome,
-    marcaId: marca.id,
-    marca: marca.nome,
-    custo: Number(b.custo_produto),
-    preco: Number(b.preco_produto),
-    estoque: Number(b.estoque_produto) || 0,
-    ativo: ['ativo', 'desativado', 'oculto'].includes(b.ativo) ? b.ativo : 'ativo',
-    imagem: String(b.imagem_url || '')
-  })
-  res.redirect('/admin/produtos/novo?salvo=1')
 })
 
-// ---------- Pedidos ----------
-router.get('/pedidos', (req, res) => {
-  const { status = '', q = '', de = '', ate = '' } = req.query
-  let lista = pedidos.slice()
-  if (status) lista = lista.filter(p => p.chave === status)
-  if (q) lista = lista.filter(p => minusculo(p.id + ' ' + p.cliente).includes(minusculo(q).replace('#', '')))
-  if (de) lista = lista.filter(p => paraISO(p.data) >= de)
-  if (ate) lista = lista.filter(p => paraISO(p.data) <= ate)
+/* =========================================================
+   USUÁRIOS (dados fictícios)
+========================================================= */
 
-  const contagens = { todos: pedidos.length }
-  ;['aguardando', 'pago', 'enviado', 'entregue', 'cancelado'].forEach(s => {
-    contagens[s] = pedidos.filter(p => p.chave === s).length
-  })
-
-  const { itens, pagina, totalPaginas } = paginar(lista, req.query.pagina)
-  res.render('admin/pedidos', {
-    pagina, totalPaginas,
-    filtros: { status, q, de, ate },
-    contagens,
-    pedidos: itens
-  })
-})
-
-// ---------- Usuários ----------
 router.get('/usuarios', (req, res) => {
   const { q = '', perfil = '', situacao = '' } = req.query
   let lista = usuarios.slice()
@@ -194,140 +226,331 @@ function alterarSituacao(situacao) {
 router.post('/usuarios/:id/bloquear', alterarSituacao('bloqueado'))
 router.post('/usuarios/:id/desbloquear', alterarSituacao('ativo'))
 
-// ---------- Avaliações (lidas e moderadas direto no banco) ----------
-// Requer a migração database/migracao_avaliacoes_moderacao.sql
-const STATUS_AVALIACAO = ['pendente', 'aprovada', 'rejeitada']
-const SEM_RESPOSTA = "(a.resposta IS NULL OR a.resposta = '')"
-const LIMITE_AVALIACOES = 100
+/* =========================================================
+   PEDIDOS
+========================================================= */
 
-const comoTexto = (v) => (typeof v === 'string' ? v.trim() : '')
-const comoInteiro = (v, min, max) => {
-  const n = Number(v)
-  return /^\d+$/.test(String(v)) && n >= min && n <= max ? String(n) : ''
-}
-const dataBR = (d) => new Date(d).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })
+router.get('/pedidos', async (req, res) => {
+  const status = comoTexto(req.query.status)
+  const q = comoTexto(req.query.q).slice(0, 200)
+  const de = comoTexto(req.query.de)
+  const ate = comoTexto(req.query.ate)
+  const paginaPedida = comoTexto(req.query.pagina || '1')
+
+  if (
+    (status && !STATUS_PEDIDO.includes(status)) ||
+    !dataValida(de) ||
+    !dataValida(ate) ||
+    (de && ate && de > ate) ||
+    !/^\d+$/.test(paginaPedida) ||
+    !Number.isSafeInteger(Number(paginaPedida)) ||
+    Number(paginaPedida) < 1
+  ) {
+    return res.status(400).send('Filtros de pedidos inválidos.')
+  }
+
+  const filtros = { status, q, de, ate }
+  // Carrinhos não são pedidos concluídos nem solicitações.
+  const condicoes = ["p.status <> 'carrinho'"]
+  const valores = []
+
+  if (status) {
+    valores.push(status)
+    condicoes.push(`p.status = $${valores.length}`)
+  }
+
+  if (q) {
+    valores.push(`%${escaparLike(q.replace(/^#/, ''))}%`)
+    const indiceId = valores.length
+
+    valores.push(`%${escaparLike(q)}%`)
+    const indiceNome = valores.length
+
+    condicoes.push(`(
+      CAST(p.id_pedido AS TEXT) ILIKE $${indiceId} ESCAPE '\\'
+      OR COALESCE(u.nome_usuario, '') ILIKE $${indiceNome} ESCAPE '\\'
+    )`)
+  }
+
+  if (de) {
+    valores.push(de)
+    condicoes.push(`p.data_criacao >= $${valores.length}::date`)
+  }
+
+  if (ate) {
+    valores.push(ate)
+    condicoes.push(`p.data_criacao < ($${valores.length}::date + INTERVAL '1 day')`)
+  }
+
+  const where = montarWhere(condicoes)
+
+  try {
+    const resultadoTotal = await conexao.query(`
+      SELECT COUNT(*)::int AS total
+      FROM pedido p
+      LEFT JOIN usuario u ON u.id_usuario = p.usuario_id
+      ${where}
+    `, valores)
+
+    const total = resultadoTotal.rows[0].total
+    const totalPaginas = Math.max(1, Math.ceil(total / POR_PAGINA))
+    const pagina = Math.min(Number(paginaPedida), totalPaginas)
+
+    const resultadoPedidos = await conexao.query(`
+      SELECT
+        p.id_pedido AS id,
+        TO_CHAR(p.data_criacao, 'DD/MM/YYYY') AS data,
+        COALESCE(u.nome_usuario, 'Visitante') AS cliente,
+        u.email,
+        f.nome_pagamento AS pagamento,
+        p.status AS chave,
+        p.status,
+        p.total,
+        COALESCE(itens.quantidade, 0)::int AS itens
+      FROM pedido p
+      LEFT JOIN usuario u ON u.id_usuario = p.usuario_id
+      LEFT JOIN forma_pagamento f ON f.id_forma_pagamento = p.forma_pagamento_id
+      LEFT JOIN (
+        SELECT pedido_id, SUM(quantidade) AS quantidade
+        FROM produto_pedido
+        GROUP BY pedido_id
+      ) itens ON itens.pedido_id = p.id_pedido
+      ${where}
+      ORDER BY p.data_criacao DESC, p.id_pedido DESC
+      LIMIT $${valores.length + 1}
+      OFFSET $${valores.length + 2}
+    `, [...valores, POR_PAGINA, (pagina - 1) * POR_PAGINA])
+
+    const resultadoStatus = await conexao.query(`
+      SELECT status, COUNT(*)::int AS total
+      FROM pedido
+      WHERE status <> 'carrinho'
+      GROUP BY status
+    `)
+
+    const contagens = { todos: 0 }
+
+    for (const linha of resultadoStatus.rows) {
+      contagens[linha.status] = linha.total
+      contagens.todos += linha.total
+    }
+
+    res.render('admin/pedidos', {
+      pedidos: resultadoPedidos.rows.map(p => ({
+        ...p,
+        id: Number(p.id),
+        total: Number(p.total),
+        statusCor: corStatus(p.status)
+      })),
+      filtros,
+      pagina,
+      totalPaginas,
+      contagens,
+      statusInfo
+    })
+  } catch (erro) {
+    return erroServidor(res, 'Não foi possível carregar os pedidos.', erro)
+  }
+})
+
+/* =========================================================
+   AVALIAÇÕES
+========================================================= */
+
+const idAvaliacao = valor => comoInteiro(valor, 1, INT_MAXIMO)
 
 router.get('/avaliacoes', async (req, res) => {
-  const status = comoTexto(req.query.status)
+  const statusRecebido = comoTexto(req.query.status)
+
   const filtros = {
-    status: [...STATUS_AVALIACAO, 'negativas'].includes(status) ? status : '',
+    status: [...STATUS_AVALIACAO, 'negativas'].includes(statusRecebido) ? statusRecebido : '',
     nota: comoInteiro(req.query.nota, 1, 5),
-    produto: comoInteiro(req.query.produto, 1, 2147483647),
+    produto: comoInteiro(req.query.produto),
     q: comoTexto(req.query.q).slice(0, 200)
   }
 
-  const where = []
+  const condicoes = []
   const valores = []
-  if (filtros.status === 'negativas') where.push('a.nota <= 3 AND ' + SEM_RESPOSTA)
-  else if (filtros.status) { where.push('a.status = ?'); valores.push(filtros.status) }
-  if (filtros.nota) { where.push('a.nota = ?'); valores.push(Number(filtros.nota)) }
-  if (filtros.produto) { where.push('a.produto_sku = ?'); valores.push(Number(filtros.produto)) }
-  if (filtros.q) {
-    const termo = '%' + filtros.q.replace(/[\\%_]/g, '\\$&') + '%'
-    where.push('(a.comentario LIKE ? OR u.nome_usuario LIKE ? OR p.titulo_produto LIKE ?)')
-    valores.push(termo, termo, termo)
+
+  if (filtros.status === 'negativas') {
+    condicoes.push(`a.nota <= 3 AND (a.resposta IS NULL OR a.resposta = '')`)
+  } else if (filtros.status) {
+    valores.push(filtros.status)
+    condicoes.push(`a.status = $${valores.length}`)
   }
 
+  if (filtros.nota) {
+    valores.push(filtros.nota)
+    condicoes.push(`a.nota = $${valores.length}`)
+  }
+
+  if (filtros.produto) {
+    valores.push(filtros.produto)
+    condicoes.push(`a.produto_sku = $${valores.length}`)
+  }
+
+  if (filtros.q) {
+    valores.push(`%${escaparLike(filtros.q)}%`)
+    const i = valores.length
+
+    condicoes.push(`(
+      COALESCE(a.comentario, '') ILIKE $${i} ESCAPE '\\'
+      OR u.nome_usuario ILIKE $${i} ESCAPE '\\'
+      OR p.titulo_produto ILIKE $${i} ESCAPE '\\'
+    )`)
+  }
+
+  const where = montarWhere(condicoes)
+
   try {
-    const banco = conexao.promise()
-    const [linhas] = await banco.execute(`
-      SELECT a.id_avaliacao_produto AS id, a.nota, a.comentario, a.data_criacao, a.status,
-             a.resposta, a.motivo_rejeicao, a.produto_sku AS sku,
-             p.titulo_produto AS produto, u.nome_usuario AS cliente,
-             EXISTS (SELECT 1 FROM produto_pedido pp
-                     JOIN pedido pe ON pe.id_pedido = pp.pedido_id
-                     WHERE pe.usuario_id = a.usuario_id AND pp.produto_sku = a.produto_sku
-                       AND pe.status IN ('aprovado', 'finalizado')) AS compra_verificada
-      FROM avaliacao_produto a
-      JOIN usuario u ON u.id_usuario = a.usuario_id
-      JOIN produto p ON p.sku = a.produto_sku
-      ${where.length ? 'WHERE ' + where.join(' AND ') : ''}
-      ORDER BY a.data_criacao DESC, a.id_avaliacao_produto DESC
-      LIMIT ${LIMITE_AVALIACOES}`, valores)
+    const [resultadoAvaliacoes, resultadoTotais, resultadoDistribuicao] = await Promise.all([
+      conexao.query(`
+        SELECT
+          a.id_avaliacao_produto AS id,
+          a.nota,
+          a.comentario,
+          a.data_criacao,
+          a.status,
+          a.resposta,
+          a.motivo_rejeicao,
+          a.produto_sku AS sku,
+          p.titulo_produto AS produto,
+          u.nome_usuario AS cliente,
+          EXISTS (
+            SELECT 1
+            FROM produto_pedido pp
+            JOIN pedido pe ON pe.id_pedido = pp.pedido_id
+            WHERE pe.usuario_id = a.usuario_id
+              AND pp.produto_sku = a.produto_sku
+              AND pe.status IN ('aprovado', 'finalizado')
+          ) AS compra_verificada
+        FROM avaliacao_produto a
+        JOIN usuario u ON u.id_usuario = a.usuario_id
+        JOIN produto p ON p.sku = a.produto_sku
+        ${where}
+        ORDER BY a.data_criacao DESC, a.id_avaliacao_produto DESC
+        LIMIT ${LIMITE_AVALIACOES}
+      `, valores),
 
-    // Resumo e contagens olham TODAS as avaliações, independente do filtro aplicado.
-    const [[totais]] = await banco.query(`
-      SELECT COUNT(*) AS total,
-             COALESCE(AVG(nota), 0) AS media,
-             COALESCE(SUM(status = 'pendente'), 0) AS pendente,
-             COALESCE(SUM(status = 'aprovada'), 0) AS aprovada,
-             COALESCE(SUM(status = 'rejeitada'), 0) AS rejeitada,
-             COALESCE(SUM(nota <= 3 AND (resposta IS NULL OR resposta = '')), 0) AS negativasSemResposta
-      FROM avaliacao_produto`)
-    const [linhasDistribuicao] = await banco.query(
-      'SELECT nota, COUNT(*) AS qtd FROM avaliacao_produto GROUP BY nota')
+      conexao.query(`
+        SELECT
+          COUNT(*)::int AS total,
+          COALESCE(AVG(nota), 0) AS media,
+          COUNT(*) FILTER (WHERE status = 'pendente')::int AS pendente,
+          COUNT(*) FILTER (WHERE status = 'aprovada')::int AS aprovada,
+          COUNT(*) FILTER (WHERE status = 'rejeitada')::int AS rejeitada,
+          COUNT(*) FILTER (
+            WHERE nota <= 3 AND (resposta IS NULL OR resposta = '')
+          )::int AS negativas_sem_resposta
+        FROM avaliacao_produto
+      `),
 
+      conexao.query(`
+        SELECT nota, COUNT(*)::int AS qtd
+        FROM avaliacao_produto
+        GROUP BY nota
+      `)
+    ])
+
+    const totais = resultadoTotais.rows[0]
     const distribuicao = {}
-    linhasDistribuicao.forEach(l => { distribuicao[l.nota] = Number(l.qtd) })
+
+    for (const linha of resultadoDistribuicao.rows) {
+      distribuicao[linha.nota] = Number(linha.qtd)
+    }
 
     res.render('admin/avaliacoes', {
-      avaliacoes: linhas.map(l => ({
-        id: l.id,
-        cliente: l.cliente,
-        data: dataBR(l.data_criacao),
-        compraVerificada: Boolean(l.compra_verificada),
-        produto: l.produto,
-        sku: l.sku,
-        nota: l.nota,
-        titulo: '',      // a tabela não tem título; o formulário da loja só envia nota e comentário
-        texto: l.comentario || '',
-        status: l.status,
-        denuncias: 0,    // ainda não existe denúncia no banco
-        resposta: l.resposta || '',
-        motivoRecusa: l.motivo_rejeicao || ''
+      avaliacoes: resultadoAvaliacoes.rows.map(a => ({
+        id: Number(a.id),
+        cliente: a.cliente,
+        data: new Date(a.data_criacao).toLocaleDateString('pt-BR', {
+          timeZone: 'America/Sao_Paulo'
+        }),
+        compraVerificada: a.compra_verificada,
+        produto: a.produto,
+        sku: Number(a.sku),
+        nota: Number(a.nota),
+        titulo: '',
+        texto: a.comentario || '',
+        status: a.status,
+        denuncias: 0,
+        resposta: a.resposta || '',
+        motivoRecusa: a.motivo_rejeicao || ''
       })),
+
       filtros,
-      resumo: { media: Number(totais.media), total: Number(totais.total), distribuicao },
+
+      resumo: {
+        media: Number(totais.media),
+        total: Number(totais.total),
+        distribuicao
+      },
+
       contagens: {
         todas: Number(totais.total),
         pendente: Number(totais.pendente),
         aprovada: Number(totais.aprovada),
         rejeitada: Number(totais.rejeitada),
-        negativasSemResposta: Number(totais.negativasSemResposta)
+        negativasSemResposta: Number(totais.negativas_sem_resposta)
       }
     })
   } catch (erro) {
-    console.error('Erro ao listar avaliações:', erro)
-    res.status(500).send('Não foi possível carregar as avaliações.')
+    return erroServidor(res, 'Não foi possível carregar as avaliações.', erro)
   }
 })
 
-// Ações de moderação: cada uma monta um UPDATE com SET fixo (nunca vindo do cliente).
-const idAvaliacao = (valor) => {
-  const n = Number(valor)
-  return /^\d+$/.test(String(valor)) && n > 0 && n <= 2147483647 ? n : null
-}
-const voltarPara = (id) => '/admin/avaliacoes' + (id ? '#avaliacao-' + id : '')
-
 async function atualizarAvaliacao(req, res, montar) {
   const id = idAvaliacao(req.params.id)
-  if (!id) return res.redirect(voltarPara())
+
+  if (!id) return res.redirect('/admin/avaliacoes')
+
   const alteracao = montar(req.body || {})
-  if (alteracao) {
-    try {
-      await conexao.promise().execute(
-        `UPDATE avaliacao_produto SET ${alteracao.set} WHERE id_avaliacao_produto = ?`,
-        [...alteracao.valores, id])
-    } catch (erro) {
-      console.error('Erro ao atualizar avaliação:', erro)
-      return res.status(500).send('Não foi possível atualizar a avaliação.')
-    }
+
+  if (!alteracao) return res.redirect(`/admin/avaliacoes#avaliacao-${id}`)
+
+  try {
+    await conexao.query(
+      `UPDATE avaliacao_produto
+       SET ${alteracao.set}
+       WHERE id_avaliacao_produto = $${alteracao.valores.length + 1}`,
+      [...alteracao.valores, id]
+    )
+
+    return res.redirect(`/admin/avaliacoes#avaliacao-${id}`)
+  } catch (erro) {
+    return erroServidor(res, 'Não foi possível atualizar a avaliação.', erro)
   }
-  res.redirect(voltarPara(id))
 }
 
 router.post('/avaliacoes/:id/aprovar', (req, res) =>
-  atualizarAvaliacao(req, res, () => ({ set: "status = 'aprovada', motivo_rejeicao = NULL", valores: [] })))
+  atualizarAvaliacao(req, res, () => ({
+    set: "status = 'aprovada', motivo_rejeicao = NULL",
+    valores: []
+  }))
+)
 
 router.post('/avaliacoes/:id/recusar', (req, res) =>
-  atualizarAvaliacao(req, res, (corpo) => motivosRecusa.includes(corpo.motivo)
-    ? { set: "status = 'rejeitada', motivo_rejeicao = ?", valores: [corpo.motivo] }
-    : null))
+  atualizarAvaliacao(req, res, corpo => {
+    if (!motivosRecusa.includes(corpo.motivo)) return null
+
+    return {
+      set: "status = 'rejeitada', motivo_rejeicao = $1",
+      valores: [corpo.motivo]
+    }
+  })
+)
 
 router.post('/avaliacoes/:id/responder', (req, res) =>
-  atualizarAvaliacao(req, res, (corpo) => {
-    const resposta = String(corpo.resposta || '').trim().slice(0, 500)
-    return resposta ? { set: 'resposta = ?, data_resposta = NOW()', valores: [resposta] } : null
-  }))
+  atualizarAvaliacao(req, res, corpo => {
+    const resposta = comoTexto(corpo.resposta).slice(0, 500)
+
+    if (!resposta) return null
+
+    return {
+      set: 'resposta = $1, data_resposta = NOW()',
+      valores: [resposta]
+    }
+  })
+)
 
 module.exports = router

@@ -11,12 +11,14 @@
   "type": "commonjs",
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
+    "aws4fetch": "^1.0.20",
     "bcryptjs": "^3.0.3",
     "dotenv": "^18.0.8",
     "ejs": "^3.1.10",
     "express": "^4.22.3",
     "express-session": "^1.19.0",
-    "mysql2": "^3.24.6"
+    "multer": "^2.5.0",
+    "pg": "^8.23.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
