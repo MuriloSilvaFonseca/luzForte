@@ -2,7 +2,7 @@
 //
 // 1. Ao clicar em "Confirmar pedido", abre um modal (SweetAlert2) pedindo confirmação
 //    e avisando que o cliente será levado ao WhatsApp da loja.
-// 2. Na tela de confirmação, abre o WhatsApp automaticamente com a mensagem pronta.
+// 2. Na tela de confirmação, oferece abrir o WhatsApp numa NOVA ABA com a mensagem pronta.
 //
 // Se o SweetAlert2 não carregar (sem internet, por exemplo), usa o confirm() do navegador.
 
@@ -64,20 +64,25 @@ function abrirWhatsAppAutomaticamente() {
     sessionStorage.setItem(chave, 'sim')
   } catch (_) { /* navegador sem sessionStorage: segue normalmente */ }
 
-  if (typeof Swal === 'undefined') {
-    window.location.href = link
-    return
-  }
+  // Sem SweetAlert, o cliente usa o botão verde da página (que já abre em nova aba)
+  if (typeof Swal === 'undefined') return
 
+  // Por que precisa de um clique? O navegador BLOQUEIA abas novas abertas sozinhas
+  // (bloqueador de pop-up). Aberta logo depois de um clique, a aba é permitida.
   Swal.fire({
     title: 'Pedido #' + pedido + ' registrado!',
-    text: 'Abrindo o WhatsApp da loja com a mensagem do seu pedido...',
+    text: 'Agora envie a mensagem do seu pedido para a loja pelo WhatsApp.',
     icon: 'success',
-    timer: 2500,
-    timerProgressBar: true,
-    showConfirmButton: false
-  }).then(() => {
-    window.location.href = link
+    confirmButtonText: 'Abrir WhatsApp',
+    confirmButtonColor: '#25d366',
+    showCancelButton: true,
+    cancelButtonText: 'Agora não',
+    cancelButtonColor: '#6b7280',
+    reverseButtons: true
+  }).then(resultado => {
+    if (!resultado.isConfirmed) return
+    // '_blank' = nova aba. 'noopener' impede a aba nova de mexer nesta página.
+    window.open(link, '_blank', 'noopener')
   })
 }
 

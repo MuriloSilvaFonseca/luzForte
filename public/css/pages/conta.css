@@ -1,0 +1,650 @@
+/* ========== MINHA CONTA ========== */
+
+.conta-page {
+  background: #f0f0ed;
+  min-height: 70vh;
+  padding: 40px 20px 60px;
+}
+
+.conta-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.conta-header {
+  margin-bottom: 32px;
+}
+
+.conta-header h1 {
+  font-size: 28px;
+  color: #1e3c72;
+  margin: 0 0 6px;
+  font-weight: 700;
+}
+
+.conta-saudacao {
+  color: #666;
+  font-size: 15px;
+  margin: 0;
+}
+
+.conta-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+/* ========== SIDEBAR ========== */
+.conta-sidebar {
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* Coluna da esquerda (menu + ajuda) acompanha a rolagem da página */
+.conta-lateral {
+  position: sticky;
+  top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ========== CARD DE AJUDA (WHATSAPP) ========== */
+.conta-ajuda {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border-top: 4px solid #25d366;
+}
+
+.conta-ajuda h2 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: #1e3c72;
+}
+
+.conta-ajuda p {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #555;
+}
+
+.conta-ajuda-botao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 16px;
+  border-radius: 8px;
+  background: #25d366;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.conta-ajuda-botao:hover {
+  background: #1da851;
+}
+
+.conta-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.conta-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #444;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+}
+
+.conta-nav-item:hover {
+  background: #f0f4fa;
+  color: #1a6be8;
+}
+
+.conta-nav-item.active {
+  background: #e8f0fe;
+  color: #1a6be8;
+  font-weight: 600;
+}
+
+.conta-nav-form {
+  margin: 0;
+}
+
+.conta-nav-sair {
+  margin-top: 8px;
+  border-top: 1px solid #eee;
+  padding-top: 16px;
+  color: #e24b4a;
+}
+
+.conta-nav-sair:hover {
+  background: #fef0f0;
+  color: #c0392b;
+}
+
+/* ========== MENSAGENS (sucesso / erro) ========== */
+.conta-alerta {
+  margin: 0 0 20px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.conta-alerta--ok {
+  background: #e6f7ef;
+  color: #0a7a4a;
+}
+
+.conta-alerta--erro {
+  background: #fef0f0;
+  color: #c0392b;
+}
+
+/* ========== CONTEÚDO ========== */
+.conta-content {
+  min-width: 0;
+}
+
+.conta-section {
+  display: none;
+}
+
+.conta-section.active {
+  display: block;
+}
+
+.conta-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.conta-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.conta-card-header h2 {
+  margin: 0;
+  font-size: 18px;
+  color: #1e3c72;
+  font-weight: 600;
+}
+
+.pedidos-count {
+  font-size: 13px;
+  color: #888;
+  background: #f5f5f5;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+/* ========== DADOS PESSOAIS ========== */
+.dados-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 32px;
+}
+
+.dado-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dado-label {
+  font-size: 12px;
+  color: #888;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.dado-valor {
+  font-size: 15px;
+  color: #1a1a1a;
+  font-weight: 500;
+}
+
+.badge-cliente {
+  display: inline-block;
+  background: #e8f0fe;
+  color: #1a6be8;
+  font-size: 13px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  width: fit-content;
+}
+
+.btn-editar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  font-family: inherit;
+}
+
+.btn-editar:hover {
+  border-color: #1a6be8;
+  color: #1a6be8;
+}
+
+.dados-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.dados-form .form-row:first-child {
+  grid-template-columns: 1fr;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e3c72;
+}
+
+.form-field input {
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #333;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+
+.form-field input:disabled {
+  background: #f5f5f5;
+  color: #888;
+}
+
+.form-field input:focus {
+  outline: none;
+  border-color: #1a6be8;
+}
+
+.hint {
+  font-size: 12px;
+  color: #999;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.btn-primario {
+  background: #1a6be8;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 11px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: inherit;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-primario:hover {
+  background: #1456c2;
+}
+
+.btn-secundario {
+  background: transparent;
+  color: #555;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 11px 22px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  font-family: inherit;
+}
+
+.btn-secundario:hover {
+  border-color: #999;
+}
+
+/* ========== PEDIDOS ========== */
+.pedidos-filtros {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.filtro-status {
+  background: #f5f5f5;
+  border: none;
+  border-radius: 20px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  font-family: inherit;
+}
+
+.filtro-status:hover {
+  background: #e8e8e8;
+}
+
+.filtro-status.active {
+  background: #1a6be8;
+  color: #fff;
+}
+
+.pedido-card {
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 16px;
+  transition: box-shadow 0.15s;
+}
+
+.pedido-card:hover {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.pedido-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pedido-info-principal {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.pedido-numero {
+  font-weight: 700;
+  font-size: 15px;
+  color: #1a1a1a;
+}
+
+.pedido-data {
+  font-size: 13px;
+  color: #888;
+}
+
+.pedido-badge {
+  font-size: 14px;
+  font-weight: 700;
+  padding: 6px 16px;
+  border-radius: 20px;
+}
+
+/* Badge com fundo cheio: o status é a informação mais importante do pedido */
+.status-finalizado {
+  background: #0a7a4a;
+  color: #fff;
+}
+
+.status-aprovado {
+  background: #1a6be8;
+  color: #fff;
+}
+
+.status-solicitado {
+  background: #f59e0b;
+  color: #3b2300;
+}
+
+.status-cancelado {
+  background: #c0392b;
+  color: #fff;
+}
+
+/* Faixa colorida na lateral do card, na cor do status */
+.pedido-card--finalizado { border-left: 5px solid #0a7a4a; }
+.pedido-card--aprovado   { border-left: 5px solid #1a6be8; }
+.pedido-card--solicitado { border-left: 5px solid #f59e0b; }
+.pedido-card--cancelado  { border-left: 5px solid #c0392b; }
+
+.pedido-itens {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.pedido-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.item-img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  background: #fafafa;
+  padding: 4px;
+}
+
+.item-detalhes {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-nome {
+  margin: 0 0 2px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-qtd {
+  font-size: 12px;
+  color: #888;
+}
+
+.item-subtotal {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  white-space: nowrap;
+}
+
+.pedido-rodape {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 14px;
+  border-top: 1px solid #eee;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pedido-pagamento {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 15px;
+  color: #1a1a1a;
+}
+
+.pedido-rotulo {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.pedido-retirada {
+  font-size: 13px;
+  color: #555;
+}
+
+.pedido-total {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #666;
+}
+
+.pedido-total strong {
+  font-size: 16px;
+  color: #1e3c72;
+}
+
+/* Aviso do status embaixo do pedido: caixa colorida e texto em negrito */
+.pedido-aviso {
+  margin: 14px 0 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pedido-aviso--solicitado { background: #fff4e0; color: #8a4b00; }
+.pedido-aviso--aprovado   { background: #e8f0fe; color: #0f4fb5; }
+.pedido-aviso--finalizado { background: #e6f7ef; color: #075c37; }
+.pedido-aviso--cancelado  { background: #fdecea; color: #a12a1f; }
+
+.pedidos-vazio {
+  text-align: center;
+  padding: 48px 20px;
+  color: #999;
+}
+
+.pedidos-vazio p {
+  margin-bottom: 20px;
+  font-size: 15px;
+}
+
+.pedidos-vazio-filtro {
+  text-align: center;
+  color: #999;
+  padding: 24px 0;
+}
+
+/* ========== ALTERAR SENHA ========== */
+.senha-form {
+  max-width: 420px;
+}
+
+.senha-form .form-field {
+  margin-bottom: 18px;
+}
+
+/* ========== RESPONSIVO ========== */
+@media (max-width: 768px) {
+  .conta-layout {
+    grid-template-columns: 1fr;
+  }
+
+  /* No celular, a coluna "se desmancha": menu em cima, conteúdo no meio e ajuda no fim */
+  .conta-lateral {
+    display: contents;
+  }
+
+  .conta-ajuda {
+    order: 2;
+  }
+
+  .conta-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .conta-nav-item {
+    flex: 1 1 auto;
+    justify-content: center;
+    padding: 10px 12px;
+  }
+
+  .conta-nav-form {
+    flex: 1 1 auto;
+  }
+
+  .conta-nav-sair {
+    margin-top: 0;
+    border-top: none;
+    padding-top: 10px;
+  }
+
+  .dados-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dados-form .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions button {
+    width: 100%;
+  }
+}

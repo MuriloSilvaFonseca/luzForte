@@ -187,10 +187,32 @@
 
 .checkout-botao-whatsapp {
   gap: 8px;
-  margin: 0 8px 8px 0;
   background: #25d366;
+}
+
+/* Agrupa os botões da confirmação com o mesmo espaço entre eles */
+.checkout-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.checkout-acoes .checkout-botao {
+  flex: 1 1 200px;
 }
 
 .checkout-botao-whatsapp:hover {
   background: #1da851;
+}
+
+/* "Continuar comprando": botão com contorno, menos destaque que os outros dois */
+.checkout-botao-secundario {
+  border: 1px solid #1a6be8;
+  background: #fff;
+  color: #1a6be8;
+}
+
+.checkout-botao-secundario:hover {
+  background: #e8f0fe;
 }

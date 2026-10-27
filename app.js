@@ -36,6 +36,7 @@ app.use(require('./middlewares/navbar'))
 
 app.use('/', rotasLoja)
 app.use('/', rotasAutenticacao)
+app.use('/', require('./routes/conta'))
 // app.use('/', produtosApi)
 app.use('/', require('./routes/avaliacao'))
 app.use('/admin', rotasProdutosAdmin)
