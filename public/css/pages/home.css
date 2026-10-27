@@ -527,3 +527,172 @@ margin-left: 70px;
    padding-left: 20px;
    padding-right: 20px;
 }
+
+/* COMO FUNCIONA */
+.como-funciona {
+  padding: 60px 0 20px;
+}
+
+.como-funciona-topo {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.como-funciona-topo h2 {
+  font-size: 2rem;
+  color: #111;
+}
+
+.como-funciona-topo span {
+  color: #ff3b30;
+}
+
+.como-funciona-topo p {
+  margin-top: 8px;
+  color: #666;
+  font-size: 15px;
+}
+
+.passos {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.passo {
+  position: relative;
+  text-align: center;
+  padding: 0 8px;
+}
+
+/* Círculo com o ícone */
+.passo-circulo {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  background: #e9eef6;
+  color: #1e3c72;               /* cor do ícone (o SVG usa currentColor) */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .3s;
+}
+
+.passo:hover .passo-circulo {
+  transform: translateY(-4px);
+}
+
+.passo-icone {
+  width: 46px;
+  height: 46px;
+}
+
+/* Selinho do número no canto do círculo */
+.passo-numero {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  background: #ff3b30;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Passo do WhatsApp em verde: é o que mais diferencia a loja */
+.passo--whatsapp .passo-circulo {
+  background: #e3f8ec;
+  color: #1da851;
+}
+
+.passo h3 {
+  margin-bottom: 8px;
+  font-size: 17px;
+  color: #1e3c72;
+}
+
+.passo p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #555;
+}
+
+/* Seta entre os passos (só no computador).
+   ::after é a linha e ::before é a ponta da seta.
+   A linha vai da borda do círculo atual (centro + 60px + folga) até a borda do próximo. */
+.passo:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 60px;
+  left: calc(50% + 76px);
+  width: calc(100% + 24px - 152px);
+  height: 2px;
+  background: #c5cfdd;
+}
+
+.passo:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  top: 56px;
+  left: calc(150% + 24px - 76px - 9px);
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid #c5cfdd;
+  border-right: 2px solid #c5cfdd;
+  transform: rotate(45deg);
+}
+
+.como-funciona-acao {
+  margin-top: 36px;
+  text-align: center;
+}
+
+.como-funciona-botao {
+  display: inline-block;
+  padding: 12px 28px;
+  border: 2px solid #1e3c72;
+  border-radius: 8px;
+  color: #1e3c72;
+  font-weight: 600;
+  text-decoration: none;
+  transition: .3s;
+}
+
+.como-funciona-botao:hover {
+  background: #1e3c72;
+  color: #fff;
+}
+
+/* Tablet: 2 por linha, sem setas */
+@media (max-width: 900px) {
+  .passos {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 36px;
+  }
+
+  .passo:not(:last-child)::after,
+  .passo:not(:last-child)::before {
+    display: none;
+  }
+}
+
+/* Celular: um embaixo do outro, com margem nas laterais */
+@media (max-width: 520px) {
+  .como-funciona {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .passos {
+    grid-template-columns: 1fr;
+  }
+}
