@@ -32,4 +32,13 @@ function montarLinkWhatsApp(pedido) {
   return 'https://wa.me/' + numeroLoja + '?text=' + encodeURIComponent(mensagem)
 }
 
-module.exports = { montarLinkWhatsApp }
+// Link simples para o cliente tirar dúvidas (usado na página Minha conta)
+function montarLinkDuvida() {
+  const numeroLoja = formatarTelefone(process.env.WHATSAPP_LOJA)
+  if (!numeroLoja) return null
+
+  const mensagem = 'Olá! Tenho uma dúvida sobre um pedido que fiz no site da LuzForte.'
+  return 'https://wa.me/' + numeroLoja + '?text=' + encodeURIComponent(mensagem)
+}
+
+module.exports = { montarLinkWhatsApp, montarLinkDuvida }

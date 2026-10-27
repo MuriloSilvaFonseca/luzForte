@@ -1,0 +1,245 @@
+<%- include("../partials/head") %>
+
+<link rel="stylesheet" href="/css/pages/conta.css">
+
+<%- include("../partials/header") %>
+
+<%
+  // Funções de apoio só para esta página
+  function reais(valor) {
+    return 'R$ ' + Number(valor).toFixed(2).replace('.', ',')
+  }
+  function dataBR(data) {
+    return new Date(data).toLocaleDateString('pt-BR')
+  }
+  const nomesStatus = { solicitado: 'Solicitado', aprovado: 'Aprovado', finalizado: 'Finalizado', cancelado: 'Cancelado' }
+  // Frase que aparece em destaque embaixo de cada pedido, de acordo com o status
+  const avisosStatus = {
+    solicitado: 'Aguardando confirmação da loja.',
+    aprovado: 'Pedido confirmado! Já pode retirar na loja.',
+    finalizado: 'Pedido retirado. Obrigado pela compra!',
+    cancelado: 'Pedido cancelado.'
+  }
+  const abaAtiva = ['dados', 'pedidos', 'senha'].includes(aba) ? aba : 'dados'
+%>
+
+<main class="conta-page">
+  <div class="conta-container">
+
+    <!-- Título -->
+    <div class="conta-header">
+      <h1>Minha Conta</h1>
+      <p class="conta-saudacao">Olá, <strong><%= dados.nome_usuario %></strong>! Gerencie seus dados e acompanhe seus pedidos.</p>
+    </div>
+
+    <!-- Mensagens vindas do servidor depois de salvar -->
+    <% if (sucesso) { %>
+      <p class="conta-alerta conta-alerta--ok" role="status"><%= sucesso %></p>
+    <% } %>
+    <% if (erro) { %>
+      <p class="conta-alerta conta-alerta--erro" role="alert"><%= erro %></p>
+    <% } %>
+
+    <div class="conta-layout">
+
+      <!-- ========== COLUNA DA ESQUERDA: menu + card de ajuda ========== -->
+      <div class="conta-lateral">
+      <aside class="conta-sidebar">
+        <nav class="conta-nav">
+          <button type="button" class="conta-nav-item <%= abaAtiva === 'dados' ? 'active' : '' %>" data-section="dados">Meus dados</button>
+          <button type="button" class="conta-nav-item <%= abaAtiva === 'pedidos' ? 'active' : '' %>" data-section="pedidos">Meus pedidos</button>
+          <button type="button" class="conta-nav-item <%= abaAtiva === 'senha' ? 'active' : '' %>" data-section="senha">Alterar senha</button>
+          <!-- Sair precisa ser POST: a rota /logout do auth.js é router.post -->
+          <form method="post" action="/logout" class="conta-nav-form">
+            <button type="submit" class="conta-nav-item conta-nav-sair">Sair</button>
+          </form>
+        </nav>
+      </aside>
+
+      <!-- Card de ajuda: dúvidas sobre o pedido vão pelo WhatsApp da loja -->
+      <div class="conta-ajuda">
+        <h2>Dúvidas sobre seu pedido?</h2>
+        <p>Se tiver alguma dúvida ou observação sobre o seu pedido, fale com a loja pelo WhatsApp.</p>
+        <% if (linkWhatsAppDuvida) { %>
+          <a class="conta-ajuda-botao" href="<%= linkWhatsAppDuvida %>" target="_blank" rel="noopener">
+            <img src="/img/icons/icons8-whatsapp-50.png" alt="" width="20" height="20">
+            Falar no WhatsApp
+          </a>
+        <% } %>
+      </div>
+      </div>
+
+      <!-- ========== CONTEÚDO ========== -->
+      <div class="conta-content">
+
+        <!-- ===== SEÇÃO: MEUS DADOS ===== -->
+        <section class="conta-section <%= abaAtiva === 'dados' ? 'active' : '' %>" id="section-dados">
+          <div class="conta-card">
+            <div class="conta-card-header">
+              <h2>Dados pessoais</h2>
+              <button type="button" class="btn-editar" id="btnEditarDados">Editar</button>
+            </div>
+
+            <!-- Visualização -->
+            <div class="dados-view" id="dadosView">
+              <div class="dados-grid">
+                <div class="dado-item">
+                  <span class="dado-label">Nome completo</span>
+                  <span class="dado-valor"><%= dados.nome_usuario %></span>
+                </div>
+                <div class="dado-item">
+                  <span class="dado-label">E-mail</span>
+                  <span class="dado-valor"><%= dados.email %></span>
+                </div>
+                <div class="dado-item">
+                  <span class="dado-label">Telefone</span>
+                  <span class="dado-valor"><%= dados.telefone %></span>
+                </div>
+                <div class="dado-item">
+                  <span class="dado-label">Tipo de conta</span>
+                  <span class="dado-valor badge-cliente"><%= dados.acesso === 'admin' ? 'Administrador' : 'Cliente' %></span>
+                </div>
+                <div class="dado-item">
+                  <span class="dado-label">Membro desde</span>
+                  <span class="dado-valor"><%= dataBR(dados.data_criacao) %></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Formulário de edição (oculto até clicar em Editar) -->
+            <form class="dados-form" id="dadosForm" method="post" action="/minha-conta/dados" hidden>
+              <div class="form-row">
+                <label class="form-field">
+                  <span class="field-label">Nome completo *</span>
+                  <input type="text" name="nome" value="<%= dados.nome_usuario %>" maxlength="200" autocomplete="name" required>
+                </label>
+              </div>
+              <div class="form-row">
+                <label class="form-field">
+                  <span class="field-label">E-mail</span>
+                  <input type="email" value="<%= dados.email %>" disabled>
+                  <small class="hint">O e-mail é usado no login e não pode ser alterado aqui.</small>
+                </label>
+                <label class="form-field">
+                  <span class="field-label">Telefone *</span>
+                  <input type="tel" name="telefone" value="<%= dados.telefone %>" maxlength="15" inputmode="numeric" data-mascara="telefone" required>
+                </label>
+              </div>
+              <div class="form-actions">
+                <button type="button" class="btn-secundario" id="btnCancelarDados">Cancelar</button>
+                <button type="submit" class="btn-primario">Salvar alterações</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- ===== SEÇÃO: MEUS PEDIDOS ===== -->
+        <section class="conta-section <%= abaAtiva === 'pedidos' ? 'active' : '' %>" id="section-pedidos">
+          <div class="conta-card">
+            <div class="conta-card-header">
+              <h2>Histórico de pedidos</h2>
+              <span class="pedidos-count"><%= pedidos.length %> <%= pedidos.length === 1 ? 'pedido' : 'pedidos' %></span>
+            </div>
+
+            <% if (pedidos.length === 0) { %>
+              <div class="pedidos-vazio">
+                <p>Você ainda não possui pedidos.</p>
+                <a href="/catalogo" class="btn-primario">Ir para o catálogo</a>
+              </div>
+            <% } else { %>
+
+              <!-- Filtro rápido de status (feito no navegador, pelo conta.js) -->
+              <div class="pedidos-filtros">
+                <button type="button" class="filtro-status active" data-status="todos">Todos</button>
+                <button type="button" class="filtro-status" data-status="solicitado">Solicitado</button>
+                <button type="button" class="filtro-status" data-status="aprovado">Aprovado</button>
+                <button type="button" class="filtro-status" data-status="finalizado">Finalizado</button>
+                <button type="button" class="filtro-status" data-status="cancelado">Cancelado</button>
+              </div>
+
+              <div class="pedidos-lista">
+                <% pedidos.forEach(function (pedido) { %>
+                  <article class="pedido-card pedido-card--<%= pedido.status %>" data-status="<%= pedido.status %>">
+                    <div class="pedido-topo">
+                      <div class="pedido-info-principal">
+                        <span class="pedido-numero">Pedido #<%= String(pedido.id_pedido).padStart(4, '0') %></span>
+                        <span class="pedido-data"><%= dataBR(pedido.data_criacao) %></span>
+                      </div>
+                      <span class="pedido-badge status-<%= pedido.status %>"><%= nomesStatus[pedido.status] || pedido.status %></span>
+                    </div>
+
+                    <div class="pedido-itens">
+                      <% pedido.itens.forEach(function (item) { %>
+                        <div class="pedido-item">
+                          <img src="<%= item.imagem || '/img/icons/icons8-caixa-128.png' %>" alt="<%= item.titulo_produto %>" class="item-img" loading="lazy"
+                               onerror="this.onerror=null; this.src='/img/icons/icons8-caixa-128.png'">
+                          <div class="item-detalhes">
+                            <p class="item-nome"><%= item.titulo_produto %></p>
+                            <span class="item-qtd"><%= item.quantidade %>x <%= reais(item.preco_unitario) %></span>
+                          </div>
+                          <span class="item-subtotal"><%= reais(item.subtotal) %></span>
+                        </div>
+                      <% }) %>
+                    </div>
+
+                    <div class="pedido-rodape">
+                      <div class="pedido-pagamento">
+                        <span class="pedido-rotulo">Pagamento</span>
+                        <strong><%= pedido.nome_pagamento || 'Não informado' %></strong>
+                        <span class="pedido-retirada">· Retirada na loja</span>
+                      </div>
+                      <div class="pedido-total">
+                        <span>Total</span>
+                        <strong><%= reais(pedido.total) %></strong>
+                      </div>
+                    </div>
+                    <% if (avisosStatus[pedido.status]) { %>
+                      <p class="pedido-aviso pedido-aviso--<%= pedido.status %>"><%= avisosStatus[pedido.status] %></p>
+                    <% } %>
+                  </article>
+                <% }) %>
+              </div>
+
+              <p class="pedidos-vazio-filtro" id="pedidosVazioFiltro" hidden>Nenhum pedido com esse status.</p>
+            <% } %>
+          </div>
+        </section>
+
+        <!-- ===== SEÇÃO: ALTERAR SENHA ===== -->
+        <section class="conta-section <%= abaAtiva === 'senha' ? 'active' : '' %>" id="section-senha">
+          <div class="conta-card">
+            <div class="conta-card-header">
+              <h2>Alterar senha</h2>
+            </div>
+
+            <form class="senha-form" id="senhaForm" method="post" action="/minha-conta/senha">
+              <label class="form-field">
+                <span class="field-label">Senha atual *</span>
+                <input type="password" name="senha_atual" placeholder="Digite sua senha atual" autocomplete="current-password" required>
+              </label>
+              <label class="form-field">
+                <span class="field-label">Nova senha *</span>
+                <input type="password" name="nova_senha" placeholder="Mínimo 8 caracteres" autocomplete="new-password" required minlength="8">
+                <small class="hint">Sua senha deve ter no mínimo 8 caracteres</small>
+              </label>
+              <label class="form-field">
+                <span class="field-label">Confirmar nova senha *</span>
+                <input type="password" name="confirma_senha" placeholder="Repita a nova senha" autocomplete="new-password" required minlength="8">
+              </label>
+              <p class="conta-alerta conta-alerta--erro" id="senhaErro" role="alert" hidden></p>
+              <div class="form-actions">
+                <button type="submit" class="btn-primario">Atualizar senha</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="/js/pages/auth-forms.js" defer></script>
+<script src="/js/pages/conta.js" defer></script>
+
+<%- include("../partials/footer") %>

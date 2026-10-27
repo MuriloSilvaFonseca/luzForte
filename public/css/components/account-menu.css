@@ -66,6 +66,16 @@
   cursor: pointer;
 }
 
+/* "Minha conta" e "Meus pedidos" são links.
+   O header.css tem ".user a { color: white }", então aqui usamos um seletor mais
+   específico (.account-menu a...) para o texto voltar a ser escuro como o "Sair". */
+.account-menu a.account-menu__option {
+  display: block;
+  box-sizing: border-box;
+  color: #122848;
+  text-decoration: none;
+}
+
 .account-menu__option:hover {
   background: #f1f4f7;
 }

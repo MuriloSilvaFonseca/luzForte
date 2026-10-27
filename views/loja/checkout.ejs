@@ -23,14 +23,22 @@
 
             <% if (locals.linkWhatsApp) { %>
                 <!-- Abre o WhatsApp com a mensagem do pedido pronta para a loja; o cliente só aperta "enviar" -->
-                <p class="checkout-whatsapp-texto">O WhatsApp não abriu? Envie o pedido para a loja por aqui:</p>
+                <p class="checkout-whatsapp-texto">Envie o pedido para a loja pelo WhatsApp (abre em uma nova aba):</p>
+            <% } %>
+
+            <!-- Botões lado a lado; no celular quebram linha -->
+            <div class="checkout-acoes">
+            <% if (locals.linkWhatsApp) { %>
                 <a class="checkout-botao checkout-botao-whatsapp" href="<%= linkWhatsApp %>" target="_blank" rel="noopener">
                     <img src="/img/icons/icons8-whatsapp-50.png" alt="" width="22" height="22">
                     Enviar pedido pelo WhatsApp
                 </a>
             <% } %>
 
-            <a class="checkout-botao" href="/catalogo">Continuar comprando</a>
+            <!-- Leva para a aba "Meus pedidos" da página Minha conta -->
+            <a class="checkout-botao" href="/minha-conta?aba=pedidos">Acompanhar pedido</a>
+            <a class="checkout-botao checkout-botao-secundario" href="/catalogo">Continuar comprando</a>
+            </div>
         </section>
     <% } else { %>
         <section class="checkout-card">
