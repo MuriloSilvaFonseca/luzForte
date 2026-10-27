@@ -15,11 +15,15 @@
                     <input type="checkbox" id="checkTodos">
                     <label for="checkTodos">Todos os produtos</label>
                 </div>
-                <p class="orientacaoCarrinho">Marque os produtos para incluí-los no resumo. Desmarcar não remove o produto do carrinho.</p>
  
                 <hr class="linhaSeparadora">
  
                 <p id="mensagemCarrinho" role="status">Carregando carrinho...</p>
+
+                <div id="carrinhoVazio" class="carrinhoVazio" hidden>
+                    <p class="carrinhoVazioTitulo">Seu carrinho está vazio.</p>
+    
+                </div>
                 <div id="itensCarrinho"></div>
                 <template id="modeloItemCarrinho">
 <div class="produtos">

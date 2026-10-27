@@ -61,6 +61,35 @@ body {
     display: none;
 }
 
+/* Mensagens do carrinho ("Carregando...", erros): com respiro em volta */
+#mensagemCarrinho {
+    padding: 20px 0;
+    font-size: 15px;
+    color: #555;
+    text-align: center;
+}
+
+#mensagemCarrinho:empty {
+    display: none;
+}
+
+/* Carrinho vazio */
+.carrinhoVazio {
+    padding: 40px 20px 32px;
+    text-align: center;
+}
+
+.carrinhoVazio[hidden] {
+    display: none;
+}
+
+.carrinhoVazioTitulo {
+    margin-bottom: 6px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e3c72;
+}
+
 .linhaSeparadora {
     border: none;
     border-top: 0.5px solid #e8e8e0;

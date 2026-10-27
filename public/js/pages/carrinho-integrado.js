@@ -61,7 +61,9 @@ function exibirCarrinho(resultado) {
     linha.className = 'linhaSeparadora'
     container.appendChild(linha)
   })
-  mensagemCarrinho(itensCarrinho.length ? '' : 'Seu carrinho está vazio.')
+  // Carrinho vazio: mostra o bloco com o botão "Ver produtos" em vez da frase solta
+  mensagemCarrinho('')
+  document.getElementById('carrinhoVazio').hidden = itensCarrinho.length > 0
   atualizarResumoCarrinho()
 }
 async function modificarCarrinho(caminho, metodo, dados) {
