@@ -15,8 +15,38 @@ function renderizarErroInterno(res) {
   })
 }
 
+// ========== HOME ==========
+// "Mais vendidos" de verdade: soma a quantidade vendida de cada produto.
+// Só contam pedidos APROVADOS ou FINALIZADOS (regra do projeto: venda só vale depois da aprovação).
+// O LEFT JOIN faz produto sem venda aparecer com 0, então a home sempre tem 4 produtos,
+// mesmo numa loja nova sem pedidos (nesse caso, a ordem é alfabética).
 router.get('/', (req, res) => {
-  res.render('loja/home')
+  const sqlMaisVendidos = `
+    SELECT p.sku, p.titulo_produto, p.preco_produto, p.estoque_produto,
+           i.url AS imagem,
+           COALESCE(v.vendidos, 0) AS vendidos
+    FROM produto p
+    LEFT JOIN (
+      SELECT pp.produto_sku, SUM(pp.quantidade) AS vendidos
+      FROM produto_pedido pp
+      JOIN pedido pe ON pe.id_pedido = pp.pedido_id
+      WHERE pe.status IN ('aprovado', 'finalizado')
+      GROUP BY pp.produto_sku
+    ) v ON v.produto_sku = p.sku
+    LEFT JOIN imagem_produto i ON i.produto_sku = p.sku AND i.ordem = 1
+    WHERE p.ativo = 'ativo'
+    ORDER BY vendidos DESC, p.titulo_produto ASC
+    LIMIT 4
+  `
+
+  conexao.query(sqlMaisVendidos, (erro, maisVendidos) => {
+    if (erro) {
+      // Se o banco falhar, a home abre mesmo assim, só sem os produtos
+      console.log(erro)
+      return res.render('loja/home', { maisVendidos: [], erroProdutos: true })
+    }
+    res.render('loja/home', { maisVendidos, erroProdutos: false })
+  })
 })
 
 router.get('/catalogo', (req, res) => {

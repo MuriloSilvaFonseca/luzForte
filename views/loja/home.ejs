@@ -4,6 +4,15 @@
 
     <%- include("../partials/header") %>
 
+    <%
+      // Procura a categoria pelo nome para montar o link do banner.
+      // Se não achar (nome mudou no banco), o botão leva para o catálogo inteiro.
+      function linkCategoria(nome) {
+        const categoria = navbarCategorias.find(c => c.nome.toLowerCase() === nome.toLowerCase())
+        return categoria ? '/catalogo?categoria=' + categoria.id_categoria : '/catalogo'
+      }
+    %>
+
     <!-- HERO -->
     <section class="hero">
         <!-- SLIDES -->
@@ -15,7 +24,7 @@
 
                 <p>Alta qualidade para<br>instalações seguras</p>
 
-                <button>Ver produtos</button>
+                <a class="hero-botao" href="<%= linkCategoria('Fios e cabos') %>">Ver produtos</a>
             </div>
         </div>
 
@@ -27,7 +36,7 @@
 
                 <p>Os melhores preços<br>para sua obra</p>
 
-                <button>Comprar agora</button>
+                <a class="hero-botao" href="<%= linkCategoria('Ferramentas') %>">Comprar agora</a>
             </div>
         </div>
 
@@ -39,7 +48,7 @@
 
                 <p>Modernidade e economia</p>
 
-                <button>Explorar</button>
+                <a class="hero-botao" href="<%= linkCategoria('Iluminação') %>">Explorar</a>
             </div>
         </div>
 
@@ -104,104 +113,66 @@
 
         </section>
 
-        <!-- PRODUTOS -->
+        <!-- PRODUTOS: os mais vendidos vêm do banco pela rota GET / (routes/loja.js) -->
         <section class="section">
 
             <div class="section-header">
                 <h2>Mais <span>Vendidos</span></h2>
 
-                <a href="">Ver mais</a>
+                <a href="/catalogo">Ver mais</a>
             </div>
 
+            <% if (erroProdutos) { %>
+                <p class="produtos-aviso">Não foi possível carregar os produtos agora.</p>
+            <% } else if (maisVendidos.length === 0) { %>
+                <p class="produtos-aviso">Nenhum produto cadastrado ainda.</p>
+            <% } %>
+
             <div class="products">
-
+                <% maisVendidos.forEach(function (produto) {
+                     const [reais, centavos] = Number(produto.preco_produto).toFixed(2).split('.')
+                %>
                 <div class="product-card">
 
-                    <img src="/img/products/fios.png" alt="">
+                    <a href="/produto?id=<%= produto.sku %>">
+                        <img src="<%= produto.imagem || '/img/icons/icons8-caixa-128.png' %>" alt="<%= produto.titulo_produto %>" loading="lazy"
+                             onerror="this.onerror=null; this.src='/img/icons/icons8-caixa-128.png'">
+                    </a>
 
                     <div class="product-info">
                         <p class="product-name">
-                            Fio Elétrico Cabo Flexível 1 via 1,50mm Azul
+                            <a href="/produto?id=<%= produto.sku %>"><%= produto.titulo_produto %></a>
                         </p>
 
-                        <span class="old-price">R$ 69,90</span>
+                        <h3>R$ <%= reais %><span>,<%= centavos %></span></h3>
 
-                        <h3>R$ 49<span>,99</span></h3>
-
-                        <button>Adicionar ao carrinho</button>
+                        <% if (produto.estoque_produto > 0) { %>
+                            <button type="button" data-id="<%= produto.sku %>">Adicionar ao carrinho</button>
+                        <% } else { %>
+                            <button type="button" disabled>Sem estoque</button>
+                        <% } %>
                     </div>
 
                 </div>
-
-                <div class="product-card">
-
-                    <img src="/img/products/fios.png" alt="">
-
-                    <div class="product-info">
-                        <p class="product-name">
-                            Fio Elétrico Cabo Flexível 1 via 1,50mm Azul
-                        </p>
-
-                        <span class="old-price">R$ 69,90</span>
-
-                        <h3>R$ 49<span>,99</span></h3>
-
-                        <button>Adicionar ao carrinho</button>
-                    </div>
-
-                </div>
-
-                <div class="product-card">
-
-                    <img src="/img/products/fios.png" alt="">
-
-                    <div class="product-info">
-                        <p class="product-name">
-                            Fio Elétrico Cabo Flexível 1 via 1,50mm Azul
-                        </p>
-
-                        <span class="old-price">R$ 69,90</span>
-
-                        <h3>R$ 49<span>,99</span></h3>
-
-                        <button>Adicionar ao carrinho</button>
-                    </div>
-
-                </div>
-
-                <div class="product-card">
-
-                    <img src="/img/products/fios.png" alt="">
-
-                    <div class="product-info">
-                        <p class="product-name">
-                            Fio Elétrico Cabo Flexível 1 via 1,50mm Azul
-                        </p>
-
-                        <span class="old-price">R$ 69,90</span>
-
-                        <h3>R$ 49<span>,99</span></h3>
-
-                        <button>Adicionar ao carrinho</button>
-                    </div>
-
-                </div>
-
+                <% }) %>
             </div>
 
         </section>
 
+        <!-- Convite para cadastro: só aparece para quem NÃO está logado -->
+        <% if (!usuario) { %>
         <section class="anuncio">
 
             <div class="propaganda">
                 <div class="texto-propaganda">
                     <h1>Cadastre e aproveite nossas ofertas!</h1>
                     <p>Materiais elétricos com os melhores preços</p>
-                    <button><a href="/login">Cadastre-se</a></button>
+                    <a class="botao-propaganda" href="/registro">Cadastre-se</a>
                 </div>
             </div>
 
         </section>
+        <% } %>
 
         <section class="avaliacoes">
 

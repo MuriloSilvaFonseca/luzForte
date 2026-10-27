@@ -151,6 +151,22 @@ body {
   background: #e92f24;
 }
 
+/* Botões do banner agora são links (<a>), com o mesmo visual do botão */
+.hero-botao {
+  display: inline-block;
+  background: #ff3b30;
+  color: white;
+  padding: 14px 26px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: .3s;
+}
+
+.hero-botao:hover {
+  background: #e92f24;
+}
+
 .dots {
   position: absolute;
   bottom: 20px;
@@ -342,6 +358,21 @@ body {
   margin-bottom: 10px;
 }
 
+.product-name a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.product-name a:hover {
+  color: #1e3c72;
+  text-decoration: underline;
+}
+
+.produtos-aviso {
+  margin-bottom: 20px;
+  color: #666;
+}
+
 .old-price {
   color: #999;
   text-decoration: line-through;
@@ -380,6 +411,8 @@ body {
 
 .product-info button:focus-visible { outline: 2px solid #183b6b; outline-offset: 3px; }
 .product-info button:disabled { opacity: 0.65; cursor: wait; }
+/* Sem estoque: botão cinza e sem a "mãozinha" */
+.product-info button:disabled:not([data-id]) { background: #9aa3ad; cursor: not-allowed; }
 
 .anuncio {
   margin: 50px;
@@ -428,6 +461,21 @@ body {
   
 }
 .texto-propaganda button:hover {
+  background-color: #ff3b30;
+}
+
+/* "Cadastre-se" agora é só um link (antes era <a> dentro de <button>, que é HTML inválido) */
+.botao-propaganda {
+  display: inline-block;
+  background-color: #e92f24;
+  color: white;
+  border-radius: 10px;
+  padding: 10px 30px;
+  font-size: 20px;
+  text-decoration: none;
+}
+
+.botao-propaganda:hover {
   background-color: #ff3b30;
 }
 .texto-propaganda{
