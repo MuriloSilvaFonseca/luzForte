@@ -25,7 +25,8 @@ test('dashboard, usuários e mudanças de status usam banco simulado', async t =
     if (sql.startsWith('SELECT COUNT(*) AS total FROM pedido')) return [[{ total: 9 }]]
     if (sql.startsWith('SELECT COALESCE(SUM(ativo')) return [[{ ativos: 20, baixo: 3 }]]
     if (sql.startsWith('SELECT COUNT(*) AS total FROM usuario')) return [[{ total: 2 }]]
-    if (sql.startsWith('SELECT status, COUNT(*) AS quantidade')) return [[{ status: 'solicitado', quantidade: 6, total: '312.50' }, { status: 'finalizado', quantidade: 4, total: '800.00' }]]
+    if (sql.startsWith('SELECT COALESCE(SUM(total), 0) AS total FROM pedido')) return [[{ total: '1247.90' }]]
+    if (sql.startsWith('SELECT status, COUNT(*) AS quantidade')) return [[{ status: 'solicitado', quantidade: 6, total: '312.50' }, { status: 'finalizado', quantidade: 4, total: '800.00' }, { status: 'aprovado', quantidade: 1, total: '70.00' }, { status: 'cancelado', quantidade: 1, total: '50.00' }, { status: 'carrinho', quantidade: 1, total: '15.40' }]]
     if (sql.startsWith('SELECT p.id_pedido AS id')) return [[{ id: 42, cliente: '<Cliente real>', data: '27/10/2026', total: '50.00' }]]
     if (sql.startsWith('SELECT sku, titulo_produto')) return [[{ sku: 1001, titulo: '<Produto do banco>', estoque: 2 }]]
     if (sql.startsWith('SELECT u.id_usuario AS id')) return [[
@@ -58,11 +59,19 @@ test('dashboard, usuários e mudanças de status usam banco simulado', async t =
       const html = await resposta.text()
       assert.match(html, /Pedidos solicitados/)
       assert.match(html, /Pedidos finalizados/)
+      assert.match(html, /1\.247,90/)
+      assert.match(html, /Inclui pedidos cancelados e carrinhos/)
+      assert.match(html, /70,00/)
+      assert.match(html, /50,00/)
+      assert.match(html, /15,40/)
       assert.match(html, /312,50/)
       assert.match(html, /800,00/)
       assert.match(html, /&lt;Cliente real&gt;/)
       assert.ok(!html.includes('18.452,90') && !html.includes('aguardando envio'))
       assert.ok(consultas.some(c => c.sql.includes("status <> 'carrinho'")))
+      assert.ok(consultas.some(c => c.sql === 'SELECT COALESCE(SUM(total), 0) AS total FROM pedido'))
+      assert.ok(html.indexOf('dashboard-faturamento') < html.indexOf('Pedidos solicitados'))
+      assert.ok(html.indexOf('Pedidos finalizados') < html.indexOf('aria-label="Indicadores"'))
     })
     await t.test('usuários persistidos podem ser desativados e reativados', async () => {
       assert.equal((await postar('/usuarios/2/ativo', { ativo: '0' })).status, 302)

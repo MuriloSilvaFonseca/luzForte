@@ -18,15 +18,31 @@
   <a class="adm-btn adm-btn--primary" href="/admin/produtos/novo">+ Cadastrar produto</a>
 </div>
 
+<section class="adm-card admin-dashboard-financeiro" aria-labelledby="dashboard-faturamento">
+  <div class="admin-dashboard-financeiro__principal">
+    <h2 id="dashboard-faturamento">Faturamento</h2>
+    <p class="admin-dashboard-financeiro__valor"><%= moeda(financeiro.total) %></p>
+    <p class="admin-dashboard-financeiro__nota">Todo o período · Todos os status</p>
+    <p class="admin-dashboard-financeiro__nota">Inclui pedidos cancelados e carrinhos.</p>
+  </div>
+  <dl class="admin-dashboard-financeiro__status">
+    <% financeiro.status.forEach(function (item) { %>
+      <div>
+        <dt><%= item.nome %></dt>
+        <dd><%= moeda(item.total) %></dd>
+      </div>
+    <% }) %>
+  </dl>
+</section>
+<div class="adm-grid-2 admin-dashboard-pedidos">
+  <% grupos.forEach(function (grupo) { %><%- include('../partials/admin/resumo-pedidos', { grupo, moeda }) %><% }) %>
+</div>
 <section class="adm-kpis admin-gestao-indicadores" aria-label="Indicadores">
   <article class="adm-card adm-kpi"><p class="adm-kpi__label">Pedidos hoje</p><p class="adm-kpi__value"><%= resumo.pedidosHoje %></p><p class="adm-kpi__hint">Pedidos registrados, sem carrinhos</p></article>
   <article class="adm-card adm-kpi"><p class="adm-kpi__label">Produtos ativos</p><p class="adm-kpi__value"><a href="/admin/produtos?status=ativo"><%= resumo.produtosAtivos %></a></p><p class="adm-kpi__hint">Disponíveis no catálogo</p></article>
   <article class="adm-card adm-kpi"><p class="adm-kpi__label">Usuários ativos</p><p class="adm-kpi__value"><a href="/admin/usuarios?situacao=ativo"><%= resumo.usuariosAtivos %></a></p><p class="adm-kpi__hint">Contas com acesso liberado</p></article>
   <article class="adm-card adm-kpi"><p class="adm-kpi__label">Estoque baixo</p><p class="adm-kpi__value"><a href="/admin/produtos?estoque=baixo&status=ativo"><%= resumo.estoqueBaixo %></a></p><p class="adm-kpi__hint">Produtos ativos com até 5 unidades</p></article>
 </section>
-<div class="adm-grid-2">
-  <% grupos.forEach(function (grupo) { %><%- include('../partials/admin/resumo-pedidos', { grupo, moeda }) %><% }) %>
-</div>
 <div class="admin-gestao-estoque">
   <section class="adm-card">
     <header class="adm-card__head">

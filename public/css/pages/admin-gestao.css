@@ -38,3 +38,71 @@
 .admin-gestao-indicadores .adm-kpi__value > a {
   color: inherit;
 }
+
+.admin-dashboard-financeiro {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(0, 2fr);
+  gap: 32px;
+  align-items: center;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.admin-dashboard-financeiro__principal h2 {
+  margin: 0;
+  color: var(--adm-text);
+  font-size: 16px;
+}
+.admin-dashboard-financeiro__valor {
+  margin: 8px 0;
+  color: var(--adm-navy-900);
+  font-size: 34px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.admin-dashboard-financeiro__nota {
+  margin: 4px 0 0;
+  color: #465365;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.admin-dashboard-financeiro__status {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px 24px;
+  margin: 0;
+}
+.admin-dashboard-financeiro__status dt {
+  color: #465365;
+  font-size: 14px;
+}
+.admin-dashboard-financeiro__status dd {
+  margin: 6px 0 0;
+  color: var(--adm-text);
+  font-size: 20px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.admin-dashboard-pedidos {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  margin-bottom: 24px;
+}
+.admin-dashboard-grupo-pedidos .admin-gestao-total strong {
+  color: var(--adm-navy-900);
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 1100px) {
+  .admin-dashboard-financeiro {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+@media (max-width: 900px) {
+  .admin-dashboard-pedidos { grid-template-columns: 1fr; }
+}
+@media (max-width: 540px) {
+  .admin-dashboard-financeiro { padding: 20px; }
+  .admin-dashboard-financeiro__valor { font-size: 30px; }
+  .admin-dashboard-financeiro__status { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

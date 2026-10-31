@@ -1,6 +1,6 @@
-<section class="adm-card">
+<section class="adm-card admin-dashboard-grupo-pedidos">
   <header class="adm-card__head">
-    <div><h2><%= grupo.titulo %></h2><p class="admin-gestao-total"><%= grupo.quantidade %> pedido(s) · Total: <strong><%= moeda(grupo.total) %></strong></p></div>
+    <div><h2><%= grupo.titulo %></h2><p class="admin-gestao-total"><%= grupo.quantidade %> pedido(s) · <strong><%= moeda(grupo.total) %></strong></p></div>
     <a href="/admin/pedidos?status=<%= grupo.status %>">Ver todos</a>
   </header>
   <div class="adm-tablewrap"><table class="adm-table">
@@ -13,5 +13,5 @@
       </tr><% }) %>
     </tbody>
   </table></div>
-  <p class="admin-gestao-ajuda">Até 5 pedidos mais recentes. O total considera todos os pedidos deste status.</p>
+  <p class="admin-gestao-ajuda">Até 5 pedidos mais recentes. Total de todos os pedidos deste status.</p>
 </section>

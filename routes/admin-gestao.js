@@ -9,7 +9,22 @@ router.get('/', async (req, res) => {
     const [[hoje]] = await banco.query("SELECT COUNT(*) AS total FROM pedido WHERE status <> 'carrinho' AND data_criacao >= CURDATE() AND data_criacao < DATE_ADD(CURDATE(), INTERVAL 1 DAY)")
     const [[produtos]] = await banco.query("SELECT COALESCE(SUM(ativo = 'ativo'), 0) AS ativos, COALESCE(SUM(ativo = 'ativo' AND estoque_produto <= 5), 0) AS baixo FROM produto")
     const [[usuarios]] = await banco.query('SELECT COUNT(*) AS total FROM usuario WHERE ativo = 1')
-    const [totais] = await banco.query("SELECT status, COUNT(*) AS quantidade, COALESCE(SUM(total), 0) AS total FROM pedido WHERE status IN ('solicitado', 'finalizado') GROUP BY status")
+    const [[faturamento]] = await banco.query('SELECT COALESCE(SUM(total), 0) AS total FROM pedido')
+    const [totais] = await banco.query('SELECT status, COUNT(*) AS quantidade, COALESCE(SUM(total), 0) AS total FROM pedido GROUP BY status')
+    const financeiro = {
+      total: faturamento.total,
+      status: [
+        { chave: 'solicitado', nome: 'Solicitados' },
+        { chave: 'aprovado', nome: 'Aprovados' },
+        { chave: 'finalizado', nome: 'Finalizados' },
+        { chave: 'cancelado', nome: 'Cancelados' },
+        { chave: 'carrinho', nome: 'Carrinhos' }
+      ]
+    }
+    for (const item of financeiro.status) {
+      const linha = totais.find(total => total.status === item.chave)
+      item.total = linha ? linha.total : 0
+    }
     const grupos = []
     for (const status of ['solicitado', 'finalizado']) {
       const [pedidos] = await banco.query(`SELECT p.id_pedido AS id, u.nome_usuario AS cliente,
@@ -20,7 +35,7 @@ router.get('/', async (req, res) => {
       grupos.push({ status, titulo: status === 'solicitado' ? 'Pedidos solicitados' : 'Pedidos finalizados', ...resumo, pedidos })
     }
     const [estoqueBaixoLista] = await banco.query("SELECT sku, titulo_produto AS titulo, estoque_produto AS estoque FROM produto WHERE ativo = 'ativo' AND estoque_produto <= 5 ORDER BY estoque_produto, sku LIMIT 5")
-    res.render('admin/visao-geral', { resumo: { pedidosHoje: hoje.total, produtosAtivos: produtos.ativos, estoqueBaixo: produtos.baixo, usuariosAtivos: usuarios.total }, grupos, estoqueBaixoLista, statusInfo })
+    res.render('admin/visao-geral', { resumo: { pedidosHoje: hoje.total, produtosAtivos: produtos.ativos, estoqueBaixo: produtos.baixo, usuariosAtivos: usuarios.total }, grupos, estoqueBaixoLista, statusInfo, financeiro })
   } catch (erro) {
     console.error('Falha na visão geral:', erro.code)
     res.status(500).send('Não foi possível carregar o painel. Confira a conexão e a migração de usuários.')
