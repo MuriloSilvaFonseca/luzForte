@@ -1,0 +1,17 @@
+<section class="adm-card">
+  <header class="adm-card__head">
+    <div><h2><%= grupo.titulo %></h2><p class="admin-gestao-total"><%= grupo.quantidade %> pedido(s) · Total: <strong><%= moeda(grupo.total) %></strong></p></div>
+    <a href="/admin/pedidos?status=<%= grupo.status %>">Ver todos</a>
+  </header>
+  <div class="adm-tablewrap"><table class="adm-table">
+    <thead><tr><th>Pedido</th><th>Cliente</th><th>Data</th><th class="is-num">Total</th></tr></thead>
+    <tbody>
+      <% if (!grupo.pedidos.length) { %><tr><td colspan="4"><div class="adm-empty">Nenhum pedido neste status.</div></td></tr><% } %>
+      <% grupo.pedidos.forEach(function (pedido) { %><tr>
+        <td><a href="/admin/pedidos/<%= pedido.id %>"><strong>#<%= pedido.id %></strong></a></td>
+        <td><%= pedido.cliente || 'Cliente visitante' %></td><td><%= pedido.data %></td><td class="is-num"><%= moeda(pedido.total) %></td>
+      </tr><% }) %>
+    </tbody>
+  </table></div>
+  <p class="admin-gestao-ajuda">Até 5 pedidos mais recentes. O total considera todos os pedidos deste status.</p>
+</section>

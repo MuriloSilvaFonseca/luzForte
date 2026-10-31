@@ -4,12 +4,15 @@
   const produtoSalvo = Boolean(locals.salvo)
   const listaMarcas = locals.marcas || []
   const listaSubcategorias = locals.subcategorias || []
+  const listaCategorias = locals.categorias || []
   const valoresFormulario = locals.valores || {}
   const acaoFormulario = emEdicao ? '/admin/produtos/' + valoresFormulario.sku + '/editar' : '/admin/produtos/novo'
 %>
 
 <%- include('../partials/admin/admin-topo', { pagina: emEdicao ? 'produtos' : 'cadastro', titulo: emEdicao ? 'Editar produto' : 'Cadastro de produto' }) %>
 
+<link rel="stylesheet" href="/css/pages/admin-produto-complementos.css">
+<div class="admin-produto-pagina">
 <nav class="adm-breadcrumb" aria-label="Você está em">
   <a href="/admin">Administração</a>
   <a href="/admin/produtos">Produtos</a>
@@ -89,16 +92,39 @@
             <option value="<%= marca.id %>"<%= String(valoresFormulario.marca_id) === String(marca.id) ? ' selected' : '' %>><%= marca.nome %></option>
           <% }) %>
         </select>
+        <div class="admin-complementos-botoes">
+          <button class="adm-btn adm-btn--sm" type="button" data-abrir-cadastro="marca" aria-controls="cadastro-marca" aria-expanded="false">Cadastrar nova marca</button>
+        </div>
+        <%- include('../partials/admin/cadastro-auxiliar', { tipoCadastro: 'marca', tituloCadastro: 'Nova marca', limiteCadastro: 50 }) %>
+        <p class="admin-produto-ajuda" role="status" data-retorno-cadastro="marca"></p>
       </div>
 
       <div class="admin-produto-campo">
-        <label class="admin-produto-label" for="subcategoria-produto">Categoria e subcategoria <span class="admin-produto-obrigatorio">*</span></label>
-        <select class="admin-produto-input" id="subcategoria-produto" name="subcategoria_id" required>
-          <option value="">Selecione uma subcategoria</option>
-          <% listaSubcategorias.forEach(function (subcategoria) { %>
-            <option value="<%= subcategoria.id %>"<%= String(valoresFormulario.subcategoria_id) === String(subcategoria.id) ? ' selected' : '' %>><%= subcategoria.nome %></option>
+        <label class="admin-produto-label" for="categoria-produto">Categoria <span class="admin-produto-obrigatorio">*</span></label>
+        <select class="admin-produto-input" id="categoria-produto" name="categoria_id" data-categoria-select required>
+          <option value="">Selecione uma categoria</option>
+          <% listaCategorias.forEach(function (categoria) { %>
+            <option value="<%= categoria.id %>"<%= String(valoresFormulario.categoria_id) === String(categoria.id) ? ' selected' : '' %>><%= categoria.nome %></option>
           <% }) %>
         </select>
+        <div class="admin-complementos-botoes"><button class="adm-btn adm-btn--sm" type="button" data-abrir-cadastro="categoria" aria-controls="cadastro-categoria" aria-expanded="false">Cadastrar categoria</button></div>
+        <%- include('../partials/admin/cadastro-auxiliar', { tipoCadastro: 'categoria', tituloCadastro: 'Nova categoria', limiteCadastro: 70 }) %>
+        <p class="admin-produto-ajuda" role="status" data-retorno-cadastro="categoria"></p>
+      </div>
+      <div class="admin-produto-campo">
+        <label class="admin-produto-label" for="subcategoria-produto">Subcategoria (opcional)</label>
+        <select class="admin-produto-input" id="subcategoria-produto" name="subcategoria_id" data-subcategoria-select>
+          <option value="">Sem subcategoria</option>
+          <% listaSubcategorias.forEach(function (subcategoria) { %>
+            <option data-categoria="<%= subcategoria.categoria_id %>" value="<%= subcategoria.id %>"<%= String(valoresFormulario.subcategoria_id) === String(subcategoria.id) ? ' selected' : '' %>><%= subcategoria.nome %></option>
+          <% }) %>
+        </select>
+        <div class="admin-complementos-botoes">
+          <button class="adm-btn adm-btn--sm" type="button" data-abrir-cadastro="subcategoria" aria-controls="cadastro-subcategoria" aria-expanded="false">Cadastrar subcategoria</button>
+        </div>
+
+        <%- include('../partials/admin/cadastro-auxiliar', { tipoCadastro: 'subcategoria', tituloCadastro: 'Nova subcategoria', limiteCadastro: 70 }) %>
+        <p class="admin-produto-ajuda" role="status" data-retorno-cadastro="subcategoria"></p>
       </div>
     </div>
   </section>
@@ -131,6 +157,10 @@
     </div>
   </section>
 
+  <%- include('../partials/admin/biblioteca-textos') %>
+  <details class="admin-textos-exclusivos"<%= ['descricao', 'especificacao', 'instalacao'].some(c => valoresFormulario[c]) || valoresFormulario.detalhes?.length ? ' open' : '' %>>
+    <summary>Textos exclusivos deste produto (opcional)</summary>
+    <p class="admin-produto-ajuda">Estes textos pertencem só a este produto. Os textos antigos foram mantidos aqui.</p>
   <!-- 4. Detalhes -->
   <section class="admin-produto-secao" aria-labelledby="admin-produto-detalhes">
     <div class="admin-produto-secao-cabecalho">
@@ -139,7 +169,7 @@
         <h2 class="admin-produto-secao-titulo" id="admin-produto-detalhes">Detalhes do produto</h2>
         <p class="admin-produto-secao-texto">Essas informações ajudam o cliente a conhecer o produto.</p>
         <% if (emEdicao) { %>
-          <p class="admin-produto-ajuda">Se houver vários registros, você edita o primeiro de cada tipo. Os demais são mantidos.</p>
+          <p class="admin-produto-ajuda">Os registros adicionais aparecem abaixo e também podem ser editados.</p>
         <% } %>
       </div>
     </div>
@@ -161,6 +191,37 @@
       </div>
     </div>
   </section>
+
+  <section class="admin-produto-secao" aria-labelledby="detalhes-adicionais-titulo">
+    <h2 class="admin-produto-secao-titulo" id="detalhes-adicionais-titulo">Detalhes adicionais</h2>
+    <p class="admin-produto-ajuda">Adicione descrições, especificações e orientações com títulos próprios. Eles serão salvos junto com o produto.</p>
+    <div id="detalhes-adicionais">
+      <% (valoresFormulario.detalhes || []).forEach(function (d, indice) { %>
+        <fieldset class="admin-complementos-detalhe" data-detalhe>
+          <legend>Detalhe adicional</legend>
+          <input type="hidden" name="detalhes[<%= indice %>][id]" value="<%= d.id %>">
+          <label class="admin-produto-label" for="detalhe-tipo-<%= indice %>">Tipo</label>
+          <% if (d.id) { %><input type="hidden" name="detalhes[<%= indice %>][tipo]" value="<%= d.tipo %>"><% } %>
+          <select class="admin-produto-input" id="detalhe-tipo-<%= indice %>" name="detalhes[<%= indice %>][tipo]"<%= d.id ? ' disabled' : '' %>>
+            <% [['descricao', 'Descrição'], ['especificacao', 'Especificação'], ['instalacao', 'Instalação']].forEach(function (tipo) { %>
+              <option value="<%= tipo[0] %>"<%= d.tipo === tipo[0] ? ' selected' : '' %>><%= tipo[1] %></option>
+            <% }) %>
+          </select>
+          <label class="admin-produto-label" for="detalhe-nome-<%= indice %>">Título</label>
+          <input class="admin-produto-input" id="detalhe-nome-<%= indice %>" name="detalhes[<%= indice %>][nome]" value="<%= d.nome %>" maxlength="70" required>
+          <label class="admin-produto-label" for="detalhe-texto-<%= indice %>">Texto</label>
+          <textarea class="admin-produto-input" id="detalhe-texto-<%= indice %>" name="detalhes[<%= indice %>][texto]" rows="3" required><%= d.texto %></textarea>
+        </fieldset>
+      <% }) %>
+    </div>
+    <div class="admin-complementos-botoes">
+      <button class="adm-btn" type="button" data-adicionar-detalhe="descricao">Adicionar descrição</button>
+      <button class="adm-btn" type="button" data-adicionar-detalhe="especificacao">Adicionar especificação</button>
+      <button class="adm-btn" type="button" data-adicionar-detalhe="instalacao">Adicionar orientação de instalação</button>
+    </div>
+  </section>
+
+  </details>
 
   <!-- 5. Imagens -->
   <section class="admin-produto-secao" aria-labelledby="admin-produto-imagem">
@@ -186,7 +247,7 @@
         <small class="admin-produto-ajuda">Enviar novas imagens substituirá as atuais. Se não selecionar arquivos, as imagens atuais serão mantidas.</small>
       <% } %>
       <label class="admin-produto-label" for="imagens-produto">Selecionar imagens</label>
-      <input class="admin-produto-input admin-produto-input-arquivo" id="imagens-produto" name="imagens" type="file" accept="image/jpeg,image/png,image/webp" multiple data-max-arquivos="5">
+      <input class="admin-produto-input admin-produto-input-arquivo" id="imagens-produto" name="imagens" type="file" accept="image/jpeg,image/png,image/webp" multiple data-max-arquivos="5" aria-describedby="imagens-produto-ajuda">
       <small class="admin-produto-ajuda" id="imagens-produto-ajuda">PNG, JPG ou WebP; até 5 imagens de no máximo 5 MB cada.</small>
     </div>
   </section>
@@ -202,4 +263,9 @@
 
 </form>
 
-<%- include('../partials/admin/admin-rodape', { scripts: ['/js/pages/admin-produto-imagens.js'] }) %>
+<!-- O atributo form liga os campos acima aos cadastros sem colocar um formulário dentro de outro. -->
+<% ['marca', 'categoria', 'subcategoria'].forEach(function (tipo) { %>
+  <form id="cadastro-<%= tipo %>-form" data-cadastro="<%= tipo %>" action="/admin/cadastros/<%= tipo %>" method="post"></form>
+<% }) %>
+</div>
+<%- include('../partials/admin/admin-rodape', { scripts: ['/js/pages/filtro-categorias.js', '/js/pages/admin-produto-imagens.js', '/js/pages/admin-produto-complementos.js', '/js/pages/admin-biblioteca-textos.js'] }) %>

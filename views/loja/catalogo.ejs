@@ -55,16 +55,15 @@
               </svg>
             </div>
             <div class="filter-body">
-              <label class="filter-check">
-                <input type="radio" name="categoria" value="" <%= !filtros.categoria ? 'checked' : '' %>> Todas
-              </label>
-              <% navbarCategorias.forEach(function (categoria) { %>
-                <label class="filter-check">
-                  <input type="radio" name="categoria" value="<%= categoria.id_categoria %>"
-                    <%= String(categoria.id_categoria) === filtros.categoria ? 'checked' : '' %>>
-                  <%= categoria.nome %>
-                </label>
-              <% }) %>
+              <select class="filtro-classificacao" name="categoria" aria-label="Categoria" data-categoria-select>
+                <option value="">Todas as categorias</option>
+                <% navbarCategorias.forEach(function (categoria) { %><option value="<%= categoria.id_categoria %>"<%= String(categoria.id_categoria) === filtros.categoria ? ' selected' : '' %>><%= categoria.nome %></option><% }) %>
+              </select>
+              <label for="filtro-subcategoria">Subcategoria</label>
+              <select class="filtro-classificacao" id="filtro-subcategoria" name="subcategoria" data-subcategoria-select data-todas-sem-categoria="sim">
+                <option value="">Todas as subcategorias</option>
+                <% navbarCategorias.forEach(function (categoria) { categoria.subcategorias.forEach(function (sub) { %><option data-categoria="<%= categoria.id_categoria %>" value="<%= sub.id_subcategoria %>"<%= String(sub.id_subcategoria) === filtros.subcategoria ? ' selected' : '' %>><%= sub.nome %></option><% }) }) %>
+              </select>
             </div>
           </div>
 
@@ -111,6 +110,7 @@
   <!-- /page-container -->
 </main>
 
+<script src="/js/pages/filtro-categorias.js"></script>
 <script src="/js/pages/catalogo.js"></script>
 
 <%- include("../partials/footer") %>

@@ -5,7 +5,7 @@ const express = require('express')
 
 test('listagem administrativa de pedidos lê o banco com filtros e paginação', async t => {
   const consultas = []
-  const estados = ['carrinho', 'solicitado', 'aprovado', 'finalizado', 'cancelado']
+  const estados = ['solicitado', 'aprovado', 'finalizado', 'cancelado']
   let total
   let linhas
   let falharEm
@@ -64,13 +64,12 @@ test('listagem administrativa de pedidos lê o banco com filtros e paginação',
   }
 
   try {
-    await t.test('listagem abre sem autenticação para visitantes e clientes', async () => {
+    await t.test('visitantes e clientes não acessam a listagem', async () => {
       for (const perfil of ['visitante', 'cliente']) {
         reiniciar()
         const resposta = await pedir('', perfil)
-        assert.equal(resposta.status, 200, perfil)
-        assert.match(await resposta.text(), /#9876/)
-        assert.equal(consultas.length, 3, perfil)
+        assert.equal(resposta.status, 403, perfil)
+        assert.equal(consultas.length, 0, perfil)
       }
     })
 
@@ -84,10 +83,12 @@ test('listagem administrativa de pedidos lê o banco com filtros e paginação',
       assert.match(html, /Pix &lt;do banco&gt;/)
       assert.match(html, /37,90/)
       assert.doesNotMatch(html, /Cliente <do banco>|Carlos Menezes|Ana Paula|Aguardando pagamento/)
-      assert.doesNotMatch(html, /href="\/admin\/pedidos\/9876"/)
+      assert.match(html, /href="\/admin\/pedidos\/9876"/)
       for (const status of estados) {
         assert.ok(links(html).some(link => link.pathname === '/admin/pedidos' && link.searchParams.get('status') === status), status)
       }
+      assert.match(listagem().sql, /p.status <> 'carrinho'/)
+      assert.doesNotMatch(html, />Carrinho</)
       assert.match(listagem().sql, /LEFT JOIN usuario/)
       assert.match(listagem().sql, /LEFT JOIN forma_pagamento/)
       assert.match(listagem().sql, /SUM\(pp\.quantidade\)/)
@@ -145,6 +146,19 @@ test('listagem administrativa de pedidos lê o banco com filtros e paginação',
         assert.ok(listagem().parametros.includes(status), status)
         assert.match(listagem().sql, /p\.status = \?/)
         assert.doesNotMatch(html, /Aguardando pagamento|>Pagos<|>Enviados<|>Entregues</)
+        const cores = { solicitado: 'yellow', aprovado: 'blue', finalizado: 'green', cancelado: 'red' }
+        assert.ok(html.includes('adm-badge--' + cores[status]))
+        assert.doesNotMatch(html, /<details|Novo status|Salvar status/)
+        if (status === 'solicitado' || status === 'aprovado') {
+          assert.match(html, /name="status_atual" value="/)
+          assert.match(html, /name="status" value="cancelado"/)
+          assert.ok(html.includes('name="status" value="' + (status === 'solicitado' ? 'aprovado' : 'finalizado') + '"'))
+          const botoes = Array.from(html.matchAll(/<button[^>]*name="status" value="([^"]+)"/g), item => item[1])
+          assert.deepEqual(botoes, [status === 'solicitado' ? 'aprovado' : 'finalizado', 'cancelado'])
+        } else {
+          assert.match(html, /Encerrado/)
+          assert.doesNotMatch(html, /admin-pedido-acoes/)
+        }
       }
     })
 

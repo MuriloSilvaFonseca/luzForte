@@ -11,7 +11,7 @@ const rotasAdmin = require('./routes/admin-paineis')
 const app = express()
 const porta = 3000
 
-app.use(express.urlencoded({ extended: true }))
+app.use(express.urlencoded({ extended: true, limit: '1mb' }))
 
 app.use( sessao({
   secret: process.env.SESSION_SECRET,
@@ -27,6 +27,7 @@ app.use((req, res, next) => {
 })
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
+app.use(require('./middlewares/usuario-ativo'))
 
 app.use('/api/carrinho', require('./routes/carrinho'))
 app.use('/api/produtos', require('./routes/produtos'))

@@ -4,7 +4,7 @@
   const moeda = (v) => 'R$ ' + Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })
   const statusInfo = {
     ativo: { rotulo: 'Ativo', cor: 'green' },
-    desativado: { rotulo: 'Desativado', cor: 'gray' },
+    desativado: { rotulo: 'Desativado', cor: 'red' },
     oculto: { rotulo: 'Oculto', cor: 'yellow' }
   }
   // Mantém os filtros ativos ao trocar de página
@@ -42,6 +42,14 @@
     <% marcas.forEach(function (m) { %>
       <option value="<%= m.id %>"<%= String(filtros.marca) === String(m.id) ? ' selected' : '' %>><%= m.nome %></option>
     <% }) %>
+  </select>
+  <select class="adm-field" name="categoria" aria-label="Categoria" data-categoria-select>
+    <option value="">Todas as categorias</option>
+    <% categorias.forEach(function (categoria) { %><option value="<%= categoria.id %>"<%= filtros.categoria === String(categoria.id) ? ' selected' : '' %>><%= categoria.nome %></option><% }) %>
+  </select>
+  <select class="adm-field" name="subcategoria" aria-label="Subcategoria" data-subcategoria-select data-todas-sem-categoria="sim">
+    <option value="">Todas as subcategorias</option>
+    <% subcategorias.forEach(function (subcategoria) { %><option data-categoria="<%= subcategoria.categoria_id %>" value="<%= subcategoria.id %>"<%= filtros.subcategoria === String(subcategoria.id) ? ' selected' : '' %>><%= subcategoria.nome %></option><% }) %>
   </select>
   <label class="adm-check">
     <input type="checkbox" name="estoque" value="baixo"<%= filtros.estoque === 'baixo' ? ' checked' : '' %>> Estoque baixo
@@ -110,4 +118,4 @@
   </div>
 </section>
 
-<%- include('../partials/admin/admin-rodape') %>
+<%- include('../partials/admin/admin-rodape', { scripts: ['/js/pages/filtro-categorias.js'] }) %>

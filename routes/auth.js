@@ -11,14 +11,20 @@ function renderizarRegistro(res, erro, valores = {}, status = 200) {
 }
 
 router.get('/registro', (req, res) => {
-  if (req.session.usuario) return res.redirect('/')
+  if (req.session.usuario) {
+    if (req.session.usuario.acesso === 'admin') return res.redirect('/admin')
+    return res.redirect('/')
+  }
   res.render('auth/registro')
 })
 
 
 // ROTA POST PARA CADASTRO DE USUÁRIO
 router.post('/registro', (req, res) => {
-  if (req.session.usuario) return res.redirect('/')
+  if (req.session.usuario) {
+    if (req.session.usuario.acesso === 'admin') return res.redirect('/admin')
+    return res.redirect('/')
+  }
 
   const { nome, email, telefone, senha, confirm_senha } = req.body
   const nomeUsuario = typeof nome === 'string' ? nome.trim() : ''
@@ -75,19 +81,25 @@ router.post('/registro', (req, res) => {
 })
 
 router.get('/login', (req, res) => {
-  if (req.session.usuario) return res.redirect('/')
-  res.render('auth/login')
+  if (req.session.usuario) {
+    if (req.session.usuario.acesso === 'admin') return res.redirect('/admin')
+    return res.redirect('/')
+  }
+  res.render('auth/login', { erro: req.query.conta === 'desativada' ? 'Sua conta está desativada.' : '' })
 })
 
 router.post('/login', (req, res) => {
-  if (req.session.usuario) return res.redirect('/')
+  if (req.session.usuario) {
+    if (req.session.usuario.acesso === 'admin') return res.redirect('/admin')
+    return res.redirect('/')
+  }
 
   const { email, password } = req.body
   if (typeof email !== 'string' || typeof password !== 'string' || !email || !password || password.length > 256) {
     return res.status(400).render('auth/login', { erro: 'Informe e-mail e senha.' })
   }
 
-  const sql = 'SELECT id_usuario, nome_usuario, acesso, senha FROM usuario WHERE email = ? LIMIT 1'
+  const sql = 'SELECT id_usuario, nome_usuario, acesso, senha, ativo FROM usuario WHERE email = ? LIMIT 1'
 
   // Busca a conta pelo e-mail, como no cadastro.
   conexao.query(sql, [email.trim()], (erro, usuarios) => {
@@ -97,7 +109,7 @@ router.post('/login', (req, res) => {
     }
 
     const usuario = usuarios[0]
-    if (!usuario) {
+    if (!usuario || Number(usuario.ativo) !== 1) {
       return res.status(401).render('auth/login', { erro: 'E-mail ou senha inválidos.' })
     }
 
@@ -141,6 +153,9 @@ router.post('/login', (req, res) => {
                 return res.status(500).render('auth/login', { erro: 'Não foi possível entrar. Tente novamente.' })
               }
 
+              if (usuario.acesso === 'admin') {
+                return res.redirect('/admin')
+              }
               return res.redirect('/carrinho')
             })
           })

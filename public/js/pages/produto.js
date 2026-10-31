@@ -223,7 +223,7 @@ async function carregarProduto() {
       estoque: registro.estoque_produto + ' em estoque',
       avaliacao: { nota: Math.round(Number(data.avaliacao.media)), totalAvaliacoes: data.avaliacao.quantidade },
       imagens: data.imagens.map(imagem => imagem.url),
-      breadcrumb: [registro.categoria, registro.subcategoria, registro.titulo_produto],
+      breadcrumb: [registro.categoria, registro.subcategoria, registro.titulo_produto].filter(Boolean),
       descricoes: data.descricoes, especificacoes: data.especificacoes, instalacoes: data.instalacoes
     };
     exibirProduto(produto);

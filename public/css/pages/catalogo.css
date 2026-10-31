@@ -343,3 +343,13 @@
   color: white;
   cursor: pointer;
 }
+ .filtro-classificacao {
+  width: 100%;
+  margin-block: 8px 16px;
+  padding: 10px;
+  border: 1px solid #cfd7e1;
+  border-radius: 5px;
+  background: #fff;
+  color: #263445;
+  font: inherit;
+}

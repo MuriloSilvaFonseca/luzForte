@@ -11,8 +11,9 @@ test('login cria sessão sem expor senha; rejeita senha incorreta e usuário do 
     query: (sql, args, callback) => {
       assert.ok(sql.startsWith('SELECT'))
       let usuarios = []
-      if (args[0] === 'seed@example.com') usuarios = [{ id_usuario: 2, nome_usuario: 'Seed', acesso: 'cliente', senha: '!LOGIN_DESABILITADO_SEED!' }]
-      if (args[0] === 'teste@example.com') usuarios = [{ id_usuario: 1, nome_usuario: 'Teste', acesso: 'cliente', senha: hash }]
+      if (args[0] === 'seed@example.com') usuarios = [{ id_usuario: 2, nome_usuario: 'Seed', acesso: 'cliente', ativo: 1, senha: '!LOGIN_DESABILITADO_SEED!' }]
+      if (args[0] === 'desativado@example.com') usuarios = [{ id_usuario: 3, nome_usuario: 'Desativado', acesso: 'cliente', ativo: 0, senha: hash }]
+      if (args[0] === 'teste@example.com') usuarios = [{ id_usuario: 1, nome_usuario: 'Teste', acesso: 'cliente', ativo: 1, senha: hash }]
       queueMicrotask(() => callback(null, usuarios))
     }
   } }
@@ -28,6 +29,7 @@ test('login cria sessão sem expor senha; rejeita senha incorreta e usuário do 
   const login = (email, password) => fetch(base + '/login', { method: 'POST', redirect: 'manual', body: new URLSearchParams({ email, password }) })
   try {
     assert.equal((await login('teste@example.com', 'errada')).status, 401)
+    assert.equal((await login('desativado@example.com', 'senha-apenas-do-teste')).status, 401)
     assert.equal((await login('seed@example.com', 'qualquer')).status, 401)
     assert.equal((await login('inexistente@example.com', 'qualquer')).status, 401)
     const response = await login('teste@example.com', 'senha-apenas-do-teste')

@@ -15,6 +15,7 @@
   }
 %>
 
+<link rel="stylesheet" href="/css/pages/admin-gestao.css">
 <nav class="adm-breadcrumb" aria-label="Você está em">
   <a href="/admin">Administração</a>
   <span>Pedidos</span>
@@ -27,6 +28,7 @@
   </div>
 </div>
 
+<% if (salvo) { %><p class="adm-alert adm-alert--success" role="status">Status do pedido atualizado.</p><% } %>
 <nav class="adm-chips" aria-label="Filtrar por status">
   <% abas.forEach(function (a) { %>
     <a class="adm-chip<%= (filtros.status || '') === a.id ? ' is-active' : '' %>" href="<%= linkPedidos({ status: a.id }) %>" <%- filtros.status === a.id ? 'aria-current="page"' : '' %>>
@@ -55,15 +57,17 @@
           <th>Status</th>
           <th class="is-num">Itens</th>
           <th class="is-num">Total</th>
+          <th>Detalhes</th>
+          <th>Ação</th>
         </tr>
       </thead>
       <tbody>
         <% if (pedidos.length === 0) { %>
-          <tr><td colspan="7"><div class="adm-empty"><strong>Nenhum pedido encontrado</strong>Tente outro filtro.</div></td></tr>
+          <tr><td colspan="9"><div class="adm-empty"><strong>Nenhum pedido encontrado</strong>Tente outro filtro.</div></td></tr>
         <% } %>
         <% pedidos.forEach(function (p) { %>
           <tr id="pedido-<%= p.id %>">
-            <td><strong>#<%= p.id %></strong></td>
+            <td><a href="/admin/pedidos/<%= p.id %>"><strong>#<%= p.id %></strong></a></td>
             <td><%= p.data %></td>
             <td>
               <div class="adm-prod__name"><%= p.cliente || 'Cliente visitante' %></div>
@@ -73,6 +77,19 @@
             <td><span class="adm-badge adm-badge--<%= statusInfo[p.status].cor %>"><%= statusInfo[p.status].rotulo %></span></td>
             <td class="is-num"><%= p.itens %></td>
             <td class="is-num"><strong><%= moeda(p.total) %></strong></td>
+            <td><a class="adm-btn adm-btn--sm" href="/admin/pedidos/<%= p.id %>" aria-label="Ver pedido <%= p.id %>">Ver pedido</a></td>
+            <td>
+              <% if (transicoes[p.status]?.length) { %>
+                  <form class="admin-pedido-acoes" method="post" action="/admin/pedidos/<%= p.id %>/status">
+                    <input type="hidden" name="status_atual" value="<%= p.status %>">
+                    <% transicoes[p.status].forEach(function (status) {
+                      const acao = { aprovado: 'Aprovar', finalizado: 'Finalizar', cancelado: 'Cancelar' }[status]
+                    %>
+                      <button class="adm-btn adm-btn--sm admin-pedido-botao admin-pedido-botao--<%= status %>" type="submit" name="status" value="<%= status %>" aria-label="<%= acao %> pedido #<%= p.id %>"><%= acao %></button>
+                    <% }) %>
+                  </form>
+              <% } else { %><span>Encerrado</span><% } %>
+            </td>
           </tr>
         <% }) %>
       </tbody>

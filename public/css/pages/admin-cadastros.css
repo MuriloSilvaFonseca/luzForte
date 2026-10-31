@@ -1,0 +1,65 @@
+.admin-cadastros-atalhos,
+.admin-cadastros-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-block: 20px;
+}
+.admin-cadastros-atalhos > a {
+  padding: 8px 12px;
+  border: 1px solid #cfd7e1;
+  border-radius: 5px;
+  background: #fff;
+  color: #263445;
+}
+.admin-cadastros-secao,
+.admin-cadastros-editor {
+  margin-block: 24px;
+  padding: 20px;
+}
+.admin-cadastros-secao > h2,
+.admin-cadastros-editor > h2 {
+  margin-bottom: 10px;
+  font-size: 19px;
+}
+.admin-cadastros-secao > p,
+.admin-cadastros-editor > p {
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+.admin-cadastros-editor[hidden] {
+  display: none;
+}
+.admin-cadastros-editor > form {
+  display: grid;
+  gap: 10px;
+}
+.admin-cadastros-editor .adm-field {
+  width: 100%;
+  max-width: 760px;
+  font: inherit;
+}
+.admin-cadastros-editor textarea {
+  resize: vertical;
+}
+.admin-cadastros-conteudo {
+  max-width: 70ch;
+  max-height: 260px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin-top: 12px;
+  line-height: 1.6;
+}
+.admin-cadastros-resumo {
+  max-width: 65ch;
+  margin-top: 8px;
+  color: #465365;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+.admin-cadastros-secao summary {
+  margin-top: 8px;
+  cursor: pointer;
+}

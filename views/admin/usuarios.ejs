@@ -1,13 +1,17 @@
-<%- include('../partials/admin-topo', { pagina: 'usuarios', titulo: 'Usuários' }) %>
+<%- include('../partials/admin/admin-topo', { pagina: 'usuarios', titulo: 'Usuários' }) %>
 
 <%
   const perfis = {
     cliente: { rotulo: 'Cliente', cor: 'blue' },
-    admin: { rotulo: 'Administrador', cor: 'red' }
+    admin: { rotulo: 'Administrador', cor: 'yellow' }
+  }
+  const linkUsuarios = (pagina) => {
+    const parametros = new URLSearchParams({ ...filtros, pagina })
+    return '/admin/usuarios?' + parametros.toString()
   }
   const situacoes = {
     ativo: { rotulo: 'Ativo', cor: 'green' },
-    bloqueado: { rotulo: 'Bloqueado', cor: 'gray' }
+    desativado: { rotulo: 'Desativado', cor: 'red' }
   }
 %>
 
@@ -23,6 +27,7 @@
   </div>
 </div>
 
+<% if (salvo) { %><p class="adm-alert adm-alert--success" role="status">Situação da conta atualizada.</p><% } %>
 <form class="adm-card adm-filters" method="get" action="/admin/usuarios">
   <input class="adm-field adm-field--search" type="search" name="q" value="<%= filtros.q %>" placeholder="Buscar por nome ou e-mail">
   <select class="adm-field" name="perfil" aria-label="Perfil">
@@ -77,14 +82,14 @@
             <td class="is-num"><%= u.pedidos %></td>
             <td class="is-num"><%= u.avaliacoes %></td>
             <td class="is-actions">
-              <a class="adm-btn adm-btn--sm" href="/admin/usuarios/<%= u.id %>">Ver</a>
               <% if (u.perfil !== 'admin') { %>
-                <form method="post" action="/admin/usuarios/<%= u.id %>/<%= u.situacao === 'bloqueado' ? 'desbloquear' : 'bloquear' %>" style="display:inline">
-                  <button class="adm-btn adm-btn--sm<%= u.situacao === 'bloqueado' ? '' : ' adm-btn--danger' %>" type="submit">
-                    <%= u.situacao === 'bloqueado' ? 'Desbloquear' : 'Bloquear' %>
+                <form method="post" action="/admin/usuarios/<%= u.id %>/ativo">
+                  <input type="hidden" name="ativo" value="<%= u.situacao === 'desativado' ? '1' : '0' %>">
+                  <button class="adm-btn adm-btn--sm<%= u.situacao === 'desativado' ? '' : ' adm-btn--danger' %>" type="submit">
+                    <%= u.situacao === 'desativado' ? 'Reativar conta' : 'Desativar conta' %>
                   </button>
                 </form>
-              <% } %>
+              <% } else { %><span>Conta protegida</span><% } %>
             </td>
           </tr>
         <% }) %>
@@ -95,10 +100,10 @@
   <div class="adm-pagination">
     <span>Página <%= pagina %> de <%= totalPaginas %></span>
     <nav aria-label="Paginação">
-      <% if (pagina > 1) { %><a class="adm-btn adm-btn--sm" href="?pagina=<%= pagina - 1 %>">Anterior</a><% } %>
-      <% if (pagina < totalPaginas) { %><a class="adm-btn adm-btn--sm" href="?pagina=<%= pagina + 1 %>">Próxima</a><% } %>
+      <% if (pagina > 1) { %><a class="adm-btn adm-btn--sm" href="<%= linkUsuarios(pagina - 1) %>">Anterior</a><% } %>
+      <% if (pagina < totalPaginas) { %><a class="adm-btn adm-btn--sm" href="<%= linkUsuarios(pagina + 1) %>">Próxima</a><% } %>
     </nav>
   </div>
 </section>
 
-<%- include('../partials/admin-rodape') %>
+<%- include('../partials/admin/admin-rodape') %>

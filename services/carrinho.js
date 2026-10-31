@@ -63,7 +63,7 @@ async function consultarCarrinho(conexao, proprietario, pedidoId) {
     SELECT pp.produto_sku, p.titulo_produto, s.nome AS subcategoria, i.url AS imagem,
            pp.quantidade, pp.preco_unitario, pp.subtotal
     FROM produto_pedido pp JOIN produto p ON p.sku = pp.produto_sku
-    JOIN subcategoria s ON s.id_subcategoria = p.subcategoria_id
+    LEFT JOIN subcategoria s ON s.id_subcategoria = p.subcategoria_id
     LEFT JOIN imagem_produto i ON i.produto_sku = p.sku AND i.ordem = 1
     WHERE pp.pedido_id = ? ORDER BY pp.produto_sku`, [pedidoId])
   const [totais] = await conexao.execute(`SELECT valor_produtos, total FROM pedido WHERE id_pedido = ? AND ${proprietario.filtro} AND status = 'carrinho'`, [pedidoId, proprietario.valor])

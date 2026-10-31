@@ -1,0 +1,40 @@
+.admin-gestao-total {
+  margin-top: 8px;
+  line-height: 1.5;
+}
+.admin-gestao-ajuda {
+  margin: 16px 20px;
+  color: #465365;
+  font-size: 13px;
+}
+.admin-gestao-estoque {
+  margin-top: 24px;
+}
+.admin-pedido-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.admin-pedido-botao {
+  border-radius: 4px;
+  color: #fff;
+}
+.admin-pedido-botao--aprovado {
+  background: #0d6efd;
+  border-color: #0d6efd;
+}
+.admin-pedido-botao--finalizado {
+  background: #198754;
+  border-color: #198754;
+}
+.admin-pedido-botao--cancelado {
+  background: #dc3545;
+  border-color: #dc3545;
+}
+.admin-pedido-botao:focus-visible {
+  outline: 2px solid #152849;
+  outline-offset: 2px;
+}
+.admin-gestao-indicadores .adm-kpi__value > a {
+  color: inherit;
+}
