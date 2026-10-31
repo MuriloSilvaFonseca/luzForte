@@ -20,14 +20,24 @@ async function buscarPedido(conexao, proprietario) {
   return pedidos.length ? pedidos[0].id_pedido : null
 }
 
+async function validarEstoque(conexao, sku, quantidade) {
+  if (!inteiroPositivo(sku) || !inteiroPositivo(quantidade)) throw erroCarrinho(400, 'Informe produto e quantidade como inteiros positivos.')
+  const [produtos] = await conexao.execute("SELECT sku, preco_produto, estoque_produto FROM produto WHERE sku = ? AND ativo = 'ativo' FOR UPDATE", [sku])
+  if (!produtos.length) throw erroCarrinho(404, 'Produto não encontrado ou indisponível.')
+  const estoque = Number(produtos[0].estoque_produto)
+  if (estoque === 0) throw erroCarrinho(409, 'Produto esgotado no momento.')
+  if (!Number.isInteger(estoque) || quantidade > estoque) throw erroCarrinho(409, 'Não há mais unidades disponíveis em estoque para este produto.')
+  return produtos[0]
+}
+
 async function definirQuantidade(conexao, pedidoId, sku, quantidade) {
   if (!inteiroPositivo(quantidade)) throw erroCarrinho(400, 'Quantidade excede o limite permitido.')
+  await validarEstoque(conexao, sku, quantidade)
   await conexao.execute('UPDATE produto_pedido SET quantidade = ?, subtotal = ? * preco_unitario WHERE pedido_id = ? AND produto_sku = ?', [quantidade, quantidade, pedidoId, sku])
 }
 
 async function adicionarItem(conexao, proprietario, pedidoId, sku, quantidade) {
-  const [produtos] = await conexao.execute("SELECT sku, preco_produto FROM produto WHERE sku = ? AND ativo = 'ativo'", [sku])
-  if (!produtos.length) throw erroCarrinho(404, 'Produto não encontrado ou indisponível.')
+  const produto = await validarEstoque(conexao, sku, quantidade)
   if (!pedidoId) {
     const sql = proprietario.usuarioId
       ? "INSERT INTO pedido (usuario_id, status) VALUES (?, 'carrinho')"
@@ -39,7 +49,7 @@ async function adicionarItem(conexao, proprietario, pedidoId, sku, quantidade) {
   if (itens.length) {
     await definirQuantidade(conexao, pedidoId, sku, itens[0].quantidade + quantidade)
   } else {
-    const preco = produtos[0].preco_produto
+    const preco = produto.preco_produto
     await conexao.execute('INSERT INTO produto_pedido (pedido_id, produto_sku, quantidade, preco_unitario, subtotal) VALUES (?, ?, ?, ?, ? * ?)', [pedidoId, sku, quantidade, preco, quantidade, preco])
   }
   return pedidoId
@@ -61,7 +71,7 @@ async function consultarCarrinho(conexao, proprietario, pedidoId) {
   if (!pedidoId) return vazio
   const [itens] = await conexao.execute(`
     SELECT pp.produto_sku, p.titulo_produto, s.nome AS subcategoria, i.url AS imagem,
-           pp.quantidade, pp.preco_unitario, pp.subtotal
+           pp.quantidade, pp.preco_unitario, pp.subtotal, p.estoque_produto, p.ativo
     FROM produto_pedido pp JOIN produto p ON p.sku = pp.produto_sku
     JOIN subcategoria s ON s.id_subcategoria = p.subcategoria_id
     LEFT JOIN imagem_produto i ON i.produto_sku = p.sku AND i.ordem = 1
@@ -71,6 +81,8 @@ async function consultarCarrinho(conexao, proprietario, pedidoId) {
 }
 
 async function executarCarrinho(identidade, operacao, dados = {}) {
+  if (!['listar', 'adicionar', 'quantidade', 'remover', 'esvaziar'].includes(operacao)) throw erroCarrinho(400, 'Operação inválida.')
+  if (!['listar', 'esvaziar'].includes(operacao) && (!inteiroPositivo(dados.sku) || (operacao !== 'remover' && !inteiroPositivo(dados.quantidade)))) throw erroCarrinho(400, 'Produto ou quantidade inválidos.')
   const proprietario = {
     usuarioId: identidade.usuarioId,
     valor: identidade.usuarioId || identidade.visitanteHash,
@@ -92,6 +104,9 @@ async function executarCarrinho(identidade, operacao, dados = {}) {
     let pedidoId = await buscarPedido(conexao, proprietario)
     if (operacao === 'adicionar') {
       pedidoId = await adicionarItem(conexao, proprietario, pedidoId, dados.sku, dados.quantidade)
+    } else if (operacao === 'esvaziar') {
+      // O pedido foi localizado pela sessão e bloqueado por buscarPedido.
+      if (pedidoId) await conexao.execute('DELETE FROM produto_pedido WHERE pedido_id = ?', [pedidoId])
     } else if (operacao !== 'listar') {
       await modificarItem(conexao, pedidoId, operacao, dados.sku, dados.quantidade)
     }

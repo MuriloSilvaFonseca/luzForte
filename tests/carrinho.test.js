@@ -4,12 +4,14 @@ const express = require('express')
 const session = require('express-session')
 
 // Banco simulado: nenhum teste deste arquivo conecta ao MySQL real.
+let estoque = 100
 let pedidos = []
 let itens = []
 let snapshot
 let rollbackCount = 0
 let released = 0
 let failWrite = false
+let falharTotais = false
 let travaDisponivel = true
 function pertenceAoProprietario(pedido, valor, sql) {
   return sql.includes('visitante_token_hash')
@@ -28,7 +30,7 @@ const connection = {
     if (failWrite && sql.startsWith('INSERT INTO produto_pedido')) throw new Error('informação sensível')
     if (sql.startsWith('SELECT id_usuario')) return [[{ id_usuario: args[0] }]]
     if (sql.startsWith('SELECT id_pedido')) return [pedidos.filter(p => pertenceAoProprietario(p, args[0], sql) && p.status === 'carrinho')]
-    if (sql.startsWith('SELECT sku')) return [args[0] === 1001 ? [{ sku: 1001, preco_produto: '10.00' }] : []]
+    if (sql.startsWith('SELECT sku')) return [args[0] === 1001 ? [{ sku: 1001, preco_produto: '10.00', estoque_produto: estoque }] : []]
     if (sql.startsWith('INSERT INTO pedido')) {
       const id = pedidos.length + 1
       const visitante = sql.includes('visitante_token_hash')
@@ -45,8 +47,12 @@ const connection = {
       item.quantidade = args[0]; item.subtotal = (args[1] * item.preco_unitario).toFixed(2)
       return [{}]
     }
-    if (sql.startsWith('DELETE FROM produto_pedido')) { itens = itens.filter(i => !(i.pedido_id === args[0] && i.produto_sku === args[1])); return [{}] }
+    if (sql.startsWith('DELETE FROM produto_pedido')) {
+      itens = itens.filter(i => !(i.pedido_id === args[0] && (args.length === 1 || i.produto_sku === args[1])))
+      return [{}]
+    }
     if (sql.startsWith('UPDATE pedido')) {
+      if (falharTotais) throw new Error('Falha simulada ao recalcular')
       const pedido = pedidos.find(p => p.id_pedido === args[1] && pertenceAoProprietario(p, args[2], sql) && p.status === 'carrinho')
       pedido.total = pedido.valor_produtos = itens.filter(i => i.pedido_id === args[0]).reduce((sum, i) => sum + Number(i.subtotal), 0).toFixed(2)
       return [{}]
@@ -85,8 +91,22 @@ test('API do carrinho: operações, isolamento, validação e rollback sem banco
     assert.equal(pedidos.length, 0)
     assert.equal((await request('POST', '/itens', { produto_sku: 1001, quantidade: 0 })).status, 400)
     assert.equal((await request('POST', '/itens', { produto_sku: 999, quantidade: 1 })).status, 404)
+    estoque = 3
+    for (const quantidade of [-1, 0, 1.5, '2', null]) {
+      assert.equal((await request('POST', '/itens', { produto_sku: 1001, quantidade })).status, 400)
+    }
+    const acimaDoEstoque = await request('POST', '/itens', { produto_sku: 1001, quantidade: 4 })
+    assert.equal(acimaDoEstoque.status, 409)
+    assert.equal(acimaDoEstoque.body.erro, 'Não há mais unidades disponíveis em estoque para este produto.')
+    estoque = 0
+    const esgotado = await request('POST', '/itens', { produto_sku: 1001, quantidade: 1 })
+    assert.equal(esgotado.status, 409)
+    assert.equal(esgotado.body.erro, 'Produto esgotado no momento.')
+    estoque = 3
     let result = await request('POST', '/itens', { produto_sku: 1001, quantidade: 2 })
     assert.equal(result.status, 200); assert.equal(result.body.total, '20.00')
+    assert.equal((await request('POST', '/itens', { produto_sku: 1001, quantidade: 2 })).status, 409)
+    assert.equal((await request('PATCH', '/itens/1001', { quantidade: 4 })).status, 409)
     result = await request('POST', '/itens', { produto_sku: 1001, quantidade: 1 })
     assert.equal(pedidos.length, 1); assert.equal(result.body.itens[0].quantidade, 3)
     assert.equal((await request('GET')).body.itens[0].quantidade, 3)
@@ -96,6 +116,7 @@ test('API do carrinho: operações, isolamento, validação e rollback sem banco
     assert.equal((await request('GET')).body.itens[0].quantidade, 3)
     assert.equal((await request('DELETE', '/itens/1001', undefined, 2)).status, 404)
     assert.equal((await request('PATCH', '/itens/1001', { quantidade: -2 })).status, 400)
+    estoque = 100
     result = await request('PATCH', '/itens/1001', { quantidade: 5 })
     assert.equal(result.body.total, '50.00'); assert.equal(result.body.status, 'carrinho')
     assert.equal((await request('DELETE', '/itens/999')).status, 404)
@@ -157,8 +178,68 @@ test('sessões reais: visitantes isolados, reutilização, validações e timeou
     resultado = await requisitar(a, 'DELETE', '/itens/1001')
     assert.equal(resultado.status, 200); assert.equal(resultado.dados.total, '0.00')
     assert.deepEqual(resultado.dados.itens, []); assert.equal(resultado.dados.status, 'carrinho')
+    await requisitar(a, 'POST', '/itens', { produto_sku: 1001, quantidade: 2 })
+    const carrinhoB = await requisitar(b)
+    assert.equal((await requisitar(a, 'DELETE', '/itens')).dados.total, '0.00')
+    assert.deepEqual((await requisitar(a)).dados.itens, [])
+    assert.deepEqual((await requisitar(b)).dados, carrinhoB.dados)
   } finally {
     travaDisponivel = true
+    await new Promise(resolve => server.close(resolve))
+  }
+})
+
+test('esvaziar pela sessão preserva outros usuários e pedidos confirmados e desfaz falha', async () => {
+  failWrite = false
+  pedidos = [
+    { id_pedido: 1, usuario_id: 1, status: 'carrinho', valor_produtos: '30.00', total: '30.00' },
+    { id_pedido: 2, usuario_id: 2, status: 'carrinho', valor_produtos: '10.00', total: '10.00' },
+    { id_pedido: 3, usuario_id: 1, status: 'solicitado', valor_produtos: '10.00', total: '10.00' }
+  ]
+  itens = [
+    { pedido_id: 1, produto_sku: 1001, quantidade: 2, subtotal: '20.00' },
+    { pedido_id: 1, produto_sku: 1002, quantidade: 1, subtotal: '10.00' },
+    { pedido_id: 2, produto_sku: 1001, quantidade: 1, subtotal: '10.00' },
+    { pedido_id: 3, produto_sku: 1001, quantidade: 1, subtotal: '10.00' }
+  ]
+  const antes = structuredClone({ pedidos, itens })
+  const app = express()
+  app.use((req, res, next) => {
+    req.session = { usuario: { id_usuario: 1 } }
+    next()
+  })
+  app.use('/api/carrinho', require('../routes/carrinho'))
+  const server = app.listen(0, '127.0.0.1')
+  await new Promise(resolve => server.once('listening', resolve))
+  async function esvaziar() {
+    const resposta = await fetch(`http://127.0.0.1:${server.address().port}/api/carrinho/itens?pedido_id=2&usuario_id=2`, {
+      method: 'DELETE', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ pedido_id: 3, usuario_id: 2, selecionados: [1001] })
+    })
+    return { status: resposta.status, dados: await resposta.json() }
+  }
+  try {
+    falharTotais = true
+    const falha = await esvaziar()
+    assert.equal(falha.status, 500)
+    assert.equal(falha.dados.erro, 'Não foi possível atualizar ou consultar o carrinho.')
+    assert.deepEqual({ pedidos, itens }, antes)
+    falharTotais = false
+    const sucesso = await esvaziar()
+    assert.equal(sucesso.status, 200)
+    assert.equal(sucesso.dados.pedido_id, 1)
+    assert.deepEqual(sucesso.dados.itens, [])
+    assert.equal(sucesso.dados.total, '0.00')
+    assert.equal(sucesso.dados.valor_produtos, '0.00')
+    assert.equal(pedidos[0].status, 'carrinho')
+    assert.deepEqual(pedidos.slice(1), antes.pedidos.slice(1))
+    assert.deepEqual(itens, antes.itens.filter(i => i.pedido_id !== 1))
+    assert.equal((await esvaziar()).status, 200)
+    pedidos = pedidos.filter(p => p.id_pedido !== 1)
+    assert.equal((await esvaziar()).status, 200)
+    assert.equal(pedidos.length, 2)
+  } finally {
+    falharTotais = false
     await new Promise(resolve => server.close(resolve))
   }
 })
