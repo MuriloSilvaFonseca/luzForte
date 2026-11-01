@@ -11,6 +11,8 @@ router.use(userEstaLogado, userAdmin)
 const POR_PAGINA = 10
 const ESTOQUE_BAIXO = 5
 
+const conexaoBanco = () => conexao.promise()
+
 // ---------- Dados fictícios ----------
 const marcas = [{ id: 1, nome: 'Philips' }, { id: 2, nome: 'Osram' }]
 const subcategorias = [
@@ -120,6 +122,96 @@ router.get('/pedidos', async (req, res) => {
     return res.status(500).send('Não foi possível carregar os dados dos pedidos.')
   }
 })
+
+// Troca o status de um pedido sem aceitar status enviado pelo cliente.
+router.post('/pedidos/:id/aprovar', async (req, res) => {
+  await mudarStatusPedido(req, res, 'aprovado')
+})
+
+router.post('/pedidos/:id/cancelar', async (req, res) => {
+  await mudarStatusPedido(req, res, 'cancelado')
+})
+
+router.post('/pedidos/:id/finalizar', async (req, res) => {
+  await mudarStatusPedido(req, res, 'finalizado')
+})
+
+router.post('/pedidos/:id/retirar', async (req, res) => {
+  await mudarStatusPedido(req, res, 'finalizado')
+})
+
+async function mudarStatusPedido(req, res, novoStatus) {
+  const id = Number(req.params.id)
+  if (!Number.isSafeInteger(id) || id < 1) {
+    return res.redirect('/admin/pedidos')
+  }
+
+  const conexao = await conexaoBanco().getConnection()
+  let transacaoAberta = false
+
+  try {
+    await conexao.beginTransaction()
+    transacaoAberta = true
+
+    const [[pedido]] = await conexao.execute(
+      'SELECT status FROM pedido WHERE id_pedido = ? FOR UPDATE',
+      [id]
+    )
+    if (!pedido) {
+      await conexao.rollback()
+      transacaoAberta = false
+      return res.redirect('/admin/pedidos')
+    }
+
+    const statusAtual = pedido.status
+    const mudancaPermitida =
+      (statusAtual === 'solicitado' && ['aprovado', 'cancelado'].includes(novoStatus)) ||
+      (statusAtual === 'aprovado' && ['finalizado', 'cancelado'].includes(novoStatus))
+    if (!mudancaPermitida) {
+      await conexao.rollback()
+      transacaoAberta = false
+      return res.redirect('/admin/pedidos')
+    }
+
+    // Aprovar baixa o estoque uma vez. Uma aprovação repetida não é permitida.
+    if (novoStatus === 'aprovado') {
+      const [itens] = await conexao.execute(
+        'SELECT produto_sku, quantidade FROM produto_pedido WHERE pedido_id = ? FOR UPDATE',
+        [id]
+      )
+
+      for (const item of itens) {
+        const [[produto]] = await conexao.execute(
+          'SELECT estoque_produto FROM produto WHERE sku = ? FOR UPDATE',
+          [item.produto_sku]
+        )
+        if (!produto || Number(produto.estoque_produto) < Number(item.quantidade)) {
+          await conexao.rollback()
+          transacaoAberta = false
+          return res.status(409).send('Não há estoque suficiente para aprovar este pedido.')
+        }
+      }
+
+      for (const item of itens) {
+        await conexao.execute(
+          'UPDATE produto SET estoque_produto = estoque_produto - ? WHERE sku = ?',
+          [item.quantidade, item.produto_sku]
+        )
+      }
+    }
+
+    await conexao.execute('UPDATE pedido SET status = ? WHERE id_pedido = ?', [novoStatus, id])
+    await conexao.commit()
+    transacaoAberta = false
+    res.redirect('/admin/pedidos?status=' + novoStatus)
+  } catch (erro) {
+    if (transacaoAberta) await conexao.rollback()
+    console.error('Erro ao mudar status do pedido:', erro.code || erro.message)
+    res.status(500).send('Não foi possível alterar o pedido.')
+  } finally {
+    conexao.release()
+  }
+}
 
 // Disponibiliza o número do menu "Avaliações" em todas as telas do admin
 router.use(async (req, res, next) => {

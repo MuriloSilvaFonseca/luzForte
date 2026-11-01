@@ -55,11 +55,12 @@
           <th>Status</th>
           <th class="is-num">Itens</th>
           <th class="is-num">Total</th>
+          <th class="is-actions">Ações</th>
         </tr>
       </thead>
       <tbody>
         <% if (pedidos.length === 0) { %>
-          <tr><td colspan="7"><div class="adm-empty"><strong>Nenhum pedido encontrado</strong>Tente outro filtro.</div></td></tr>
+          <tr><td colspan="8"><div class="adm-empty"><strong>Nenhum pedido encontrado</strong>Tente outro filtro.</div></td></tr>
         <% } %>
         <% pedidos.forEach(function (p) { %>
           <tr id="pedido-<%= p.id %>">
@@ -73,6 +74,23 @@
             <td><span class="adm-badge adm-badge--<%= statusInfo[p.status].cor %>"><%= statusInfo[p.status].rotulo %></span></td>
             <td class="is-num"><%= p.itens %></td>
             <td class="is-num"><strong><%= moeda(p.total) %></strong></td>
+            <td class="is-actions">
+              <% if (p.status === 'solicitado') { %>
+                <form method="post" action="/admin/pedidos/<%= p.id %>/aprovar" style="display:inline">
+                  <button class="adm-btn adm-btn--sm" type="submit">Aprovar</button>
+                </form>
+                <form method="post" action="/admin/pedidos/<%= p.id %>/cancelar" style="display:inline">
+                  <button class="adm-btn adm-btn--sm adm-btn--danger" type="submit">Cancelar</button>
+                </form>
+              <% } else if (p.status === 'aprovado') { %>
+                <form method="post" action="/admin/pedidos/<%= p.id %>/retirar" style="display:inline">
+                  <button class="adm-btn adm-btn--sm" type="submit">Marcar como retirado</button>
+                </form>
+                <form method="post" action="/admin/pedidos/<%= p.id %>/cancelar" style="display:inline">
+                  <button class="adm-btn adm-btn--sm adm-btn--danger" type="submit">Cancelar</button>
+                </form>
+              <% } %>
+            </td>
           </tr>
         <% }) %>
       </tbody>
