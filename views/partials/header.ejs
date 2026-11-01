@@ -48,7 +48,7 @@
                                 <img src="/img/icons/icons8-usuário-homem-com-círculo-48.png" alt="" class="icon">
                                 <span>Olá, <%= usuario.nome_usuario %></span>
                             </button>
-                            <%- include("./account-menu") %>
+                            <%- include("./account-menu", { painelAdmin: false }) %>
                         <% } else { %>
                             <a href="/login">
                                 <img src="/img/icons/icons8-usuário-homem-com-círculo-48.png" alt="" class="icon">

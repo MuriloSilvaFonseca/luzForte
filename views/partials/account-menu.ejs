@@ -2,6 +2,13 @@
   <div class="account-menu__options">
     <a class="account-menu__option" href="/minha-conta" role="menuitem">Minha conta</a>
     <a class="account-menu__option" href="/minha-conta?aba=pedidos" role="menuitem">Meus pedidos</a>
+    <% if (typeof painelAdmin !== 'undefined' && painelAdmin) { %>
+      <%# Link de retorno colocado no header do painel administrativo. %>
+      <a class="account-menu__option" href="/" role="menuitem">Área do usuário</a>
+    <% } else if (usuario && usuario.acesso === 'admin') { %>
+      <%# O painel aparece somente para usuários administradores. %>
+      <a class="account-menu__option" href="/admin" role="menuitem">Painel administrativo</a>
+    <% } %>
     <form method="post" action="/logout">
       <button class="account-menu__option" type="submit" role="menuitem">Sair</button>
     </form>
