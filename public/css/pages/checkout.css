@@ -153,6 +153,25 @@
   color: #1e3f6d;
 }
 
+.checkout-retirada {
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 8px;
+  background: #f2f6fc;
+}
+
+.checkout-retirada h2 {
+  margin-bottom: 10px;
+  color: #1e3f6d;
+  font-size: 18px;
+}
+
+.checkout-retirada p {
+  margin: 8px 0;
+  color: #344054;
+  line-height: 1.5;
+}
+
 @media (max-width: 520px) {
   .checkout-page {
     padding: 24px 12px;

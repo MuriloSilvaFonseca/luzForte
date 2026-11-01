@@ -1,4 +1,5 @@
 -- LuzForte: dados fictícios para praticar consultas (MySQL 8).
+-- Compatível com o schema completo de database/Luz_ForteDB.sql.
 -- Execute APENAS em um banco de testes com as tabelas vazias já criadas.
 -- Execute uma única vez: os IDs são fixos e uma repetição gera duplicidades.
 -- Este arquivo não apaga dados nem altera a estrutura.
@@ -47,9 +48,9 @@ INSERT INTO marca (id_marca, nome) VALUES
 -- forma_pagamento
 INSERT INTO forma_pagamento (id_forma_pagamento, nome_pagamento, ativo) VALUES
 (1, 'Pix', 'sim'),
-(2, 'Cartão na loja', 'sim'),
+(2, 'Cartão de crédito', 'sim'),
 (3, 'Dinheiro', 'sim'),
-(4, 'Boleto (desativado para teste)', 'nao');
+(4, 'Cartão débito', 'sim');
 
 -- usuario
 INSERT INTO usuario (id_usuario, nome_usuario, senha, data_criacao, email, acesso, telefone) VALUES
@@ -130,17 +131,17 @@ INSERT INTO instalacao (id_instalacao, nome_instalacao, texto_instalacao, produt
 (4, 'Instalação', 'Instalação por profissional qualificado conforme manual.', 1008);
 
 -- pedido
-INSERT INTO pedido (id_pedido, valor_produtos, total, observacoes, status, data_criacao, usuario_id, forma_pagamento_id) VALUES
-(1, 77.40, 77.40, 'Retirado na loja.', 'finalizado', '2026-08-10 09:30:00', 2, 1),
-(2, 149.00, 149.00, NULL, 'finalizado', '2026-08-18 14:00:00', 3, 2),
-(3, 94.40, 94.40, NULL, 'finalizado', '2026-09-05 11:10:00', 2, 3),
-(4, 113.00, 113.00, 'Cliente desistiu antes da confirmação.', 'cancelado', '2026-09-12 16:20:00', 4, 1),
-(5, 128.30, 128.30, NULL, 'finalizado', '2026-09-20 10:00:00', 5, 2),
-(6, 122.70, 122.70, 'Confirmado; aguardando retirada.', 'aprovado', '2026-10-10 08:45:00', 3, 1),
-(7, 37.30, 37.30, 'Aguardar confirmação da loja.', 'solicitado', '2026-10-11 15:00:00', 6, 3),
-(8, 119.50, 119.50, NULL, 'solicitado', '2026-10-12 09:15:00', 4, 1),
-(9, 54.90, 54.90, 'Confirmado; aguardando retirada.', 'aprovado', '2026-10-13 13:30:00', 2, 2),
-(10, 119.80, 119.80, 'Pedido cancelado antes da confirmação.', 'cancelado', '2026-10-13 17:00:00', 5, 3);
+INSERT INTO pedido (id_pedido, valor_produtos, total, observacoes, status, data_criacao, usuario_id, forma_pagamento_id, visitante_token_hash) VALUES
+(1, 77.40, 77.40, 'Retirado na loja.', 'finalizado', '2026-08-10 12:30:00', 2, 1, NULL),
+(2, 149.00, 149.00, NULL, 'finalizado', '2026-08-18 17:00:00', 3, 2, NULL),
+(3, 94.40, 94.40, NULL, 'finalizado', '2026-09-05 14:10:00', 2, 3, NULL),
+(4, 113.00, 113.00, 'Cliente desistiu antes da confirmação.', 'cancelado', '2026-09-12 19:20:00', 4, 1, NULL),
+(5, 128.30, 128.30, NULL, 'finalizado', '2026-09-20 13:00:00', 5, 2, NULL),
+(6, 122.70, 122.70, 'Confirmado; aguardando retirada.', 'aprovado', '2026-10-10 11:45:00', 3, 1, NULL),
+(7, 37.30, 37.30, 'Aguardar confirmação da loja.', 'solicitado', '2026-10-11 18:00:00', 6, 3, NULL),
+(8, 119.50, 119.50, NULL, 'solicitado', '2026-10-12 12:15:00', 4, 1, NULL),
+(9, 54.90, 54.90, 'Confirmado; aguardando retirada.', 'aprovado', '2026-10-13 16:30:00', 2, 2, NULL),
+(10, 119.80, 119.80, 'Pedido cancelado antes da confirmação.', 'cancelado', '2026-10-13 20:00:00', 5, 3, NULL);
 
 -- produto_pedido
 INSERT INTO produto_pedido (produto_sku, pedido_id, subtotal, preco_unitario, quantidade, custo_unitario) VALUES
@@ -165,14 +166,14 @@ INSERT INTO produto_pedido (produto_sku, pedido_id, subtotal, preco_unitario, qu
 (1003, 10, 119.80, 59.90, 2, 35.00);
 
 -- avaliacao_produto
-INSERT INTO avaliacao_produto (id_avaliacao_produto, nota, comentario, data_criacao, produto_sku, usuario_id) VALUES
-(1, 5, 'Gostei da iluminação.', '2026-08-12 10:00:00', 1001, 2),
-(2, 4, 'Bom acabamento.', '2026-08-13 10:00:00', 1008, 2),
-(3, 5, 'Atendeu ao que eu precisava.', '2026-08-20 10:00:00', 1004, 3),
-(4, 3, 'Produto razoável.', '2026-08-21 10:00:00', 1006, 3),
-(5, 4, 'Fácil de usar.', '2026-09-07 10:00:00', 1010, 2),
-(6, 5, 'Boa compra.', '2026-09-22 10:00:00', 1002, 5),
-(7, 2, 'Não gostei do acabamento.', '2026-09-23 10:00:00', 1009, 5);
+INSERT INTO avaliacao_produto (id_avaliacao_produto, nota, comentario, status, motivo_rejeicao, resposta, data_resposta, data_criacao, produto_sku, usuario_id) VALUES
+(1, 5, 'Gostei da iluminação.', 'pendente', NULL, NULL, NULL, '2026-08-12 13:00:00', 1001, 2),
+(2, 4, 'Bom acabamento.', 'pendente', NULL, NULL, NULL, '2026-08-13 13:00:00', 1008, 2),
+(3, 5, 'Atendeu ao que eu precisava.', 'pendente', NULL, NULL, NULL, '2026-08-20 13:00:00', 1004, 3),
+(4, 3, 'Produto razoável.', 'pendente', NULL, NULL, NULL, '2026-08-21 13:00:00', 1006, 3),
+(5, 4, 'Fácil de usar.', 'pendente', NULL, NULL, NULL, '2026-09-07 13:00:00', 1010, 2),
+(6, 5, 'Boa compra.', 'pendente', NULL, NULL, NULL, '2026-09-22 13:00:00', 1002, 5),
+(7, 2, 'Não gostei do acabamento.', 'pendente', NULL, NULL, NULL, '2026-09-23 13:00:00', 1009, 5);
 
 COMMIT;
 

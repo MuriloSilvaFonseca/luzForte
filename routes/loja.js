@@ -83,6 +83,10 @@ router.get('/carrinho', (req, res) => {
   res.render('loja/carrinho')
 })
 
+router.get('/como-comprar', (req, res) => {
+  res.render('loja/como-comprar')
+})
+
 router.get('/checkout', userEstaLogado, async (req, res) => {
   try {
     if (req.query.pedido) {

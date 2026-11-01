@@ -367,6 +367,60 @@ body {
     color: #888;
 }
 
+.linkComoComprar {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    margin-top: 14px;
+    padding: 11px 12px;
+    border: 1px solid #dce6f2;
+    border-radius: 8px;
+    background: #f5f8fc;
+    color: #1e3f6d;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.35;
+    text-decoration: none;
+    transition: border-color .15s ease, background-color .15s ease, color .15s ease;
+}
+
+.linkComoComprar:hover {
+    border-color: #1a6be8;
+    background: #edf4ff;
+    color: #1456c2;
+}
+
+.linkComoComprar:focus-visible {
+    outline: 2px solid #1a6be8;
+    outline-offset: 3px;
+}
+
+.linkComoComprarIcone {
+    display: grid;
+    flex: 0 0 22px;
+    width: 22px;
+    height: 22px;
+    place-items: center;
+    border-radius: 50%;
+    background: #e2edfc;
+    color: #1a6be8;
+    font-family: Georgia, serif;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.linkComoComprarSeta {
+    margin-left: auto;
+    color: #1a6be8;
+    font-size: 17px;
+    transition: transform .15s ease;
+}
+
+.linkComoComprar:hover .linkComoComprarSeta {
+    transform: translateX(3px);
+}
+
 /*cupom de desconto  */
 .textoCupom {
     font-size: 14px;
