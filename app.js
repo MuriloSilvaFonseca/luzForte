@@ -25,6 +25,12 @@ app.use((req, res, next) => {
   res.locals.usuario = req.session.usuario || null
   next()
 })
+
+app.use((req, res, next) => {
+  const numero = (process.env.WHATSAPP_LOJA || '').replace(/\D/g, '')
+  res.locals.whatsappLoja = numero || null
+  next()
+})
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
 

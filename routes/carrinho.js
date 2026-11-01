@@ -32,6 +32,7 @@ async function responderCarrinho(req, res, operacao) {
 }
 
 router.get('/', (req, res) => responderCarrinho(req, res, 'listar'))
+router.delete('/itens', (req, res) => responderCarrinho(req, res, 'esvaziar'))
 router.post('/itens', (req, res) => {
   if (!inteiroPositivo(req.body && req.body.produto_sku) || !inteiroPositivo(req.body && req.body.quantidade)) {
     return res.status(400).json({ erro: 'Informe produto_sku e quantidade como números inteiros positivos.' })

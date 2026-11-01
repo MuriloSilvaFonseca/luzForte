@@ -1,45 +1,61 @@
-    <footer class="footer">
-      <div class="footer-container">
+<footer class="footer">
+  <div class="footer-container">
 
-        <div class="footer-logo">
-          <img src="/img/logos/logo2.png" alt="">
-          <p>© <%= new Date().getFullYear() %> LuzForte. Todos os direitos reservados.</p>
-        </div>
+    <div class="footer-logo">
+      <img src="/img/logos/logo2.png" alt="">
+      <p>© <%= new Date().getFullYear() %> LuzForte. Todos os direitos reservados.</p>
+    </div>
 
-        <div class="footer-links">
-          <h3>Início</h3>
-          <ul>
-            <li><a href="/sobre-nos">Quem Somos</a></li>
-            <li><a href="/contato">Contato</a></li>
-            <li><a href="/como-comprar">Como comprar</a></li>
-            <li><a href="/">Categorias</a></li>
-            <li><a href="/politica-de-privacidade">Política de Privacidade</a></li>
-          </ul>
-        </div>
+    <div class="footer-links">
+      <h3>Início</h3>
+      <ul>
+        <li><a href="/sobre-nos">Quem Somos</a></li>
+        <li><a href="/contato">Contato</a></li>
+        <li><a href="/como-comprar">Como comprar</a></li>
+        <li><a href="/">Categorias</a></li>
+        <li><a href="/politica-de-privacidade">Política de Privacidade</a></li>
+      </ul>
+    </div>
 
-        <div class="footer-local">
-          <h3>Local</h3>
-          <p>R. Quatorze de Julho, 880 -</p>
-          <p>Vila Oriental, São João da Boa</p>
-          <p>Vista - SP</p>
-          <p><strong>Retirada:</strong> seg. a sex., 7h às 18h; sáb., 7h30 às 12h.</p>
+    <div class="footer-local">
+      <h3>Local</h3>
+      <p>R. Quatorze de Julho, 880 -</p>
+      <p>Vila Oriental, São João da Boa</p>
+      <p>Vista - SP</p>
+      <p><strong>Retirada:</strong> seg. a sex., 7h às 18h; sáb., 7h30 às 12h.</p>
 
-          <div class="social-icons">
-            <a href="https://www.facebook.com/luzforte2011"><img src="/img/icons/icons8-facebook-novo-50.png" alt=""></a>
-            <a
-              href="https://api.whatsapp.com/send/?phone=%2B551936231726&text=Ol%C3%A1%2C+vim+pelo+Instagram+e+preciso+de+um+or%C3%A7amento%21&type=phone_number&app_absent=0"><img
-                src="/img/icons/icons8-whatsapp-50.png" alt=""></a>
-            <a href="https://www.instagram.com/luzforte_/"><img src="/img/icons/icons8-instagram-50.png" alt=""></a>
-          </div>
-        </div>
-
-        <div class="footer-contact">
-          <h3>Atendimento</h3>
-          <p> (19) 3623-1726</p>
-          <p> luzforte2011@hotmail.com</p>
-        </div>
-
+      <div class="social-icons">
+        <a href="https://www.facebook.com/luzforte2011"><img src="/img/icons/icons8-facebook-novo-50.png" alt=""></a>
+        <% if (whatsappLoja) { %>
+          <a href="https://wa.me/<%= whatsappLoja %>?text=<%= encodeURIComponent('Olá, vim pelo site da LuzForte') %>"
+            target="_blank" rel="noopener noreferrer" aria-label="Conversar com a LuzForte pelo WhatsApp">
+            <img src="/img/icons/icons8-whatsapp-50.png" alt="WhatsApp">
+          </a>
+        <% } %>
+        <a href="https://www.instagram.com/luzforte_/"><img src="/img/icons/icons8-instagram-50.png" alt=""></a>
       </div>
-    </footer>
-  </body>
+    </div>
+
+    <div class="footer-contact">
+      <h3>Atendimento</h3>
+      <p>(19) 3623-1726</p>
+      <p>luzforte2011@hotmail.com</p>
+    </div>
+
+  </div>
+</footer>
+
+<% if (whatsappLoja) { %>
+  <a
+    href="https://wa.me/<%= whatsappLoja %>?text=<%= encodeURIComponent('Olá, vim pelo site da LuzForte') %>"
+    class="whatsapp-flutuante"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Conversar com a LuzForte pelo WhatsApp"
+  >
+    <img src="/img/icons/icons8-whatsapp-50.png" alt="">
+  </a>
+<% } %>
+
+</body>
 </html>

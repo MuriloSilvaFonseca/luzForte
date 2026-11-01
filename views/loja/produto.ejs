@@ -40,10 +40,11 @@
                 <div class="quantity_section_produto">
                     <div class="quantity_control_produto">
                         <button class="quantity_btn_produto" onclick="decrementQuantity()">−</button>
-                        <input type="number" id="quantity" class="quantity_input_produto" value="1" min="1" max="99">
+                        <input type="number" id="quantity" class="quantity_input_produto" value="0" min="1" max="0" disabled>
                         <button class="quantity_btn_produto" onclick="incrementQuantity()">+</button>
                     </div>
                 </div>
+                <p id="mensagemEstoqueProduto" class="aviso_estoque_produto" role="status"></p>
 
                 <div class="action_buttons_produto">
                     <button class="btn_produto btn_primary_produto" onclick="addToCart()">Adicionar ao Carrinho</button>

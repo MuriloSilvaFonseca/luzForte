@@ -38,9 +38,20 @@ body {
 
 .parteSuperiorCarrinho {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 10px;
     padding-bottom: 16px;
+}
+
+#esvaziarCarrinho { margin-left: auto; }
+#esvaziarCarrinho[hidden] { display: none; }
+.btnQty:disabled, .btnDel:disabled { opacity: 0.5; cursor: not-allowed; }
+.avisoEstoqueCarrinho { font-size: 12px; line-height: 1.5; color: #9b4d13; }
+.avisoEstoqueCarrinho:empty { display: none; }
+
+@media (max-width: 480px) {
+    #esvaziarCarrinho { margin-left: 0; }
 }
 
 .parteSuperiorCarrinho label {

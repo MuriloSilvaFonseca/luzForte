@@ -4,7 +4,31 @@ function erroPedido(status, mensagem) {
   return Object.assign(new Error(mensagem), { status })
 }
 
-async function carregarCheckout(usuarioId) {
+function validarSelecao(selecao) {
+  if (!Array.isArray(selecao) || !selecao.length || selecao.length > 500 || selecao.some(sku => !Number.isInteger(sku) || sku <= 0 || sku > 2147483647) || new Set(selecao).size !== selecao.length) {
+    throw erroPedido(400, 'Selecione ao menos um produto válido no carrinho.')
+  }
+  return selecao
+}
+
+function selecionarItens(itens, selecao) {
+  validarSelecao(selecao)
+  const selecionados = itens.filter(item => selecao.includes(item.produto_sku))
+  if (selecionados.length !== selecao.length) throw erroPedido(409, 'A seleção mudou. Volte ao carrinho e selecione os produtos novamente.')
+  for (const item of selecionados) {
+    if (item.ativo !== 'ativo' || !Number.isInteger(item.quantidade) || item.quantidade <= 0 || item.quantidade > Number(item.estoque_produto)) {
+      throw erroPedido(409, 'Estoque insuficiente para ' + item.titulo_produto + '. Revise o carrinho.')
+    }
+  }
+  return selecionados
+}
+
+function totalItens(itens) {
+  return (itens.reduce((soma, item) => soma + Math.round(Number(item.preco_unitario) * 100) * item.quantidade, 0) / 100).toFixed(2)
+}
+
+async function carregarCheckout(usuarioId, selecao) {
+  validarSelecao(selecao)
   const conexao = banco.promise()
   const [pedidos] = await conexao.execute(
     "SELECT id_pedido, valor_produtos FROM pedido WHERE usuario_id = ? AND status = 'carrinho' ORDER BY id_pedido DESC LIMIT 2",
@@ -20,7 +44,7 @@ async function carregarCheckout(usuarioId) {
   if (!pedidos.length) return { itens: [], total: '0.00', formasPagamento }
 
   const [itens] = await conexao.execute(
-    `SELECT pp.produto_sku, p.titulo_produto, pp.quantidade, pp.preco_unitario, pp.subtotal
+    `SELECT pp.produto_sku, p.titulo_produto, pp.quantidade, pp.preco_unitario, pp.quantidade * pp.preco_unitario AS subtotal, p.estoque_produto, p.ativo
      FROM produto_pedido pp
      JOIN produto p ON p.sku = pp.produto_sku
      WHERE pp.pedido_id = ?
@@ -28,20 +52,25 @@ async function carregarCheckout(usuarioId) {
     [pedidos[0].id_pedido]
   )
 
-  return { itens, total: pedidos[0].valor_produtos, formasPagamento }
+  const selecionados = selecionarItens(itens, selecao)
+  return { itens: selecionados, total: totalItens(selecionados), formasPagamento }
 }
 
-async function finalizarPedido(usuarioId, formaPagamentoId) {
+async function finalizarPedido(usuarioId, formaPagamentoId, selecao) {
   if (!Number.isInteger(formaPagamentoId) || formaPagamentoId <= 0) {
     throw erroPedido(400, 'Selecione uma forma de pagamento.')
   }
 
+  validarSelecao(selecao)
   const conexao = await banco.promise().getConnection()
   let transacao = false
 
   try {
     await conexao.beginTransaction()
     transacao = true
+
+    const [usuarios] = await conexao.execute('SELECT id_usuario FROM usuario WHERE id_usuario = ? FOR UPDATE', [usuarioId])
+    if (!usuarios.length) throw erroPedido(401, 'Sessão inválida. Entre novamente na conta.')
 
     const [pedidos] = await conexao.execute(
       "SELECT id_pedido FROM pedido WHERE usuario_id = ? AND status = 'carrinho' ORDER BY id_pedido DESC LIMIT 2 FOR UPDATE",
@@ -53,10 +82,11 @@ async function finalizarPedido(usuarioId, formaPagamentoId) {
 
     const pedidoId = pedidos[0].id_pedido
     const [itens] = await conexao.execute(
-      'SELECT produto_sku FROM produto_pedido WHERE pedido_id = ? FOR UPDATE',
+      `SELECT pp.produto_sku, pp.quantidade, pp.preco_unitario, p.titulo_produto, p.estoque_produto, p.ativo
+       FROM produto_pedido pp JOIN produto p ON p.sku = pp.produto_sku WHERE pp.pedido_id = ? ORDER BY pp.produto_sku FOR UPDATE`,
       [pedidoId]
     )
-    if (!itens.length) throw erroPedido(400, 'Adicione pelo menos um produto antes de finalizar o pedido.')
+    const selecionados = selecionarItens(itens, selecao)
 
     const [formasPagamento] = await conexao.execute(
       "SELECT id_forma_pagamento FROM forma_pagamento WHERE id_forma_pagamento = ? AND ativo = 'sim'",
@@ -64,19 +94,25 @@ async function finalizarPedido(usuarioId, formaPagamentoId) {
     )
     if (!formasPagamento.length) throw erroPedido(400, 'A forma de pagamento selecionada não está disponível.')
 
-    const [totais] = await conexao.execute(
-      'SELECT COALESCE(SUM(subtotal), 0) AS total FROM produto_pedido WHERE pedido_id = ?',
-      [pedidoId]
-    )
-
+    const total = totalItens(selecionados)
+    // Finaliza o pedido existente e move somente os desmarcados para outro carrinho.
+    // Tudo fica na mesma transação, preservando preços e quantidades do banco.
+    if (selecionados.length < itens.length) {
+      const [novo] = await conexao.execute("INSERT INTO pedido (usuario_id, status) VALUES (?, 'carrinho')", [usuarioId])
+      for (const item of itens.filter(item => !selecao.includes(item.produto_sku))) {
+        await conexao.execute('UPDATE produto_pedido SET pedido_id = ? WHERE pedido_id = ? AND produto_sku = ?', [novo.insertId, pedidoId, item.produto_sku])
+      }
+      await conexao.execute('UPDATE pedido SET valor_produtos = (SELECT COALESCE(SUM(quantidade * preco_unitario), 0) FROM produto_pedido WHERE pedido_id = ?), total = valor_produtos WHERE id_pedido = ?', [novo.insertId, novo.insertId])
+    }
+    await conexao.execute('UPDATE produto_pedido SET subtotal = quantidade * preco_unitario WHERE pedido_id = ?', [pedidoId])
     await conexao.execute(
       "UPDATE pedido SET valor_produtos = ?, total = ?, forma_pagamento_id = ?, status = 'solicitado' WHERE id_pedido = ? AND usuario_id = ? AND status = 'carrinho'",
-      [totais[0].total, totais[0].total, formaPagamentoId, pedidoId, usuarioId]
+      [total, total, formaPagamentoId, pedidoId, usuarioId]
     )
 
     await conexao.commit()
     transacao = false
-    return { pedidoId, total: totais[0].total }
+    return { pedidoId, total }
   } catch (erro) {
     if (transacao) await conexao.rollback()
     throw erro

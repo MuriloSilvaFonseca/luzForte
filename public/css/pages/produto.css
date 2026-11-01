@@ -783,6 +783,14 @@
     vertical-align: middle;
 }
 
+.aviso_estoque_produto {
+    color: #9b4d13;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+.aviso_estoque_produto:empty { display: none; }
+.quantity_btn_produto:disabled { opacity: 0.5; cursor: not-allowed; }
 /* ===== LUZFORTE: novos estilos do produto (colar no FINAL do produto.css) ===== */
 /* Paleta tirada do catalogo.css (#183b6b, #1e3c72, #555, #777, sombras e raios dos cards). */
 
