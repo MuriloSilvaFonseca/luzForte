@@ -83,6 +83,11 @@ router.get('/carrinho', (req, res) => {
   res.render('loja/carrinho')
 })
 
+function selecaoCheckout(valor) {
+  if (typeof valor !== 'string' || !/^\d+(,\d+)*$/.test(valor) || valor.length > 5500) return []
+  return valor.split(',').map(Number)
+}
+
 router.get('/checkout', userEstaLogado, async (req, res) => {
   try {
     if (req.query.pedido) {
@@ -98,10 +103,11 @@ router.get('/checkout', userEstaLogado, async (req, res) => {
       return res.render('loja/checkout', { pedidoFinalizado, linkWhatsApp })
     }
 
-    const checkout = await carregarCheckout(req.session.usuario.id_usuario)
+    const checkout = await carregarCheckout(req.session.usuario.id_usuario, selecaoCheckout(req.query.itens))
     // whatsappAtivo: muda o texto do modal de confirmação (só avisa do WhatsApp se o número estiver no .env)
     return res.render('loja/checkout', { ...checkout, pedidoFinalizado: null, erro: null, whatsappAtivo: Boolean(process.env.WHATSAPP_LOJA) })
   } catch (erro) {
+    if (erro.status) return res.status(erro.status).render('loja/checkout', { itens: [], total: '0.00', formasPagamento: [], pedidoFinalizado: null, erro: erro.message, whatsappAtivo: false })
     console.log(erro)
     return renderizarErroInterno(res)
   }
@@ -110,12 +116,12 @@ router.get('/checkout', userEstaLogado, async (req, res) => {
 router.post('/checkout', userEstaLogado, async (req, res) => {
   try {
     const formaPagamentoId = Number(req.body.forma_pagamento_id)
-    const pedido = await finalizarPedido(req.session.usuario.id_usuario, formaPagamentoId)
+    const pedido = await finalizarPedido(req.session.usuario.id_usuario, formaPagamentoId, selecaoCheckout(req.body.itens))
     return res.redirect('/checkout?pedido=' + pedido.pedidoId)
   } catch (erro) {
     console.log(erro)
     try {
-      const checkout = await carregarCheckout(req.session.usuario.id_usuario)
+      const checkout = await carregarCheckout(req.session.usuario.id_usuario, selecaoCheckout(req.body.itens))
       return res.status(erro.status || 500).render('loja/checkout', {
         ...checkout,
         pedidoFinalizado: null,
@@ -123,6 +129,7 @@ router.post('/checkout', userEstaLogado, async (req, res) => {
         whatsappAtivo: Boolean(process.env.WHATSAPP_LOJA)
       })
     } catch (_) {
+      if (erro.status) return res.status(erro.status).render('loja/checkout', { itens: [], total: '0.00', formasPagamento: [], pedidoFinalizado: null, erro: erro.message, whatsappAtivo: false })
       return renderizarErroInterno(res)
     }
   }

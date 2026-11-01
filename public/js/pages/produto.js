@@ -287,6 +287,7 @@ async function carregarProduto() {
       sku: registro.sku, nome: registro.titulo_produto, codigo: registro.sku, classificacao: registro.marca,
       precoAtual: Number(registro.preco_produto), precoAntigo: Number(registro.preco_produto),
       estoque: registro.estoque_produto + ' em estoque',
+      estoqueDisponivel: Number(registro.estoque_produto),
       avaliacao: { nota: Math.round(Number(data.avaliacao.media)), totalAvaliacoes: data.avaliacao.quantidade },
       imagens: data.imagens.map(imagem => imagem.url),
       categoria: registro.categoria, idCategoria: registro.id_categoria,
@@ -294,9 +295,8 @@ async function carregarProduto() {
     };
     exibirProduto(produto);
     renderAvaliacoes(data);
-    carregarRelacionados(produto);
-    document.querySelectorAll('.action_buttons_produto button').forEach(botao => { botao.disabled = false; });
-    document.querySelectorAll('.action_buttons_produto button').forEach(botao => { botao.disabled = false; });
+atualizarControlesQuantidade();
+carregarRelacionados(produto);
   } catch (error) {
     console.error(error);
     const nome = document.getElementById("productName");
@@ -357,11 +357,27 @@ function changeImage(index) {
   thumbnails[index].classList.add("active_produto");
 }
 
+function atualizarControlesQuantidade() {
+  const input = document.getElementById('quantity');
+  const maximo = produtoAtual?.estoqueDisponivel || 0;
+  input.max = maximo;
+  input.value = maximo ? Math.min(maximo, Math.max(1, Math.floor(Number(input.value) || 1))) : 0;
+  input.disabled = !maximo;
+  document.querySelector('[onclick="decrementQuantity()"]').disabled = Number(input.value) <= 1;
+  document.querySelector('[onclick="incrementQuantity()"]').disabled = Number(input.value) >= maximo;
+  document.querySelectorAll('.action_buttons_produto button').forEach(botao => { botao.disabled = !maximo; });
+  const aviso = document.getElementById('mensagemEstoqueProduto');
+  aviso.textContent = '';
+  if (!maximo) aviso.textContent = 'Produto esgotado no momento.';
+  else if (Number(input.value) >= maximo) aviso.textContent = 'Não há mais unidades disponíveis em estoque para este produto.';
+}
+
 function incrementQuantity() {
   const input = document.getElementById("quantity");
   const currentValue = parseInt(input.value, 10);
-  if (currentValue < 99) {
+  if (currentValue < produtoAtual?.estoqueDisponivel) {
     input.value = currentValue + 1;
+    atualizarControlesQuantidade();
   }
 }
 
@@ -370,20 +386,25 @@ function decrementQuantity() {
   const currentValue = parseInt(input.value, 10);
   if (currentValue > 1) {
     input.value = currentValue - 1;
+    atualizarControlesQuantidade();
   }
 }
 
 let adicionandoCarrinho = false;
 async function addToCart() {
-  if (!produtoAtual || adicionandoCarrinho) return false;
+  if (!produtoAtual || !produtoAtual.estoqueDisponivel || adicionandoCarrinho) return false;
   adicionandoCarrinho = true;
   try {
     await window.adicionarProdutoCarrinho(produtoAtual.sku, Number(document.getElementById('quantity').value));
+    atualizarControlesQuantidade();
     const aviso = document.getElementById('notification');
     aviso.style.display = 'block';
     setTimeout(() => { aviso.style.display = 'none'; }, 3000);
     return true;
-  } catch (erro) { alert(erro.message); return false; }
+  } catch (erro) {
+    document.getElementById('mensagemEstoqueProduto').textContent = erro.message;
+    return false;
+  }
   finally { adicionandoCarrinho = false; }
 }
 async function buyNow() {
@@ -411,14 +432,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  document.getElementById("quantity").addEventListener("input", function (e) {
-    let value = parseInt(e.target.value, 10);
-
-    if (isNaN(value) || value < 1) {
-      e.target.value = 1;
-    } else if (value > 99) {
-      e.target.value = 99;
-    }
+  document.getElementById("quantity").addEventListener("input", function () {
+    atualizarControlesQuantidade();
   });
 });
 

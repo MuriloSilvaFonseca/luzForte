@@ -75,6 +75,7 @@
                     <form action="/checkout" method="post" id="form-checkout"
                           data-whatsapp="<%= locals.whatsappAtivo ? 'sim' : 'nao' %>">
                         <label for="forma_pagamento_id">Forma de pagamento</label>
+                        <input type="hidden" name="itens" value="<%= itens.map(item => item.produto_sku).join(',') %>">
                         <select id="forma_pagamento_id" name="forma_pagamento_id" required>
                             <option value="">Selecione uma opção</option>
                             <% formasPagamento.forEach(forma => { %>

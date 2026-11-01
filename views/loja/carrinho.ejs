@@ -14,6 +14,10 @@
                 <div class="parteSuperiorCarrinho">
                     <input type="checkbox" id="checkTodos">
                     <label for="checkTodos">Todos os produtos</label>
+                    <button type="button" id="esvaziarCarrinho" class="btnDel" hidden>
+                        <i class="ti ti-trash" aria-hidden="true"></i>
+                        <span>Esvaziar carrinho</span>
+                    </button>
                 </div>
  
                 <hr class="linhaSeparadora">
@@ -24,6 +28,7 @@
                     <p class="carrinhoVazioTitulo">Seu carrinho está vazio.</p>
     
                 </div>
+                <p class="orientacaoCarrinho">Desmarcar não remove o produto do carrinho.</p>
                 <div id="itensCarrinho"></div>
                 <template id="modeloItemCarrinho">
 <div class="produtos">
@@ -36,6 +41,7 @@
                     <div class="acoesCarrinho">
                         <span class="nomeProduto"></span>
                         <span class="badgeCategoria"></span>
+                        <p class="avisoEstoqueCarrinho" role="status"></p>
                         <div class="controlesQty">
                             <button class="btnQty" onclick="mudarQty(this, -1)">−</button>
                             <span class="qtyValor">1</span>
@@ -99,6 +105,7 @@
         </div>
     </section>
     
-     <script src="/js/pages/carrinho-integrado.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.all.min.js" defer></script>
+     <script src="/js/pages/carrinho-integrado.js" defer></script>
 
 <%- include("../partials/footer") %>

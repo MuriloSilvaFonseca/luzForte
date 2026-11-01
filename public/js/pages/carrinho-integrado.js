@@ -1,5 +1,6 @@
 let itensCarrinho = []
 let carrinhoOcupado = false
+let confirmandoRemocao = false
 const selecionadosCarrinho = new Set()
 const reaisCarrinho = valor => Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
@@ -13,11 +14,13 @@ function atualizarResumoCarrinho() {
   document.querySelector('.valorResumo').textContent = reaisCarrinho(centavos / 100)
   document.querySelector('.descontoValor').textContent = reaisCarrinho(0)
   document.querySelector('.valorTotal').textContent = reaisCarrinho(centavos / 100)
-  const todosSelecionados = itensCarrinho.length > 0 && itens.length === itensCarrinho.length
-  document.getElementById('avisoSelecaoCarrinho').textContent = itensCarrinho.length && !todosSelecionados
-    ? 'Selecione todos os produtos para continuar com a compra.'
+  document.getElementById('avisoSelecaoCarrinho').textContent = itensCarrinho.length && !itens.length
+    ? 'Nenhum produto selecionado. Selecione ao menos um produto para continuar.'
     : ''
-  document.querySelector('.botaoCarrinhoFinalizar button').disabled = !todosSelecionados
+  document.querySelector('.botaoCarrinhoFinalizar button').disabled = !itens.length || carrinhoOcupado || confirmandoRemocao
+  const esvaziar = document.getElementById('esvaziarCarrinho')
+  esvaziar.hidden = itensCarrinho.length === 0
+  esvaziar.disabled = carrinhoOcupado || confirmandoRemocao
   const todos = document.getElementById('checkTodos')
   todos.checked = itensCarrinho.length > 0 && itens.length === itensCarrinho.length
   todos.indeterminate = itens.length > 0 && itens.length < itensCarrinho.length
@@ -46,12 +49,23 @@ function criarItemCarrinho(item, modelo) {
     atualizarResumoCarrinho()
   })
   card.querySelector('.btnDel').setAttribute('aria-label', 'Remover ' + item.titulo_produto)
-  card.querySelector('.btnDel').addEventListener('click', () => modificarCarrinho('/itens/' + item.produto_sku, 'DELETE'))
+  card.querySelector('.btnDel').addEventListener('click', () => removerItemCarrinho(item.produto_sku))
+  const menos = card.querySelector('.btnQty[onclick*="-1"]')
+  const mais = card.querySelector('.btnQty[onclick="mudarQty(this, 1)"]')
+  if (menos) menos.disabled = item.quantidade <= 1
+  if (mais) mais.disabled = item.ativo !== 'ativo' || item.quantidade >= Number(item.estoque_produto)
+  if (menos && Number(item.estoque_produto) === 0) menos.disabled = true
+  const aviso = card.querySelector('.avisoEstoqueCarrinho')
+  if (Number(item.estoque_produto) === 0) aviso.textContent = 'Produto esgotado no momento.'
+  else if (item.quantidade >= Number(item.estoque_produto)) aviso.textContent = 'Não há mais unidades disponíveis em estoque para este produto.'
   return fragmento
 }
 
 function exibirCarrinho(resultado) {
   itensCarrinho = resultado.itens
+  for (const sku of selecionadosCarrinho) {
+    if (!itensCarrinho.some(item => item.produto_sku === sku)) selecionadosCarrinho.delete(sku)
+  }
   const container = document.getElementById('itensCarrinho')
   container.replaceChildren()
   const modelo = document.getElementById('modeloItemCarrinho')
@@ -66,18 +80,46 @@ function exibirCarrinho(resultado) {
   document.getElementById('carrinhoVazio').hidden = itensCarrinho.length > 0
   atualizarResumoCarrinho()
 }
+async function confirmarRemocao(texto, confirmButtonText) {
+  if (carrinhoOcupado || confirmandoRemocao) return false
+  confirmandoRemocao = true
+  atualizarResumoCarrinho()
+  try {
+    if (window.Swal) {
+      const resposta = await window.Swal.fire({ icon: 'question', text: texto, showCancelButton: true, cancelButtonText: 'Cancelar', confirmButtonText })
+      return resposta.isConfirmed
+    }
+    return window.confirm(texto)
+  } catch (_) {
+    mensagemCarrinho('Não foi possível abrir a confirmação. Tente novamente.')
+    return false
+  } finally {
+    confirmandoRemocao = false
+    atualizarResumoCarrinho()
+  }
+}
+async function removerItemCarrinho(sku) {
+  const confirmado = await confirmarRemocao('Deseja realmente remover este produto do carrinho?', 'Sim, remover')
+  if (confirmado) return modificarCarrinho('/itens/' + sku, 'DELETE')
+}
+async function esvaziarCarrinho() {
+  if (!itensCarrinho.length) return
+  const confirmado = await confirmarRemocao('Deseja realmente esvaziar seu carrinho? Todos os produtos serão removidos.', 'Sim, esvaziar')
+  if (confirmado) return modificarCarrinho('/itens', 'DELETE')
+}
 async function modificarCarrinho(caminho, metodo, dados) {
-  if (carrinhoOcupado) return
+  if (carrinhoOcupado || confirmandoRemocao) return
   carrinhoOcupado = true
+  atualizarResumoCarrinho()
   try {
     exibirCarrinho(await window.carrinhoApi(caminho, metodo, dados))
   } catch (erro) { mensagemCarrinho(erro.message) }
-  finally { carrinhoOcupado = false }
+  finally { carrinhoOcupado = false; atualizarResumoCarrinho() }
 }
 function mudarQty(botao, delta) {
   const sku = Number(botao.closest('.produtos').dataset.sku)
   const item = itensCarrinho.find(item => item.produto_sku === sku)
-  if (!item || item.quantidade + delta < 1) return
+  if (!item || item.quantidade + delta < 1 || (delta > 0 && (item.ativo !== 'ativo' || item.quantidade + delta > Number(item.estoque_produto)))) return
   return modificarCarrinho('/itens/' + sku, 'PATCH', { quantidade: item.quantidade + delta })
 }
 function toggleFav(botao) {
@@ -86,6 +128,7 @@ function toggleFav(botao) {
   botao.querySelector('i').className = ativo ? 'ti ti-heart' : 'ti ti-heart-filled'
 }
 document.addEventListener('DOMContentLoaded', async () => {
+  document.getElementById('esvaziarCarrinho').addEventListener('click', esvaziarCarrinho)
   document.getElementById('checkTodos').addEventListener('change', evento => {
     itensCarrinho.forEach(item => {
       if (evento.target.checked) selecionadosCarrinho.add(item.produto_sku)
@@ -97,7 +140,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     mensagemCarrinho('Cupons ainda não estão disponíveis. Os valores exibidos são os registrados no carrinho.')
   })
   document.querySelector('.botaoCarrinhoFinalizar button').addEventListener('click', () => {
-    window.location.href = '/checkout'
+    if (carrinhoOcupado || confirmandoRemocao) return
+    const skus = itensCarrinho.filter(item => selecionadosCarrinho.has(item.produto_sku)).map(item => item.produto_sku)
+    if (!skus.length) return mensagemCarrinho('Nenhum produto selecionado.')
+    window.location.href = '/checkout?itens=' + encodeURIComponent(skus.join(','))
   })
   try {
     const resultado = await window.carrinhoApi()
