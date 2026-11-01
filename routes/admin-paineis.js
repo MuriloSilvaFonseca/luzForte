@@ -40,12 +40,6 @@ const pedidos = [
   { id: 2039, data: '16/10/2026', cliente: 'Marina Souza', email: 'marina@email.com', pagamento: 'Cartão', chave: 'enviado', status: 'Enviado', statusCor: 'blue', itens: 5, total: 412 }
 ]
 
-const usuarios = [
-  { id: 1, nome: 'Administrador', email: 'admin@luzforte.com', perfil: 'admin', situacao: 'ativo', cadastro: '01/08/2026', pedidos: 0, avaliacoes: 0 },
-  { id: 2, nome: 'Carlos Menezes', email: 'carlos@email.com', perfil: 'cliente', situacao: 'ativo', cadastro: '03/09/2026', pedidos: 4, avaliacoes: 2 },
-  { id: 3, nome: 'Usuário 4821', email: 'u4821@email.com', perfil: 'cliente', situacao: 'bloqueado', cadastro: '12/10/2026', pedidos: 0, avaliacoes: 1 }
-]
-
 // ---------- Auxiliares ----------
 const minusculo = (v) => String(v || '').trim().toLowerCase()
 
@@ -219,30 +213,88 @@ router.post('/produtos/novo', (req, res) => {
 })
 
 // ---------- Usuários ----------
-router.get('/usuarios', (req, res) => {
-  const { q = '', perfil = '', situacao = '' } = req.query
-  let lista = usuarios.slice()
-  if (q) lista = lista.filter(u => minusculo(u.nome + ' ' + u.email).includes(minusculo(q)))
-  if (perfil) lista = lista.filter(u => u.perfil === perfil)
-  if (situacao) lista = lista.filter(u => u.situacao === situacao)
+router.get('/usuarios', async (req, res, next) => {
+  const q = String(req.query.q || '').trim()
+  const perfil = String(req.query.perfil || '').trim()
+  const situacao = String(req.query.situacao || '').trim()
+  const paginaPedida = Math.max(parseInt(req.query.pagina, 10) || 1, 1)
+  const condicoes = []
+  const valores = []
 
-  const { itens, pagina, totalPaginas } = paginar(lista, req.query.pagina)
-  res.render('admin/usuarios', {
-    total: lista.length, pagina, totalPaginas,
-    filtros: { q, perfil, situacao },
-    usuarios: itens
-  })
+  if (q) {
+    condicoes.push('(u.nome_usuario LIKE ? OR u.email LIKE ?)')
+    const busca = `%${q}%`
+    valores.push(busca, busca)
+  }
+  if (perfil === 'admin' || perfil === 'cliente') {
+    condicoes.push('u.acesso = ?')
+    valores.push(perfil)
+  }
+  // A tabela usuario não possui situação de bloqueio. Todos os usuários reais estão ativos.
+  if (situacao === 'bloqueado') {
+    condicoes.push('1 = 0')
+  }
+
+  const where = condicoes.length ? 'WHERE ' + condicoes.join(' AND ') : ''
+
+  try {
+    const banco = conexao.promise()
+    const [[resultado]] = await banco.execute(
+      `SELECT COUNT(*) AS total FROM usuario u ${where}`,
+      valores
+    )
+    const total = Number(resultado.total)
+    const totalPaginas = Math.max(1, Math.ceil(total / POR_PAGINA))
+    const pagina = Math.min(paginaPedida, totalPaginas)
+
+    // Busca os usuários reais do banco e calcula pedidos e avaliações de cada um.
+    const [usuariosBanco] = await banco.execute(`
+      SELECT u.id_usuario AS id,
+             u.nome_usuario AS nome,
+             u.email,
+             u.acesso AS perfil,
+             'ativo' AS situacao,
+             DATE_FORMAT(u.data_criacao, '%d/%m/%Y') AS cadastro,
+             (SELECT COUNT(*) FROM pedido p WHERE p.usuario_id = u.id_usuario) AS pedidos,
+             (SELECT COUNT(*) FROM avaliacao_produto a WHERE a.usuario_id = u.id_usuario) AS avaliacoes
+      FROM usuario u
+      ${where}
+      ORDER BY u.data_criacao DESC, u.id_usuario DESC
+      LIMIT ? OFFSET ?`,
+      [...valores, POR_PAGINA, (pagina - 1) * POR_PAGINA]
+    )
+
+    res.render('admin/usuarios', {
+      total,
+      pagina,
+      totalPaginas,
+      filtros: { q, perfil, situacao },
+      usuarios: usuariosBanco
+    })
+  } catch (erro) {
+    next(erro)
+  }
 })
 
-function alterarSituacao(situacao) {
-  return (req, res) => {
-    const u = usuarios.find(x => x.id === Number(req.params.id))
-    if (u && u.perfil !== 'admin') u.situacao = situacao // admin nunca é bloqueado
-    res.redirect('/admin/usuarios')
+// Altera entre cliente e administrador pelo campo acesso da tabela usuario.
+router.post('/usuarios/:id/perfil', async (req, res, next) => {
+  const id = Number(req.params.id)
+  const novoPerfil = String(req.body.perfil || '').trim()
+
+  if (!Number.isInteger(id) || id < 1 || !['cliente', 'admin'].includes(novoPerfil)) {
+    return res.redirect('/admin/usuarios')
   }
-}
-router.post('/usuarios/:id/bloquear', alterarSituacao('bloqueado'))
-router.post('/usuarios/:id/desbloquear', alterarSituacao('ativo'))
+
+  try {
+    await conexao.promise().execute(
+      'UPDATE usuario SET acesso = ? WHERE id_usuario = ?',
+      [novoPerfil, id]
+    )
+    res.redirect('/admin/usuarios')
+  } catch (erro) {
+    next(erro)
+  }
+})
 
 // ---------- Avaliações (lidas e moderadas direto no banco) ----------
 // Requer a migração database/migracao_avaliacoes_moderacao.sql
