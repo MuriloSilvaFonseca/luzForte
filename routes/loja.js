@@ -83,6 +83,10 @@ router.get('/carrinho', (req, res) => {
   res.render('loja/carrinho')
 })
 
+router.get('/como-comprar', (req, res) => {
+  res.render('loja/como-comprar')
+})
+
 function selecaoCheckout(valor) {
   if (typeof valor !== 'string' || !/^\d+(,\d+)*$/.test(valor) || valor.length > 5500) return []
   return valor.split(',').map(Number)

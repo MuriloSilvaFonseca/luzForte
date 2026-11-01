@@ -1,0 +1,102 @@
+.como-comprar {
+  width: min(1000px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 48px 0 64px;
+  color: #263449;
+}
+
+.como-comprar-intro {
+  max-width: 760px;
+  margin: 0 auto 28px;
+  text-align: center;
+}
+
+.como-comprar-etiqueta {
+  margin-bottom: 8px;
+  color: #1a6be8;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.como-comprar h1 {
+  margin-bottom: 12px;
+  color: #1e3f6d;
+  font-size: clamp(30px, 5vw, 42px);
+}
+
+.como-comprar-intro > p:last-child,
+.como-comprar-card p,
+.como-comprar-card li,
+.passos-compra span {
+  line-height: 1.6;
+}
+
+.como-comprar-card {
+  padding: 26px;
+  border: 1px solid #e0e5eb;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(30, 63, 109, .06);
+}
+
+.como-comprar-card h2 {
+  margin-bottom: 16px;
+  color: #1e3f6d;
+  font-size: 22px;
+}
+
+.passos-compra {
+  display: grid;
+  gap: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: passo;
+}
+
+.passos-compra li {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  min-height: 76px;
+  padding: 8px 8px 18px 54px;
+  counter-increment: passo;
+}
+
+.passos-compra li::before {
+  position: absolute;
+  top: 4px;
+  left: 0;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 50%;
+  background: #eaf2ff;
+  color: #1a6be8;
+  content: counter(passo);
+  font-weight: 700;
+}
+
+.passos-compra strong { color: #1e3f6d; }
+.passos-compra span { color: #526174; }
+
+.como-comprar-detalhes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.como-comprar-card ul { padding-left: 22px; }
+.como-comprar-card address { margin-bottom: 12px; font-style: normal; line-height: 1.6; }
+.como-comprar-card p + p { margin-top: 10px; }
+.como-comprar-voltar { margin-top: 24px; text-align: center; }
+.como-comprar-voltar a { color: #1a6be8; font-weight: 700; }
+.como-comprar-voltar span { margin: 0 8px; color: #667085; }
+
+@media (max-width: 640px) {
+  .como-comprar { padding: 32px 0 44px; }
+  .como-comprar-card { padding: 20px 16px; }
+  .como-comprar-detalhes { grid-template-columns: 1fr; }
+}

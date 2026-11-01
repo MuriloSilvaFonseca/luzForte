@@ -1,5 +1,8 @@
 CREATE DATABASE  IF NOT EXISTS `luz_forte` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `luz_forte`;
+-- Arquivo canônico do banco: schema, alterações antes espalhadas em migrações
+-- e dados de demonstração. Para uma instalação nova, execute somente este SQL.
+-- ATENÇÃO: recria as tabelas e substitui os dados existentes.
 -- MySQL dump 10.13  Distrib 8.0.43, for Win64 (x86_64)
 --
 -- Host: localhost    Database: luz_forte
@@ -160,7 +163,7 @@ CREATE TABLE `forma_pagamento` (
 
 LOCK TABLES `forma_pagamento` WRITE;
 /*!40000 ALTER TABLE `forma_pagamento` DISABLE KEYS */;
-INSERT INTO `forma_pagamento` VALUES (1,'Pix','sim'),(2,'Cartão na loja','sim'),(3,'Dinheiro','sim'),(4,'Boleto (desativado para teste)','nao');
+INSERT INTO `forma_pagamento` VALUES (1,'Pix','sim'),(2,'Cartão de crédito','sim'),(3,'Dinheiro','sim'),(4,'Cartão débito','sim');
 /*!40000 ALTER TABLE `forma_pagamento` ENABLE KEYS */;
 UNLOCK TABLES;
 

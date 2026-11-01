@@ -37,8 +37,8 @@ views/            as páginas (.ejs)
   admin/          páginas do painel administrativo (a criar)
 public/           arquivos enviados direto ao navegador
   css/  img/  js/  data/
-config/           conexão com o banco (a criar)
-database/         schema.sql do MySQL (a criar)
+config/           conexão com o banco
+database/         Luz_ForteDB.sql (schema e dados de demonstração)
 docs/             documentação do projeto
 ```
 
@@ -56,6 +56,17 @@ docs/             documentação do projeto
 | Login | `/login` |
 | Esqueci a senha | `/esqueci-senha` |
 | Registro | `/registro` |
+
+## Banco de dados
+
+Para criar o banco completo em uma instalação nova, execute apenas
+`database/Luz_ForteDB.sql` no MySQL. O arquivo reúne a estrutura atual e os
+dados de demonstração; ele recria as tabelas existentes, então não deve ser
+executado sobre um banco com dados que precisam ser preservados.
+
+`database/queriesInsertMYSQL_local.sql` é uma alternativa para inserir o mesmo
+conjunto de dados em tabelas vazias já criadas com esse schema. Não execute os
+dois arquivos em sequência, pois o dump principal já inclui esses dados.
 
 ## Como criar uma página nova
 

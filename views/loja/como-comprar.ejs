@@ -1,0 +1,40 @@
+<%- include("../partials/head", { tituloPagina: 'Como comprar' }) %>
+<link rel="stylesheet" href="/css/pages/como-comprar.css">
+<%- include("../partials/header") %>
+
+<main class="como-comprar">
+  <section class="como-comprar-intro">
+    <p class="como-comprar-etiqueta">Compra com retirada na loja</p>
+    <h1>Como comprar na LuzForte</h1>
+    <p>Você faz o pedido pelo site, conversa com a nossa equipe pelo WhatsApp e paga somente quando retirar na loja. Não há pagamento online nem entrega.</p>
+  </section>
+
+  <section class="como-comprar-card" aria-labelledby="passos-titulo">
+    <h2 id="passos-titulo">Do carrinho à retirada</h2>
+    <ol class="passos-compra">
+      <li><strong>Monte seu carrinho</strong><span>Escolha os produtos e as quantidades que deseja.</span></li>
+      <li><strong>Entre na sua conta</strong><span>Faça login para continuar com o pedido.</span></li>
+      <li><strong>Finalize o pedido</strong><span>Revise os itens, escolha como pretende pagar e confirme. Isso registra uma solicitação, não cobra nada.</span></li>
+      <li><strong>Envie a mensagem no WhatsApp</strong><span>Na confirmação, toque em “Enviar pedido pelo WhatsApp” e envie a mensagem para a loja.</span></li>
+      <li><strong>Aguarde a aprovação da loja</strong><span>Nossa equipe confere os produtos e confirma com você pelo WhatsApp.</span></li>
+      <li><strong>Retire e pague na loja</strong><span>Após a aprovação, venha buscar o pedido e pague no balcão.</span></li>
+    </ol>
+  </section>
+
+  <section class="como-comprar-detalhes">
+    <article class="como-comprar-card">
+      <h2>Formas de pagamento</h2>
+      <p>O pagamento é feito presencialmente na retirada. Aceitamos:</p>
+      <ul><li>Pix</li><li>Cartão de crédito</li><li>Cartão débito</li><li>Dinheiro</li></ul>
+    </article>
+    <article class="como-comprar-card">
+      <h2>Onde retirar</h2>
+      <address>R. Quatorze de Julho, 880 – Vila Oriental<br>São João da Boa Vista – SP</address>
+      <p><strong>Horário:</strong> segunda a sexta, das 7h às 18h; sábado, das 7h30 às 12h.</p>
+      <p>Domingos e feriados: consulte a loja pelo WhatsApp antes de vir.</p>
+    </article>
+  </section>
+  <p class="como-comprar-voltar"><a href="/catalogo">Escolher produtos</a> <span>ou</span> <a href="/carrinho">ver meu carrinho</a></p>
+</main>
+
+<%- include("../partials/footer") %>
