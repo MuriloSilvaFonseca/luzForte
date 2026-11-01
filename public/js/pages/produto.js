@@ -31,15 +31,38 @@ function criarEstrelas(nota) {
   return img;
 }
 
-function exibirCaminhoProduto(itens) {
+function exibirCaminhoProduto(produto) {
   const el = document.getElementById('breadcrumbProduto');
   if (!el) return;
+  const itens = [{ texto: 'Início', href: '/' }];
+  if (produto.categoria) {
+    itens.push({
+      texto: produto.categoria,
+      href: produto.idCategoria ? '/catalogo?categoria=' + encodeURIComponent(produto.idCategoria) : null
+    });
+  }
+  itens.push({ texto: produto.nome, href: null });
+
   el.replaceChildren();
-  itens.forEach((texto, indice) => {
-    if (indice) el.appendChild(document.createTextNode(' / '));
-    const parte = document.createElement('span');
-    parte.textContent = texto;
-    el.appendChild(parte);
+  itens.forEach((item, indice) => {
+    if (indice) {
+      const separador = document.createElement('span');
+      separador.className = 'sep_produto';
+      separador.setAttribute('aria-hidden', 'true');
+      separador.textContent = '›';
+      el.appendChild(separador);
+    }
+    if (item.href) {
+      const link = document.createElement('a');
+      link.href = item.href;
+      link.textContent = item.texto;
+      el.appendChild(link);
+    } else {
+      const parte = document.createElement('span');
+      parte.textContent = item.texto;
+      if (indice === itens.length - 1) parte.setAttribute('aria-current', 'page');
+      el.appendChild(parte);
+    }
   });
 }
 
@@ -198,10 +221,53 @@ resumo.replaceChildren(
   });
 }
 
+function criarCardRelacionado(item) {
+  const card = document.createElement('a');
+  card.className = 'relacionado_card_produto';
+  card.href = '/produto?id=' + encodeURIComponent(item.sku);
+
+  const imagem = document.createElement('img');
+  imagem.loading = 'lazy';
+  imagem.alt = item.titulo_produto;
+  imagem.addEventListener('error', () => { imagem.src = '/img/icons/icons8-caixa-128.png'; }, { once: true });
+  imagem.src = window.imagemProdutoSegura(item.imagem);
+
+  const nome = document.createElement('p');
+  nome.className = 'relacionado_nome_produto';
+  nome.textContent = item.titulo_produto;
+
+  const preco = document.createElement('p');
+  preco.className = 'relacionado_preco_produto';
+  preco.textContent = `R$ ${formatarPreco(Number(item.preco_produto))}`;
+
+  card.append(imagem, nome, preco);
+  return card;
+}
+
+// Usa a rota que já existe: /api/produtos?categoria=<id>. Se falhar, o bloco simplesmente fica escondido.
+async function carregarRelacionados(produto) {
+  const bloco = document.getElementById('produtosRelacionados');
+  const grade = document.getElementById('relacionadosGrid');
+  if (!bloco || !grade || !produto.idCategoria) return;
+  try {
+    const resposta = await fetch('/api/produtos?categoria=' + encodeURIComponent(produto.idCategoria));
+    const dados = await resposta.json();
+    if (!resposta.ok) throw new Error(dados.erro);
+    const lista = dados.produtos
+      .filter(item => String(item.sku) !== String(produto.sku))
+      .slice(0, 4);
+    if (!lista.length) return;
+    grade.replaceChildren(...lista.map(criarCardRelacionado));
+    bloco.hidden = false;
+  } catch (erro) {
+    console.error(erro);
+  }
+}
+
 function exibirProduto(produto) {
   
   produtoAtual = produto;
-  exibirCaminhoProduto(produto.breadcrumb);
+  exibirCaminhoProduto(produto);
   exibirImagens(produto);
   exibirInformacoes(produto);
   exibirDescricoes(produto);
@@ -224,12 +290,13 @@ async function carregarProduto() {
       estoqueDisponivel: Number(registro.estoque_produto),
       avaliacao: { nota: Math.round(Number(data.avaliacao.media)), totalAvaliacoes: data.avaliacao.quantidade },
       imagens: data.imagens.map(imagem => imagem.url),
-      breadcrumb: [registro.categoria, registro.subcategoria, registro.titulo_produto],
+      categoria: registro.categoria, idCategoria: registro.id_categoria,
       descricoes: data.descricoes, especificacoes: data.especificacoes, instalacoes: data.instalacoes
     };
     exibirProduto(produto);
     renderAvaliacoes(data);
-    atualizarControlesQuantidade();
+atualizarControlesQuantidade();
+carregarRelacionados(produto);
   } catch (error) {
     console.error(error);
     const nome = document.getElementById("productName");

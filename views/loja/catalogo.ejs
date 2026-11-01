@@ -18,9 +18,6 @@
         <div>
           <h1>Produtos</h1>
           <p class="prod-count">Carregando produtos...</p>
-          <% if (filtros.busca) { %>
-            <p>Busca por: "<%= filtros.busca %>" &nbsp;<a href="/catalogo">limpar</a></p>
-          <% } %>
         </div>
         <div class="sort-area">
           <span>Ordenar por</span>
@@ -38,6 +35,9 @@
         <span class="sep">›</span>
         <span>Catálogo</span>
       </div>
+
+      <!-- Filtros ativos: preenchido pelo catalogo.js (etiquetas com ✕ para remover cada filtro) -->
+      <div class="filtros-ativos" id="filtrosAtivos" hidden></div>
 
       <!-- Sidebar + Grid -->
       <div class="content-row">
@@ -114,5 +114,3 @@
 <script src="/js/pages/catalogo.js"></script>
 
 <%- include("../partials/footer") %>
-
-

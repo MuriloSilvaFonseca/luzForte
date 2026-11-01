@@ -5,7 +5,7 @@
     <%- include("../partials/header") %>
 
     <div class="container_produto">
-        <div class="breadcrumb_produto" id="breadcrumbProduto"></div>
+        <nav class="breadcrumb_produto" id="breadcrumbProduto" aria-label="Caminho do produto"></nav>
 
         <div class="product_section_produto">
             <div class="gallery_produto">
@@ -122,6 +122,11 @@
 </div>
 </section>
 
+
+        <section class="relacionados_produto" id="produtosRelacionados" aria-labelledby="relacionadosTitulo" hidden>
+            <h2 class="relacionados_titulo_produto" id="relacionadosTitulo">Produtos relacionados</h2>
+            <div class="relacionados_grid_produto" id="relacionadosGrid"></div>
+        </section>
 
     </div>
 
