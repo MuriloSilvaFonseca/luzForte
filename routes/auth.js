@@ -141,7 +141,7 @@ router.post('/login', (req, res) => {
                 return res.status(500).render('auth/login', { erro: 'Não foi possível entrar. Tente novamente.' })
               }
 
-              return res.redirect('/carrinho')
+              return res.redirect(usuario.acesso === 'admin' ? '/admin' : '/carrinho')
             })
           })
       })

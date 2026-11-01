@@ -37,6 +37,7 @@
 
 <form class="adm-card adm-filters" method="get" action="/admin/pedidos">
   <% if (filtros.status) { %><input type="hidden" name="status" value="<%= filtros.status %>"><% } %>
+  <% if (filtros.usuario) { %><input type="hidden" name="usuario" value="<%= filtros.usuario %>"><% } %>
   <input class="adm-field adm-field--search" type="search" name="q" value="<%= filtros.q %>" placeholder="Buscar por nº do pedido ou cliente">
   <input class="adm-field" type="date" name="de" value="<%= filtros.de %>" aria-label="Data inicial">
   <input class="adm-field" type="date" name="ate" value="<%= filtros.ate %>" aria-label="Data final">
@@ -71,24 +72,44 @@
               <div class="adm-prod__sub"><%= p.email || 'Não informado' %></div>
             </td>
             <td><%= p.pagamento || 'Não informado' %></td>
-            <td><span class="adm-badge adm-badge--<%= statusInfo[p.status].cor %>"><%= statusInfo[p.status].rotulo %></span></td>
+            <td>
+              <span class="adm-badge adm-badge--<%= statusInfo[p.status].cor %>"><%= statusInfo[p.status].rotulo %></span>
+              <% if (p.status === 'cancelado' && p.observacoes) { %>
+                <div class="adm-prod__sub adm-pedido-motivo"><%= p.observacoes %></div>
+              <% } %>
+            </td>
             <td class="is-num"><%= p.itens %></td>
             <td class="is-num"><strong><%= moeda(p.total) %></strong></td>
             <td class="is-actions">
+              <button class="adm-btn adm-btn--sm adm-btn--icon adm-btn--icon-info" type="button" data-ver-pedido
+                      data-url="/admin/pedidos/<%= p.id %>/detalhes" aria-haspopup="dialog"
+                      aria-label="Ver detalhes do pedido <%= p.id %>" title="Ver detalhes">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
               <% if (p.status === 'solicitado') { %>
                 <form method="post" action="/admin/pedidos/<%= p.id %>/aprovar" style="display:inline">
-                  <button class="adm-btn adm-btn--sm" type="submit">Aprovar</button>
+                  <button class="adm-btn adm-btn--sm adm-btn--icon adm-btn--icon-success" type="submit"
+                          aria-label="Aprovar pedido <%= p.id %>" title="Aprovar pedido">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m5 12 4.5 4.5L19 7"/></svg>
+                  </button>
                 </form>
-                <form method="post" action="/admin/pedidos/<%= p.id %>/cancelar" style="display:inline">
-                  <button class="adm-btn adm-btn--sm adm-btn--danger" type="submit">Cancelar</button>
-                </form>
+                <button class="adm-btn adm-btn--sm adm-btn--icon adm-btn--icon-danger" type="button"
+                        data-cancelar-pedido data-action="/admin/pedidos/<%= p.id %>/cancelar"
+                        aria-haspopup="dialog" aria-label="Cancelar pedido <%= p.id %>" title="Cancelar pedido">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg>
+                </button>
               <% } else if (p.status === 'aprovado') { %>
                 <form method="post" action="/admin/pedidos/<%= p.id %>/retirar" style="display:inline">
-                  <button class="adm-btn adm-btn--sm" type="submit">Marcar como retirado</button>
+                  <button class="adm-btn adm-btn--sm adm-btn--icon adm-btn--icon-success" type="submit"
+                          aria-label="Marcar pedido <%= p.id %> como retirado" title="Marcar como retirado">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 8.5 12 4l9 4.5v9L12 22l-9-4.5v-9Z"/><path d="M3.5 8.7 12 13l8.5-4.3M12 13v8.5m-4-13.3 8.5-4.2"/></svg>
+                  </button>
                 </form>
-                <form method="post" action="/admin/pedidos/<%= p.id %>/cancelar" style="display:inline">
-                  <button class="adm-btn adm-btn--sm adm-btn--danger" type="submit">Cancelar</button>
-                </form>
+                <button class="adm-btn adm-btn--sm adm-btn--icon adm-btn--icon-danger" type="button"
+                        data-cancelar-pedido data-action="/admin/pedidos/<%= p.id %>/cancelar"
+                        aria-haspopup="dialog" aria-label="Cancelar pedido <%= p.id %>" title="Cancelar pedido">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg>
+                </button>
               <% } %>
             </td>
           </tr>
@@ -106,4 +127,33 @@
   </div>
 </section>
 
-<%- include('../partials/admin/admin-rodape') %>
+<dialog class="adm-modal" id="modal-cancelar-pedido" aria-labelledby="modal-cancelar-titulo"
+        aria-describedby="modal-cancelar-descricao">
+  <form method="post" id="form-cancelar-pedido">
+    <h2 id="modal-cancelar-titulo">Cancelar pedido</h2>
+    <p id="modal-cancelar-descricao">Informe o motivo do cancelamento do pedido <strong id="cancelar-pedido-id"></strong>.</p>
+    <label class="adm-modal__label" for="motivo-cancelamento">Motivo do cancelamento</label>
+    <textarea class="adm-modal__textarea" id="motivo-cancelamento" name="motivo_cancelamento"
+              minlength="3" maxlength="1000" rows="5" required></textarea>
+    <div class="adm-modal__acoes">
+      <button class="adm-btn" type="button" data-fechar-modal>Voltar</button>
+      <button class="adm-btn adm-btn--danger" type="submit">Confirmar cancelamento</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="adm-modal adm-modal--detalhes" id="modal-detalhes-pedido"
+        aria-labelledby="modal-detalhes-titulo" aria-describedby="modal-detalhes-status">
+  <div class="adm-modal__detalhes-conteudo">
+    <div class="adm-modal__detalhes-cabecalho">
+      <div>
+        <h2 id="modal-detalhes-titulo">Detalhes do pedido</h2>
+        <p id="modal-detalhes-status" role="status" aria-live="polite">Carregando...</p>
+      </div>
+      <button class="adm-btn" type="button" data-fechar-detalhes>Fechar</button>
+    </div>
+    <div id="detalhes-pedido-conteudo" aria-busy="true"></div>
+  </div>
+</dialog>
+
+<%- include('../partials/admin/admin-rodape', { pageScript: 'admin-pedidos' }) %>

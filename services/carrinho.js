@@ -1,5 +1,6 @@
 const criptografia = require('node:crypto')
 const banco = require('../config/database')
+const { adquirirLock, liberarLock } = require('./lock-mysql')
 const LIMITE_INTEIRO_MYSQL = 2147483647 // Maior valor positivo do tipo INT.
 
 function erroCarrinho(status, mensagem) {
@@ -12,7 +13,9 @@ function inteiroPositivo(valor) {
 
 async function buscarPedido(conexao, proprietario) {
   if (proprietario.usuarioId) {
-    const [usuarios] = await conexao.execute('SELECT id_usuario FROM usuario WHERE id_usuario = ? FOR UPDATE', [proprietario.usuarioId])
+    // Esta consulta só verifica a existência da conta; bloquear a linha do
+    // usuário fazia qualquer chamada simultânea do carrinho disputar o mesmo lock.
+    const [usuarios] = await conexao.execute('SELECT id_usuario FROM usuario WHERE id_usuario = ?', [proprietario.usuarioId])
     if (!usuarios.length) throw erroCarrinho(401, 'Sessão inválida. Entre novamente na conta.')
   }
   const [pedidos] = await conexao.execute(`SELECT id_pedido FROM pedido WHERE ${proprietario.filtro} AND status = 'carrinho' ORDER BY id_pedido DESC FOR UPDATE`, [proprietario.valor])
@@ -90,15 +93,14 @@ async function executarCarrinho(identidade, operacao, dados = {}) {
   }
   const conexao = await banco.promise().getConnection()
   let transacao = false
-  let travaVisitante
+  let travaCarrinho
+  let conexaoDestruida = false
   try {
-    // A trava protege também a criação do primeiro pedido do visitante.
-    if (!proprietario.usuarioId) {
-      const nome = 'lfc:' + proprietario.valor.slice(0, 60)
-      const [[trava]] = await conexao.execute('SELECT GET_LOCK(?, 5) AS obtida', [nome])
-      if (Number(trava.obtida) !== 1) throw erroCarrinho(409, 'Carrinho ocupado. Tente novamente.')
-      travaVisitante = nome
-    }
+    // Serializa chamadas da mesma conta/sessão, inclusive ao criar o primeiro carrinho.
+    const nome = proprietario.usuarioId
+      ? 'lfu:' + proprietario.usuarioId
+      : 'lfc:' + proprietario.valor.slice(0, 60)
+    travaCarrinho = await adquirirLock(conexao, nome)
     await conexao.beginTransaction()
     transacao = true
     let pedidoId = await buscarPedido(conexao, proprietario)
@@ -119,13 +121,13 @@ async function executarCarrinho(identidade, operacao, dados = {}) {
     return resultado
   } catch (erro) {
     if (transacao) {
-      try { await conexao.rollback() } catch (_) { /* A conexão será liberada abaixo. */ }
+      try { await conexao.rollback() }
+      catch (_) { conexaoDestruida = true }
     }
     throw erro
   } finally {
-    let conexaoDestruida = false
-    if (travaVisitante) {
-      try { await conexao.execute('SELECT RELEASE_LOCK(?) AS liberada', [travaVisitante]) }
+    if (travaCarrinho) {
+      try { await liberarLock(conexao, travaCarrinho) }
       catch (_) { conexao.destroy(); conexaoDestruida = true }
     }
     if (!conexaoDestruida) conexao.release()
@@ -158,7 +160,10 @@ async function transferirCarrinhoVisitante(usuarioId, tokenVisitante) {
 
   const conexao = await banco.promise().getConnection()
   let transacao = false
+  let travaUsuario
+  let destruirConexao = false
   try {
+    travaUsuario = await adquirirLock(conexao, 'lfu:' + usuarioId)
     await conexao.beginTransaction()
     transacao = true
 
@@ -213,11 +218,17 @@ async function transferirCarrinhoVisitante(usuarioId, tokenVisitante) {
     transacao = false
   } catch (erro) {
     if (transacao) {
-      try { await conexao.rollback() } catch (_) { /* a conexão é liberada abaixo */ }
+      try { await conexao.rollback() }
+      catch (_) { destruirConexao = true }
     }
     throw erro
   } finally {
-    conexao.release()
+    if (travaUsuario) {
+      try { await liberarLock(conexao, travaUsuario) }
+      catch (_) { destruirConexao = true }
+    }
+    if (destruirConexao) conexao.destroy()
+    else conexao.release()
   }
 }
 

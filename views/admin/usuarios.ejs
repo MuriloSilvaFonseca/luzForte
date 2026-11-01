@@ -93,15 +93,24 @@
               <% if (u.perfil !== 'admin') { %>
                 <form method="post" action="/admin/usuarios/<%= u.id %>/perfil" style="display:inline">
                   <input type="hidden" name="perfil" value="admin">
-                  <button class="adm-btn adm-btn--sm" type="submit">Tornar administrador</button>
+                  <button class="adm-btn adm-btn--sm adm-btn--icon adm-btn--icon-success" type="submit"
+                          aria-label="Tornar <%= u.nome %> administrador" title="Tornar administrador">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9" cy="8" r="4"/><path d="M3 21v-2a6 6 0 0 1 6-6h2m6-1v8m-4-4h8"/></svg>
+                  </button>
                 </form>
               <% } else { %>
                 <form method="post" action="/admin/usuarios/<%= u.id %>/perfil" style="display:inline">
                   <input type="hidden" name="perfil" value="cliente">
-                  <button class="adm-btn adm-btn--sm adm-btn--danger" type="submit">Tornar cliente</button>
+                  <button class="adm-btn adm-btn--sm adm-btn--icon adm-btn--icon-danger" type="submit"
+                          aria-label="Tornar <%= u.nome %> cliente" title="Tornar cliente">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9" cy="8" r="4"/><path d="M3 21v-2a6 6 0 0 1 6-6h2m2 2h8"/></svg>
+                  </button>
                 </form>
               <% } %>
-              <span class="adm-prod__sub">ID <%= u.id %></span>
+              <a class="adm-btn adm-btn--sm adm-btn--icon adm-btn--icon-info" href="/admin/pedidos?usuario=<%= u.id %>&de=&ate=" aria-label="Ver histórico de pedidos de <%= u.nome %>" title="Histórico de pedidos">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5m4-1v5l3 2"/></svg>
+              </a>
+              <span class="adm-prod__sub" title="ID do usuário">ID <%= u.id %></span>
             </td>
           </tr>
         <% }) %>

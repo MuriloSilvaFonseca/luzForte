@@ -249,7 +249,60 @@
 .adm-btn--danger { background: #fff; border-color: #f0b7b2; color: var(--adm-red-dark); }
 .adm-btn--danger:hover { background: var(--adm-red-bg); filter: none; }
 .adm-btn--sm { min-height: 32px; padding: 5px 10px; font-size: 13px; }
+.adm-btn--icon { width: 34px; min-width: 34px; height: 34px; min-height: 34px; padding: 7px; border-radius: 9px; }
+.adm-btn--icon svg { display: block; width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.adm-btn--icon-info { background: #e8f1fc; border-color: #c7dcf7; color: #245b99; }
+.adm-btn--icon-success { background: #e8f5eb; border-color: #b9dfc1; color: #216b31; }
+.adm-btn--icon-danger { background: #fff0ef; border-color: #f1c2bd; color: #a72b21; }
+.adm-btn--icon-info:hover { background: #d8e9fb; filter: none; }
+.adm-btn--icon-success:hover { background: #d8efdd; filter: none; }
+.adm-btn--icon-danger:hover { background: #ffe0dd; filter: none; }
 .adm-btn:disabled { opacity: .55; cursor: not-allowed; }
+
+.adm-modal {
+  width: min(520px, calc(100% - 32px));
+  margin: auto;
+  padding: 24px;
+  border: 1px solid var(--adm-border);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--adm-text);
+  box-shadow: 0 20px 60px rgb(15 23 42 / 25%);
+}
+
+.adm-modal::backdrop { background: rgb(15 23 42 / 58%); }
+.adm-modal h2 { margin: 0 0 8px; color: var(--adm-navy-800); font-size: 21px; }
+.adm-modal p { margin: 0 0 18px; color: var(--adm-muted); line-height: 1.5; }
+.adm-modal__label { display: block; margin-bottom: 7px; font-weight: 700; }
+.adm-modal__textarea {
+  display: block;
+  width: 100%;
+  min-height: 120px;
+  padding: 10px 12px;
+  border: 1px solid #cfd7e1;
+  border-radius: var(--adm-radius-sm);
+  resize: vertical;
+}
+.adm-modal__textarea:focus-visible { outline: 2px solid var(--adm-blue); outline-offset: 2px; }
+.adm-modal__acoes { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 9px; margin-top: 18px; }
+.adm-pedido-motivo { max-width: 240px; margin-top: 6px; white-space: pre-wrap; }
+.adm-modal--detalhes { width: min(820px, calc(100% - 32px)); }
+.adm-modal__detalhes-cabecalho { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.adm-modal__detalhes-cabecalho p { margin-bottom: 16px; }
+.adm-pedido-resumo { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.adm-pedido-resumo > div { min-width: 0; padding: 10px; border: 1px solid var(--adm-border); border-radius: var(--adm-radius-sm); }
+.adm-pedido-resumo dt { margin-bottom: 4px; color: var(--adm-muted); font-size: 12px; }
+.adm-pedido-resumo dd { overflow-wrap: anywhere; font-weight: 700; }
+.adm-pedido-itens-titulo, .adm-pedido-observacoes h3 { margin: 22px 0 10px; color: var(--adm-navy-800); font-size: 16px; }
+.adm-pedido-itens-wrap { overflow-x: auto; }
+.adm-pedido-itens { min-width: 560px; }
+.adm-pedido-sem-itens, .adm-pedido-observacoes p { line-height: 1.5; white-space: pre-wrap; }
+.adm-pedido-observacoes p { margin: 0; padding: 12px; border-radius: var(--adm-radius-sm); background: var(--adm-bg); }
+.adm-pedido-itens-wrap + .adm-pedido-observacoes { margin-top: 20px; }
+@media (max-width: 640px) {
+  .adm-modal--detalhes { padding: 18px 14px; }
+  .adm-pedido-resumo { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 
 /* ---------- Cards / KPIs ---------- */
 .adm-card {
@@ -355,11 +408,11 @@
 .adm-btn:hover { text-decoration: none; }
 
 /* ---------- Badges por cor (usados nas views) ---------- */
-.adm-badge--green { background: var(--adm-green-bg); color: #216b31; }
-.adm-badge--yellow { background: #fff7e6; color: #8a5a00; }
-.adm-badge--red { background: var(--adm-red-bg); color: #9f241b; }
-.adm-badge--gray { background: #eef0f4; color: #4b5668; }
-.adm-badge--blue { background: var(--adm-blue-bg); color: #2a5d99; }
+.adm-badge--green { background: var(--adm-green-bg); color: #216b31; border: 1px solid #b9dfc1; }
+.adm-badge--yellow { background: #fff7e6; color: #8a5a00; border: 1px solid #f0d99f; }
+.adm-badge--red { background: var(--adm-red-bg); color: #9f241b; border: 1px solid #f0b7b2; }
+.adm-badge--gray { background: #eef0f4; color: #4b5668; border: 1px solid #d7dbe2; }
+.adm-badge--blue { background: var(--adm-blue-bg); color: #2a5d99; border: 1px solid #c7dcf7; }
 
 /* ---------- Tabelas: colunas especiais ---------- */
 .adm-table th.is-num,

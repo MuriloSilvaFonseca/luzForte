@@ -1,4 +1,5 @@
 const banco = require('../config/database')
+const { adquirirLock, liberarLock } = require('./lock-mysql')
 
 function erroPedido(status, mensagem) {
   return Object.assign(new Error(mensagem), { status })
@@ -64,12 +65,15 @@ async function finalizarPedido(usuarioId, formaPagamentoId, selecao) {
   validarSelecao(selecao)
   const conexao = await banco.promise().getConnection()
   let transacao = false
+  let travaUsuario
+  let destruirConexao = false
 
   try {
+    travaUsuario = await adquirirLock(conexao, 'lfu:' + usuarioId)
     await conexao.beginTransaction()
     transacao = true
 
-    const [usuarios] = await conexao.execute('SELECT id_usuario FROM usuario WHERE id_usuario = ? FOR UPDATE', [usuarioId])
+    const [usuarios] = await conexao.execute('SELECT id_usuario FROM usuario WHERE id_usuario = ?', [usuarioId])
     if (!usuarios.length) throw erroPedido(401, 'Sessão inválida. Entre novamente na conta.')
 
     const [pedidos] = await conexao.execute(
@@ -114,10 +118,18 @@ async function finalizarPedido(usuarioId, formaPagamentoId, selecao) {
     transacao = false
     return { pedidoId, total }
   } catch (erro) {
-    if (transacao) await conexao.rollback()
+    if (transacao) {
+      try { await conexao.rollback() }
+      catch (_) { destruirConexao = true }
+    }
     throw erro
   } finally {
-    conexao.release()
+    if (travaUsuario) {
+      try { await liberarLock(conexao, travaUsuario) }
+      catch (_) { destruirConexao = true }
+    }
+    if (destruirConexao) conexao.destroy()
+    else conexao.release()
   }
 }
 

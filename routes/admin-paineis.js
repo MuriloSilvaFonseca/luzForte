@@ -69,17 +69,18 @@ function dataPedidoValida(valor) {
 }
 
 router.get('/pedidos', async (req, res) => {
-  const { status = '', q = '', de = '', ate = '', pagina: paginaPedida = '1' } = req.query
-  if (![status, q, de, ate, paginaPedida].every(valor => typeof valor === 'string')) {
+  const { status = '', q = '', usuario = '', de = '', ate = '', pagina: paginaPedida = '1' } = req.query
+  if (![status, q, usuario, de, ate, paginaPedida].every(valor => typeof valor === 'string')) {
     return res.status(400).send('Filtros de pedidos inválidos.')
   }
   if ((status && !Object.hasOwn(statusInfo, status)) || !dataPedidoValida(de) || !dataPedidoValida(ate) ||
+      (usuario && (!/^\d+$/.test(usuario) || Number(usuario) < 1)) ||
       (de && ate && de > ate) || !/^\d+$/.test(paginaPedida) ||
       !Number.isSafeInteger(Number(paginaPedida)) || Number(paginaPedida) < 1) {
     return res.status(400).send('Filtros de pedidos inválidos.')
   }
 
-  const filtros = { status, q: q.trim(), de, ate }
+  const filtros = { status, q: q.trim(), usuario, de, ate }
   const condicoes = []
   const valores = []
   if (status) { condicoes.push('p.status = ?'); valores.push(status) }
@@ -87,6 +88,7 @@ router.get('/pedidos', async (req, res) => {
     condicoes.push("(CAST(p.id_pedido AS CHAR) LIKE CONCAT('%', ?, '%') OR u.nome_usuario LIKE CONCAT('%', ?, '%'))")
     valores.push(filtros.q.replace(/^#/, ''), filtros.q)
   }
+  if (usuario) { condicoes.push('p.usuario_id = ?'); valores.push(Number(usuario)) }
   if (de) { condicoes.push('p.data_criacao >= ?'); valores.push(de) }
   if (ate) { condicoes.push('p.data_criacao < DATE_ADD(?, INTERVAL 1 DAY)'); valores.push(ate) }
   const where = condicoes.length ? 'WHERE ' + condicoes.join(' AND ') : ''
@@ -101,7 +103,7 @@ router.get('/pedidos', async (req, res) => {
     const pagina = Math.min(Number(paginaPedida), totalPaginas)
     const [pedidos] = await banco.query(`
       SELECT p.id_pedido AS id, DATE_FORMAT(p.data_criacao, '%d/%m/%Y') AS data,
-             u.nome_usuario AS cliente, u.email, f.nome_pagamento AS pagamento, p.status, p.total,
+             u.nome_usuario AS cliente, u.email, f.nome_pagamento AS pagamento, p.status, p.total, p.observacoes,
              COALESCE((SELECT SUM(pp.quantidade) FROM produto_pedido pp WHERE pp.pedido_id = p.id_pedido), 0) AS itens
       FROM pedido p
       LEFT JOIN usuario u ON u.id_usuario = p.usuario_id
@@ -123,13 +125,47 @@ router.get('/pedidos', async (req, res) => {
   }
 })
 
+router.get('/pedidos/:id/detalhes', async (req, res) => {
+  const id = Number(req.params.id)
+  if (!Number.isSafeInteger(id) || id < 1) {
+    return res.status(400).json({ erro: 'Pedido inválido.' })
+  }
+
+  try {
+    const banco = conexaoBanco()
+    const [[pedido]] = await banco.execute(`
+      SELECT p.id_pedido AS id, DATE_FORMAT(p.data_criacao, '%d/%m/%Y %H:%i') AS data,
+             p.status, p.total, p.observacoes, u.nome_usuario AS cliente, u.email,
+             f.nome_pagamento AS pagamento
+      FROM pedido p
+      LEFT JOIN usuario u ON u.id_usuario = p.usuario_id
+      LEFT JOIN forma_pagamento f ON f.id_forma_pagamento = p.forma_pagamento_id
+      WHERE p.id_pedido = ?`, [id])
+
+    if (!pedido) return res.status(404).json({ erro: 'Pedido não encontrado.' })
+
+    const [itens] = await banco.execute(`
+      SELECT pp.produto_sku AS sku, p.titulo_produto AS produto, pp.quantidade,
+             pp.preco_unitario, pp.subtotal
+      FROM produto_pedido pp
+      JOIN produto p ON p.sku = pp.produto_sku
+      WHERE pp.pedido_id = ?
+      ORDER BY p.titulo_produto`, [id])
+
+    return res.json({ pedido, itens })
+  } catch (erro) {
+    console.error('Erro ao carregar detalhes do pedido:', erro.code || erro.message)
+    return res.status(500).json({ erro: 'Não foi possível carregar os detalhes do pedido.' })
+  }
+})
+
 // Troca o status de um pedido sem aceitar status enviado pelo cliente.
 router.post('/pedidos/:id/aprovar', async (req, res) => {
   await mudarStatusPedido(req, res, 'aprovado')
 })
 
 router.post('/pedidos/:id/cancelar', async (req, res) => {
-  await mudarStatusPedido(req, res, 'cancelado')
+  await mudarStatusPedido(req, res, 'cancelado', req.body && req.body.motivo_cancelamento)
 })
 
 router.post('/pedidos/:id/finalizar', async (req, res) => {
@@ -140,10 +176,17 @@ router.post('/pedidos/:id/retirar', async (req, res) => {
   await mudarStatusPedido(req, res, 'finalizado')
 })
 
-async function mudarStatusPedido(req, res, novoStatus) {
+async function mudarStatusPedido(req, res, novoStatus, motivoCancelamento) {
   const id = Number(req.params.id)
   if (!Number.isSafeInteger(id) || id < 1) {
     return res.redirect('/admin/pedidos')
+  }
+
+  const motivo = novoStatus === 'cancelado' && typeof motivoCancelamento === 'string'
+    ? motivoCancelamento.trim()
+    : ''
+  if (novoStatus === 'cancelado' && (motivo.length < 3 || motivo.length > 1000)) {
+    return res.status(400).send('Informe um motivo de cancelamento entre 3 e 1000 caracteres.')
   }
 
   const conexao = await conexaoBanco().getConnection()
@@ -154,7 +197,7 @@ async function mudarStatusPedido(req, res, novoStatus) {
     transacaoAberta = true
 
     const [[pedido]] = await conexao.execute(
-      'SELECT status FROM pedido WHERE id_pedido = ? FOR UPDATE',
+      'SELECT status, observacoes FROM pedido WHERE id_pedido = ? FOR UPDATE',
       [id]
     )
     if (!pedido) {
@@ -200,7 +243,15 @@ async function mudarStatusPedido(req, res, novoStatus) {
       }
     }
 
-    await conexao.execute('UPDATE pedido SET status = ? WHERE id_pedido = ?', [novoStatus, id])
+    if (novoStatus === 'cancelado') {
+      const observacoesAnteriores = String(pedido.observacoes || '').trim()
+      const observacoes = observacoesAnteriores
+        ? observacoesAnteriores + '\nMotivo do cancelamento: ' + motivo
+        : 'Motivo do cancelamento: ' + motivo
+      await conexao.execute('UPDATE pedido SET status = ?, observacoes = ? WHERE id_pedido = ?', [novoStatus, observacoes, id])
+    } else {
+      await conexao.execute('UPDATE pedido SET status = ? WHERE id_pedido = ?', [novoStatus, id])
+    }
     await conexao.commit()
     transacaoAberta = false
     res.redirect('/admin/pedidos?status=' + novoStatus)
