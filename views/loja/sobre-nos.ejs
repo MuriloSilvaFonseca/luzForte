@@ -20,7 +20,6 @@
                     <h3 class="tituloNossaLoja tituloSobreNos">Nossa loja</h3>
                     <p class="legendaNossaLoja legendaNossaLoja1">Fundada em 2011 na cidade de São João da Boa Vista, a LuzForte surgiu do sonho de dois irmãos eletricistas que queriam oferecer materiais de alta qualidade com preço justo e atendimento especializado.</p>
                     <p class="legendaNossaLoja legendaNossaLoja2">Hoje, com mais de duas décadas de experiência, atendemos profissionais da elétrica, construtoras, empresas e consumidores finais em toda a região, tanto em nossas lojas físicas quanto pelo nosso e-commerce.</p>
-                    <p class="legendaNossaLoja legendaNossaLoja3">Hoje, com mais de duas décadas de experiência, atendemos profissionais da elétrica, construtoras, empresas e consumidores finais em toda a região, tanto em nossas lojas físicas quanto pelo nosso e-commerce.</p>
                 </div>     
 
                 <div class="alinhamentoImagemNossaLoja">
@@ -75,8 +74,12 @@
                 <h2 class="tituloFalarConosco">Pronto para falar com a <span class="vermelho">gente?</span></h2>
                 <p class="legendaFalarConosco">Visite-nos na nossa loja fisica ou compre conosco por aqui!</p>
                 <div class="botaoSobreNosPai">
-                    <button class="verProdutosSobreNos botaoSobreNos">Ver produtos</button>
-                    <button class="falarConoscoSobreNos botaoSobreNos">Fale com a gente</button>
+                    <a class="verProdutosSobreNos botaoSobreNos" href="/">Ver produtos</a>
+                    <% if (whatsappLoja) { %>
+                        <a class="falarConoscoSobreNos botaoSobreNos"
+                           href="https://wa.me/<%= whatsappLoja %>?text=<%= encodeURIComponent('Olá, vim pelo site da LuzForte') %>"
+                           target="_blank" rel="noopener noreferrer">Fale com a gente</a>
+                    <% } %>
                 </div>
             </div>
         </section>
