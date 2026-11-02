@@ -201,7 +201,11 @@
     gap: 15px;
     margin: auto;
 }
-.botaoSobreNosPai button{
+.botaoSobreNos{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
     margin-top: 35px;
     background-color: transparent;
     border: 3px solid rgba(30, 63, 109, 1);
@@ -211,7 +215,12 @@
     height: 63px;
     border-radius: 10px;
 }
-.botaoSobreNosPai button:hover{
+.botaoSobreNos:hover{
     background-color: rgba(30, 63, 109, 1);
     color: white;
+}
+
+.botaoSobreNos:focus-visible{
+    outline: 2px solid rgba(30, 63, 109, 1);
+    outline-offset: 4px;
 }

@@ -286,17 +286,6 @@
     transform: scaleX(1);
 }
 
-.link-menu-admin {
-    padding: 8px 12px;
-    border: 1px solid #ff7168;
-    border-radius: 5px;
-    background: #e5483a;
-    color: #fff;
-}
-
-.link-menu-admin::after { display: none; }
-.link-menu-admin:hover { background: #c9362a; color: #fff; }
-
 .link-destaque {
     color: #ff3b3b;
 }
