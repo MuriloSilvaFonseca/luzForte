@@ -1,0 +1,152 @@
+.admin-produto-pagina {
+  width: 100%;
+  max-width: 1050px;
+  margin-inline: auto;
+}
+.admin-complementos-botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-block: 10px;
+}
+
+.admin-complementos-painel {
+  display: grid;
+  gap: 10px;
+  margin-block: 12px;
+  padding: 16px;
+  border-radius: 6px;
+  background: #f5f7fa;
+}
+
+.admin-complementos-painel[hidden] {
+  display: none;
+}
+
+.admin-complementos-painel .admin-produto-label {
+  margin-bottom: 0;
+}
+
+.admin-complementos-detalhe {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin-block: 18px;
+  padding: 16px;
+  border: 1px solid #cfd7e1;
+  border-radius: 8px;
+}
+
+.admin-complementos-detalhe > legend {
+  padding-inline: 6px;
+  font-weight: 700;
+}
+
+.admin-complementos-painel .adm-btn:disabled {
+  cursor: wait;
+  opacity: .65;
+}
+
+.admin-produto-input-arquivo::file-selector-button {
+  min-height: 40px;
+  margin-right: 12px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 5px;
+  background: #14284b;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-produto-input-arquivo::file-selector-button:hover {
+  background: #1e3a64;
+}
+
+.admin-complementos-detalhe .admin-produto-input {
+  font: inherit;
+  resize: vertical;
+}
+
+.admin-textos-grupo {
+  min-width: 0;
+  margin-top: 20px;
+  padding: 16px 0;
+  border: 0;
+  border-top: 1px solid #dce2e9;
+}
+
+.admin-textos-grupo > legend {
+  padding-right: 12px;
+  color: #263445;
+  font-weight: 700;
+}
+
+.admin-textos-vinculo {
+  padding-block: 12px;
+  border-bottom: 1px solid #e4e8ed;
+}
+
+.admin-textos-vinculo > details {
+  margin-top: 8px;
+}
+
+.admin-textos-conteudo {
+  max-height: 220px;
+  margin-block: 12px;
+  overflow: auto;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+.admin-textos-editor,
+.admin-textos-seletor {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  background: #f5f7fa;
+  border-radius: 6px;
+}
+
+.admin-textos-editor[hidden],
+.admin-textos-seletor[hidden] {
+  display: none;
+}
+
+.admin-textos-aviso {
+  margin: 0 0 8px;
+  color: #713b10;
+  line-height: 1.5;
+}
+
+.admin-textos-exclusivos {
+  margin-top: 24px;
+  padding-block: 20px;
+  border-top: 1px solid #dce2e9;
+}
+
+.admin-textos-exclusivos > summary,
+.admin-textos-vinculo > details > summary {
+  cursor: pointer;
+  color: #263445;
+}
+
+.admin-textos-exclusivos > summary {
+  font-weight: 700;
+}
+
+.admin-textos-grupo .adm-btn:focus-visible {
+  outline: 2px solid #14284b;
+  outline-offset: 3px;
+}
+
+.admin-textos-grupo .adm-btn:disabled {
+  cursor: wait;
+  opacity: .6;
+}
+
+.admin-textos-grupo .admin-produto-input {
+  font: inherit;
+}

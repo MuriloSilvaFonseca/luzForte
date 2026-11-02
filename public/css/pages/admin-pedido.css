@@ -1,0 +1,27 @@
+.adm-pedido {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.adm-pedido__dados {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+}
+
+.adm-pedido__dados dt {
+  color: var(--adm-muted);
+  font-size: 14px;
+}
+
+.adm-pedido__dados dd {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.adm-pedido__observacoes {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

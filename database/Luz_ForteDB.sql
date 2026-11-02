@@ -307,11 +307,14 @@ CREATE TABLE `produto` (
   `ativo` enum('ativo','desativado','oculto') NOT NULL DEFAULT 'ativo',
   `GTIN_EAN` char(14) DEFAULT NULL,
   `marca_id` int NOT NULL,
-  `subcategoria_id` int NOT NULL,
+  `categoria_id` int NOT NULL,
+  `subcategoria_id` int DEFAULT NULL,
   PRIMARY KEY (`sku`),
   UNIQUE KEY `uq_produto_gtin_ean` (`GTIN_EAN`),
   KEY `fk_produto_marca` (`marca_id`),
+  KEY `fk_produto_categoria` (`categoria_id`),
   KEY `fk_produto_subcategoria` (`subcategoria_id`),
+  CONSTRAINT `fk_produto_categoria` FOREIGN KEY (`categoria_id`) REFERENCES `categoria` (`id_categoria`) ON DELETE RESTRICT,
   CONSTRAINT `fk_produto_marca` FOREIGN KEY (`marca_id`) REFERENCES `marca` (`id_marca`) ON DELETE RESTRICT,
   CONSTRAINT `fk_produto_subcategoria` FOREIGN KEY (`subcategoria_id`) REFERENCES `subcategoria` (`id_subcategoria`) ON DELETE RESTRICT,
   CONSTRAINT `chk_produto_custo` CHECK ((`custo_produto` >= 0)),
@@ -326,7 +329,7 @@ CREATE TABLE `produto` (
 
 LOCK TABLES `produto` WRITE;
 /*!40000 ALTER TABLE `produto` DISABLE KEYS */;
-INSERT INTO `produto` VALUES (1001,'Lâmpada LED 9W branca',50,12.90,7.00,'ativo',NULL,1,1),(1002,'Lâmpada LED 12W neutra',24,18.50,10.00,'ativo',NULL,1,1),(1003,'Painel LED 18W de sobrepor',8,59.90,35.00,'ativo',NULL,1,2),(1004,'Cabo flexível 2,5 mm² azul - metro',150,3.90,2.20,'ativo',NULL,2,3),(1005,'Cabo flexível 4 mm² preto - metro',80,6.50,3.80,'ativo',NULL,2,3),(1006,'Disjuntor monopolar 20A',15,22.00,13.00,'ativo',NULL,3,4),(1007,'Disjuntor bipolar 32A',0,48.00,29.00,'ativo',NULL,3,4),(1008,'Tomada 10A branca',35,14.90,8.00,'ativo',NULL,4,5),(1009,'Tomada 20A branca',18,17.90,10.00,'ativo',NULL,4,5),(1010,'Interruptor simples branco',22,11.50,6.00,'ativo',NULL,4,6),(1011,'Alicate universal 8 polegadas',4,39.90,24.00,'oculto',NULL,5,7),(1012,'Chave de fenda 1/4',0,16.90,9.50,'desativado',NULL,5,7);
+INSERT INTO `produto` VALUES (1001,'Lâmpada LED 9W branca',50,12.90,7.00,'ativo',NULL,1,1,1),(1002,'Lâmpada LED 12W neutra',24,18.50,10.00,'ativo',NULL,1,1,1),(1003,'Painel LED 18W de sobrepor',8,59.90,35.00,'ativo',NULL,1,1,2),(1004,'Cabo flexível 2,5 mm² azul - metro',150,3.90,2.20,'ativo',NULL,2,2,3),(1005,'Cabo flexível 4 mm² preto - metro',80,6.50,3.80,'ativo',NULL,2,2,3),(1006,'Disjuntor monopolar 20A',15,22.00,13.00,'ativo',NULL,3,3,4),(1007,'Disjuntor bipolar 32A',0,48.00,29.00,'ativo',NULL,3,3,4),(1008,'Tomada 10A branca',35,14.90,8.00,'ativo',NULL,4,4,5),(1009,'Tomada 20A branca',18,17.90,10.00,'ativo',NULL,4,4,5),(1010,'Interruptor simples branco',22,11.50,6.00,'ativo',NULL,4,4,6),(1011,'Alicate universal 8 polegadas',4,39.90,24.00,'oculto',NULL,5,5,7),(1012,'Chave de fenda 1/4',0,16.90,9.50,'desativado',NULL,5,5,7);
 /*!40000 ALTER TABLE `produto` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -437,6 +440,7 @@ CREATE TABLE `usuario` (
   `email` varchar(255) NOT NULL,
   `acesso` enum('admin','cliente') NOT NULL DEFAULT 'cliente',
   `telefone` varchar(20) NOT NULL,
+  `ativo` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id_usuario`),
   UNIQUE KEY `uq_usuario_email` (`email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -448,7 +452,7 @@ CREATE TABLE `usuario` (
 
 LOCK TABLES `usuario` WRITE;
 /*!40000 ALTER TABLE `usuario` DISABLE KEYS */;
-INSERT INTO `usuario` VALUES (1,'Administrador Teste','!LOGIN_DESABILITADO_SEED!','2026-08-01 13:00:00','usuario1@example.com','admin','19000000001'),(2,'Ana Oliveira','!LOGIN_DESABILITADO_SEED!','2026-08-02 13:00:00','usuario2@example.com','cliente','19000000002'),(3,'Bruno Santos','!LOGIN_DESABILITADO_SEED!','2026-08-03 13:00:00','usuario3@example.com','cliente','19000000003'),(4,'Carla Almeida','!LOGIN_DESABILITADO_SEED!','2026-08-04 13:00:00','usuario4@example.com','cliente','19000000004'),(5,'Diego Costa','!LOGIN_DESABILITADO_SEED!','2026-08-05 13:00:00','usuario5@example.com','cliente','19000000005'),(6,'Elisa Pereira','!LOGIN_DESABILITADO_SEED!','2026-08-06 13:00:00','usuario6@example.com','cliente','19000000006'),(7,'Felipe Rocha','!LOGIN_DESABILITADO_SEED!','2026-08-07 13:00:00','usuario7@example.com','cliente','19000000007'),(8,'Gabriela Lima','!LOGIN_DESABILITADO_SEED!','2026-08-08 13:00:00','usuario8@example.com','cliente','19000000008');
+INSERT INTO `usuario` (`id_usuario`, `nome_usuario`, `senha`, `data_criacao`, `email`, `acesso`, `telefone`) VALUES (1,'Administrador Teste','!LOGIN_DESABILITADO_SEED!','2026-08-01 13:00:00','usuario1@example.com','admin','19000000001'),(2,'Ana Oliveira','!LOGIN_DESABILITADO_SEED!','2026-08-02 13:00:00','usuario2@example.com','cliente','19000000002'),(3,'Bruno Santos','!LOGIN_DESABILITADO_SEED!','2026-08-03 13:00:00','usuario3@example.com','cliente','19000000003'),(4,'Carla Almeida','!LOGIN_DESABILITADO_SEED!','2026-08-04 13:00:00','usuario4@example.com','cliente','19000000004'),(5,'Diego Costa','!LOGIN_DESABILITADO_SEED!','2026-08-05 13:00:00','usuario5@example.com','cliente','19000000005'),(6,'Elisa Pereira','!LOGIN_DESABILITADO_SEED!','2026-08-06 13:00:00','usuario6@example.com','cliente','19000000006'),(7,'Felipe Rocha','!LOGIN_DESABILITADO_SEED!','2026-08-07 13:00:00','usuario7@example.com','cliente','19000000007'),(8,'Gabriela Lima','!LOGIN_DESABILITADO_SEED!','2026-08-08 13:00:00','usuario8@example.com','cliente','19000000008');
 /*!40000 ALTER TABLE `usuario` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -462,3 +466,23 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2026-10-19 22:02:58
+
+CREATE TABLE IF NOT EXISTS modelo_texto (
+  id_modelo_texto INT NOT NULL AUTO_INCREMENT,
+  tipo ENUM('descricao', 'especificacao', 'instalacao') NOT NULL,
+  nome VARCHAR(70) NOT NULL,
+  texto TEXT NOT NULL,
+  assinatura BINARY(32) GENERATED ALWAYS AS (UNHEX(SHA2(CONCAT(TRIM(nome), CHAR(0), TRIM(REPLACE(REPLACE(texto, CHAR(13,10), CHAR(10)), CHAR(13), CHAR(10)))), 256))) STORED,
+  UNIQUE KEY uq_modelo_tipo_conteudo (tipo, assinatura),
+  PRIMARY KEY (id_modelo_texto)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS produto_modelo_texto (
+  produto_sku INT NOT NULL,
+  modelo_texto_id INT NOT NULL,
+  PRIMARY KEY (produto_sku, modelo_texto_id),
+  CONSTRAINT fk_produto_modelo_produto FOREIGN KEY (produto_sku)
+    REFERENCES produto (sku) ON DELETE CASCADE,
+  CONSTRAINT fk_produto_modelo_texto FOREIGN KEY (modelo_texto_id)
+    REFERENCES modelo_texto (id_modelo_texto) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

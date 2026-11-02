@@ -1,6 +1,6 @@
 # LuzForte
 
-LuzForte é um projeto acadêmico de e-commerce de materiais elétricos, feito com **Node.js + Express + EJS** (banco MySQL nas próximas etapas).
+LuzForte é um projeto acadêmico de e-commerce de materiais elétricos, feito com **Node.js + Express + EJS + MySQL**.
 
 ## Como rodar
 
@@ -13,13 +13,24 @@ Pré-requisito: [Node.js](https://nodejs.org) instalado (versão 18 ou superior)
    npm install
    ```
 
-3. Suba o servidor:
+3. Configure o `.env` a partir do `.env.example`, incluindo MySQL e `SESSION_SECRET`.
+   Em um banco local já existente, prepare os campos e tabelas do admin com:
+
+   ```
+   node scripts/atualizar-banco-local.js
+   ```
+
+   Esse comando adiciona a estrutura necessária e preserva os registros. Faça backup
+   antes de atualizar um banco com dados importantes. O dump `database/Luz_ForteDB.sql`
+   contém exclusões de tabelas e deve ser usado somente na preparação de banco vazio.
+
+4. Suba o servidor:
 
    ```
    npm run dev
    ```
 
-4. Abra **http://localhost:3000** no navegador.
+5. Abra **http://localhost:3000** no navegador.
 
 O `nodemon` reinicia o servidor sozinho quando você salva um arquivo `.js`. Mudanças em `.ejs` e `.css` aparecem ao recarregar a página.
 
@@ -79,3 +90,5 @@ dois arquivos em sequência, pois o dump principal já inclui esses dados.
      res.render('area/minha-pagina')
    })
    ```
+
+Para verificar o código com banco simulado: `node --test tests/*.test.js`. Esses testes não alteram o MySQL.

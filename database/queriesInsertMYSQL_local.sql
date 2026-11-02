@@ -64,19 +64,19 @@ INSERT INTO usuario (id_usuario, nome_usuario, senha, data_criacao, email, acess
 (8, 'Gabriela Lima', '!LOGIN_DESABILITADO_SEED!', '2026-08-08 10:00:00', 'usuario8@example.com', 'cliente', '19000000008');
 
 -- produto
-INSERT INTO produto (sku, titulo_produto, estoque_produto, preco_produto, custo_produto, ativo, GTIN_EAN, marca_id, subcategoria_id) VALUES
-(1001, 'Lâmpada LED 9W branca', 50, 12.90, 7.00, 'ativo', NULL, 1, 1),
-(1002, 'Lâmpada LED 12W neutra', 24, 18.50, 10.00, 'ativo', NULL, 1, 1),
-(1003, 'Painel LED 18W de sobrepor', 8, 59.90, 35.00, 'ativo', NULL, 1, 2),
-(1004, 'Cabo flexível 2,5 mm² azul - metro', 150, 3.90, 2.20, 'ativo', NULL, 2, 3),
-(1005, 'Cabo flexível 4 mm² preto - metro', 80, 6.50, 3.80, 'ativo', NULL, 2, 3),
-(1006, 'Disjuntor monopolar 20A', 15, 22.00, 13.00, 'ativo', NULL, 3, 4),
-(1007, 'Disjuntor bipolar 32A', 0, 48.00, 29.00, 'ativo', NULL, 3, 4),
-(1008, 'Tomada 10A branca', 35, 14.90, 8.00, 'ativo', NULL, 4, 5),
-(1009, 'Tomada 20A branca', 18, 17.90, 10.00, 'ativo', NULL, 4, 5),
-(1010, 'Interruptor simples branco', 22, 11.50, 6.00, 'ativo', NULL, 4, 6),
-(1011, 'Alicate universal 8 polegadas', 4, 39.90, 24.00, 'oculto', NULL, 5, 7),
-(1012, 'Chave de fenda 1/4', 0, 16.90, 9.50, 'desativado', NULL, 5, 7);
+INSERT INTO produto (sku, titulo_produto, estoque_produto, preco_produto, custo_produto, ativo, GTIN_EAN, marca_id, categoria_id, subcategoria_id) VALUES
+(1001, 'Lâmpada LED 9W branca', 50, 12.90, 7.00, 'ativo', NULL, 1,1, 1),
+(1002, 'Lâmpada LED 12W neutra', 24, 18.50, 10.00, 'ativo', NULL, 1,1, 1),
+(1003, 'Painel LED 18W de sobrepor', 8, 59.90, 35.00, 'ativo', NULL, 1,1, 2),
+(1004, 'Cabo flexível 2,5 mm² azul - metro', 150, 3.90, 2.20, 'ativo', NULL, 2,2, 3),
+(1005, 'Cabo flexível 4 mm² preto - metro', 80, 6.50, 3.80, 'ativo', NULL, 2,2, 3),
+(1006, 'Disjuntor monopolar 20A', 15, 22.00, 13.00, 'ativo', NULL, 3,3, 4),
+(1007, 'Disjuntor bipolar 32A', 0, 48.00, 29.00, 'ativo', NULL, 3,3, 4),
+(1008, 'Tomada 10A branca', 35, 14.90, 8.00, 'ativo', NULL, 4,4, 5),
+(1009, 'Tomada 20A branca', 18, 17.90, 10.00, 'ativo', NULL, 4,4, 5),
+(1010, 'Interruptor simples branco', 22, 11.50, 6.00, 'ativo', NULL, 4,4, 6),
+(1011, 'Alicate universal 8 polegadas', 4, 39.90, 24.00, 'oculto', NULL, 5,5, 7),
+(1012, 'Chave de fenda 1/4', 0, 16.90, 9.50, 'desativado', NULL, 5,5, 7);
 
 -- descricao
 INSERT INTO descricao (id_descricao, nome_descricao, texto_descricao, produto_sku) VALUES

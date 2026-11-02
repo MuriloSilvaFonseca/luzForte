@@ -6,7 +6,7 @@ const router = express.Router()
 router.get('/', async (req, res) => {
   const filtros = ["p.ativo = 'ativo'"]
   const valores = []
-  for (const [parametro, coluna] of [['categoria', 's.categoria_id'], ['subcategoria', 'p.subcategoria_id'], ['marca', 'p.marca_id']]) {
+  for (const [parametro, coluna] of [['categoria', 'p.categoria_id'], ['subcategoria', 'p.subcategoria_id'], ['marca', 'p.marca_id']]) {
     // Valor vazio (opção "Todas" do formulário) significa: sem esse filtro
     if (req.query[parametro] !== undefined && req.query[parametro] !== '') {
       const valor = Number(req.query[parametro])
@@ -28,8 +28,8 @@ router.get('/', async (req, res) => {
     const [produtos] = await conexao.promise().execute(`
       SELECT p.sku, p.titulo_produto, p.preco_produto, p.estoque_produto,
              m.nome AS marca, i.url AS imagem, s.nome AS subcategoria, c.nome AS categoria
-      FROM produto p JOIN subcategoria s ON s.id_subcategoria = p.subcategoria_id
-      JOIN categoria c ON c.id_categoria = s.categoria_id
+      FROM produto p LEFT JOIN subcategoria s ON s.id_subcategoria = p.subcategoria_id
+      JOIN categoria c ON c.id_categoria = p.categoria_id
       JOIN marca m ON m.id_marca = p.marca_id
       LEFT JOIN imagem_produto i ON i.produto_sku = p.sku AND i.ordem = 1
       WHERE ${filtros.join(' AND ')} ORDER BY ${ordem}`, valores)
@@ -51,8 +51,8 @@ router.get('/:sku', async (req, res) => {
       SELECT p.sku, p.titulo_produto, p.preco_produto, p.estoque_produto,
              m.nome AS marca, s.nome AS subcategoria, c.nome AS categoria, c.id_categoria
       FROM produto p JOIN marca m ON m.id_marca = p.marca_id
-      JOIN subcategoria s ON s.id_subcategoria = p.subcategoria_id
-      JOIN categoria c ON c.id_categoria = s.categoria_id
+      LEFT JOIN subcategoria s ON s.id_subcategoria = p.subcategoria_id
+      JOIN categoria c ON c.id_categoria = p.categoria_id
       WHERE p.sku = ? AND p.ativo = 'ativo'`, [sku])
     if (!produtos.length) return res.status(404).json({ erro: 'Produto não encontrado.' })
         const [[imagens], [descricoes], [especificacoes], [instalacoes], [resumo], [distribuicao], [lista]] = await Promise.all([
@@ -68,6 +68,14 @@ router.get('/:sku', async (req, res) => {
                      WHERE a.produto_sku = ? AND a.status = 'aprovada'
                      ORDER BY a.data_criacao DESC LIMIT 20`, [sku])
     ])
+    const [compartilhados] = await banco.execute(`
+      SELECT m.tipo, m.nome, m.texto FROM produto_modelo_texto v
+      JOIN modelo_texto m ON m.id_modelo_texto = v.modelo_texto_id
+      WHERE v.produto_sku = ? ORDER BY m.id_modelo_texto`, [sku])
+    for (const modelo of compartilhados) {
+      const listas = { descricao: descricoes, especificacao: especificacoes, instalacao: instalacoes }
+      listas[modelo.tipo].push({ ['nome_' + modelo.tipo]: modelo.nome, ['texto_' + modelo.tipo]: modelo.texto })
+    }
     res.json({
       produto: produtos[0], imagens, descricoes, especificacoes, instalacoes,
       avaliacao: { quantidade: resumo[0].quantidade, media: Number(resumo[0].media) },

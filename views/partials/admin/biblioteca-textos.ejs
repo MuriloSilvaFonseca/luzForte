@@ -1,0 +1,58 @@
+<section class="admin-produto-secao" aria-labelledby="biblioteca-textos-titulo">
+  <h2 class="admin-produto-secao-titulo" id="biblioteca-textos-titulo">Textos do produto</h2>
+  <p class="admin-produto-ajuda">Escolha um texto da biblioteca ou crie um novo. O mesmo texto pode ser usado em vários produtos.</p>
+  <p class="admin-produto-ajuda">Os vínculos são salvos com o produto. Textos criados ou editados na biblioteca são salvos na hora.</p>
+  <p class="admin-produto-ajuda"><a href="/admin/cadastros#cadastros-textos" target="_blank" rel="noopener">Consultar todos os textos e marcas</a></p>
+  <noscript>Ative o JavaScript para escolher e editar textos da biblioteca.</noscript>
+  <% [['descricao', 'Descrição'], ['especificacao', 'Especificação'], ['instalacao', 'Instalação']].forEach(function ([tipo, rotulo]) { %>
+    <fieldset class="admin-textos-grupo" data-biblioteca="<%= tipo %>">
+      <legend><%= rotulo %></legend>
+      <div class="admin-textos-vinculados">
+        <% (locals.modelosSelecionados || []).filter(m => m.tipo === tipo).forEach(function (modelo) { %>
+          <article class="admin-textos-vinculo" data-modelo-id="<%= modelo.id %>">
+            <input type="hidden" name="modelos" value="<%= modelo.id %>">
+            <strong data-nome><%= modelo.nome %></strong>
+            <details><summary>Ver texto</summary><p class="admin-textos-conteudo" data-texto><%= modelo.texto %></p></details>
+            <div class="admin-complementos-botoes">
+              <button class="adm-btn adm-btn--sm" type="button" data-copiar-modelo>Usar como base e editar</button>
+              <button class="adm-btn adm-btn--sm" type="button" data-editar-modelo>Editar texto compartilhado</button>
+              <button class="adm-btn adm-btn--sm" type="button" data-desvincular>Retirar deste produto</button>
+            </div>
+            <span data-usos hidden><%= modelo.usos %></span>
+          </article>
+        <% }) %>
+      </div>
+      <div class="admin-complementos-botoes">
+        <button class="adm-btn" type="button" data-escolher-texto>Escolher texto salvo</button>
+        <button class="adm-btn" type="button" data-novo-modelo>Criar texto</button>
+      </div>
+      <div class="admin-textos-seletor" data-seletor hidden>
+        <label class="admin-produto-label" for="buscar-modelo-<%= tipo %>">Buscar na biblioteca</label>
+        <div class="admin-complementos-botoes">
+          <input class="admin-produto-input" id="buscar-modelo-<%= tipo %>" type="search" maxlength="200" placeholder="Busque pelo título ou conteúdo" data-busca-modelo>
+          <button class="adm-btn" type="button" data-buscar-modelos>Buscar</button>
+        </div>
+        <label class="admin-produto-label" for="escolher-modelo-<%= tipo %>">Texto salvo</label>
+        <select class="admin-produto-input" id="escolher-modelo-<%= tipo %>" data-lista-modelos><option value="">Selecione um texto</option></select>
+        <p class="admin-textos-conteudo" data-previa></p>
+        <div class="admin-complementos-botoes">
+          <button class="adm-btn adm-btn--primary" type="button" data-usar-modelo>Usar neste produto</button>
+          <button class="adm-btn" type="button" data-usar-base>Usar como base e editar</button>
+          <button class="adm-btn" type="button" data-fechar-seletor>Fechar</button>
+        </div>
+      </div>
+      <div class="admin-textos-editor" data-editor hidden>
+        <p class="admin-textos-aviso" data-aviso-modelo></p>
+        <label class="admin-produto-label" for="nome-modelo-<%= tipo %>">Título do texto</label>
+        <input class="admin-produto-input" id="nome-modelo-<%= tipo %>" maxlength="70" data-nome-modelo>
+        <label class="admin-produto-label" for="texto-modelo-<%= tipo %>">Conteúdo</label>
+        <textarea class="admin-produto-input admin-produto-textarea" id="texto-modelo-<%= tipo %>" rows="4" data-texto-modelo></textarea>
+        <div class="admin-complementos-botoes">
+          <button class="adm-btn adm-btn--primary" type="button" data-salvar-modelo>Salvar texto e usar</button>
+          <button class="adm-btn" type="button" data-cancelar-modelo>Cancelar</button>
+        </div>
+      </div>
+      <p class="admin-produto-ajuda" role="status" data-mensagem-biblioteca></p>
+    </fieldset>
+  <% }) %>
+</section>

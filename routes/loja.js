@@ -60,6 +60,7 @@ router.get('/catalogo', (req, res) => {
       marcas,
       filtros: {
         categoria: req.query.categoria,
+        subcategoria: req.query.subcategoria,
         marca: req.query.marca,
         busca: req.query.q,
         ordenar: req.query.ordenar

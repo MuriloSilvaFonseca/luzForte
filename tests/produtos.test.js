@@ -12,6 +12,7 @@ test('catálogo mantém filtros parametrizados, ordenação segura e detalhes re
       consultas.push({ sql, valores })
       if (sql.includes('FROM produto p')) return [valores[0] === 999 ? [] : [{ sku: 1001, titulo_produto: 'Produto de teste', preco_produto: '12.90' }]]
       if (sql.includes('FROM imagem_produto')) return [[{ url: '/img/teste.png' }]]
+      if (sql.includes('FROM produto_modelo_texto')) return [[{ tipo: 'descricao', nome: 'Compartilhado', texto: 'Texto da biblioteca' }]]
       if (sql.includes('FROM descricao')) return [[{ nome_descricao: 'Descrição', texto_descricao: '<texto>' }]]
       if (sql.includes('FROM especificacao')) return [[{ nome_especificacao: 'Potência', texto_especificacao: '9W' }]]
       if (sql.includes('FROM instalacao')) return [[{ nome_instalacao: 'Instalação', texto_instalacao: 'Instrução' }]]
@@ -40,6 +41,7 @@ test('catálogo mantém filtros parametrizados, ordenação segura e detalhes re
     assert.equal(detalhe.produto.sku, 1001)
     assert.equal(detalhe.imagens[0].url, '/img/teste.png')
     assert.equal(detalhe.descricoes[0].texto_descricao, '<texto>')
+    assert.equal(detalhe.descricoes[1].texto_descricao, 'Texto da biblioteca')
     assert.equal(detalhe.especificacoes.length, 1)
     assert.equal(detalhe.instalacoes.length, 1)
     assert.equal(detalhe.avaliacao.quantidade, 2)

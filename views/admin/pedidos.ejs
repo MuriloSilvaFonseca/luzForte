@@ -15,6 +15,7 @@
   }
 %>
 
+<link rel="stylesheet" href="/css/pages/admin-gestao.css">
 <nav class="adm-breadcrumb" aria-label="Você está em">
   <a href="/admin">Administração</a>
   <span>Pedidos</span>
@@ -27,6 +28,7 @@
   </div>
 </div>
 
+<% if (salvo) { %><p class="adm-alert adm-alert--success" role="status">Status do pedido atualizado.</p><% } %>
 <nav class="adm-chips" aria-label="Filtrar por status">
   <% abas.forEach(function (a) { %>
     <a class="adm-chip<%= (filtros.status || '') === a.id ? ' is-active' : '' %>" href="<%= linkPedidos({ status: a.id }) %>" <%- filtros.status === a.id ? 'aria-current="page"' : '' %>>
@@ -65,7 +67,7 @@
         <% } %>
         <% pedidos.forEach(function (p) { %>
           <tr id="pedido-<%= p.id %>">
-            <td><strong>#<%= p.id %></strong></td>
+            <td><a href="/admin/pedidos/<%= p.id %>"><strong>#<%= p.id %></strong></a></td>
             <td><%= p.data %></td>
             <td>
               <div class="adm-prod__name"><%= p.cliente || 'Cliente visitante' %></div>
@@ -81,6 +83,7 @@
             <td class="is-num"><%= p.itens %></td>
             <td class="is-num"><strong><%= moeda(p.total) %></strong></td>
             <td class="is-actions">
+              <a class="adm-btn adm-btn--sm" href="/admin/pedidos/<%= p.id %>" aria-label="Ver pedido <%= p.id %>">Ver pedido</a>
               <button class="adm-btn adm-btn--sm adm-btn--icon adm-btn--icon-info" type="button" data-ver-pedido
                       data-url="/admin/pedidos/<%= p.id %>/detalhes" aria-haspopup="dialog"
                       aria-label="Ver detalhes do pedido <%= p.id %>" title="Ver detalhes">

@@ -1,0 +1,17 @@
+<div class="admin-complementos-painel" id="cadastro-<%= tipoCadastro %>" role="group" aria-labelledby="titulo-cadastro-<%= tipoCadastro %>" hidden>
+  <strong id="titulo-cadastro-<%= tipoCadastro %>"><%= tituloCadastro %></strong>
+  <% if (tipoCadastro === 'subcategoria') { %>
+    <label class="admin-produto-label" for="cadastro-categoria-pai">Categoria</label>
+    <select class="admin-produto-input" id="cadastro-categoria-pai" name="categoria_id" form="cadastro-subcategoria-form" required>
+      <option value="">Selecione uma categoria</option>
+    </select>
+    <button class="adm-btn adm-btn--sm" type="button" id="recarregar-categorias">Recarregar categorias</button>
+  <% } %>
+  <label class="admin-produto-label" for="cadastro-nome-<%= tipoCadastro %>">Nome da <%= tipoCadastro %></label>
+  <input class="admin-produto-input" id="cadastro-nome-<%= tipoCadastro %>" name="nome" maxlength="<%= limiteCadastro %>" form="cadastro-<%= tipoCadastro %>-form" required>
+  <div class="admin-complementos-botoes">
+    <button class="adm-btn adm-btn--primary" type="submit" form="cadastro-<%= tipoCadastro %>-form" data-salvar-cadastro>Salvar <%= tipoCadastro %></button>
+    <button class="adm-btn" type="button" data-fechar-cadastro="<%= tipoCadastro %>">Cancelar</button>
+  </div>
+  <p class="admin-produto-ajuda" role="status" data-mensagem></p>
+</div>

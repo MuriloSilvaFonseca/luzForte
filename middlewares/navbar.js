@@ -4,8 +4,7 @@ const conexao = require('../config/database')
 const categoriasSql = `
   SELECT c.id_categoria, c.nome, COUNT(p.sku) AS produtos_ativos
   FROM categoria c
-  LEFT JOIN subcategoria s ON s.categoria_id = c.id_categoria
-  LEFT JOIN produto p ON p.subcategoria_id = s.id_subcategoria AND p.ativo = 'ativo'
+  LEFT JOIN produto p ON p.categoria_id = c.id_categoria AND p.ativo = 'ativo'
   GROUP BY c.id_categoria, c.nome
   ORDER BY produtos_ativos DESC, c.nome ASC, c.id_categoria ASC
 `

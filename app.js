@@ -9,9 +9,9 @@ const rotasAdmin = require('./routes/admin-paineis')
 // Neon (futuro): exige DATABASE_URL no .env.
 // const produtosApi = require('./routes/api-produtos')
 const app = express()
-const porta = 3000
+const porta = Number(process.env.PORT || 3000)
 
-app.use(express.urlencoded({ extended: true }))
+app.use(express.urlencoded({ extended: true, limit: '1mb' }))
 
 app.use( sessao({
   secret: process.env.SESSION_SECRET,
@@ -33,6 +33,7 @@ app.use((req, res, next) => {
 })
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
+app.use(require('./middlewares/usuario-ativo'))
 
 app.use('/api/carrinho', require('./routes/carrinho'))
 app.use('/api/produtos', require('./routes/produtos'))
@@ -71,6 +72,10 @@ app.use((erro, req, res, next) => {
   })
 })
 
-app.listen(porta, () => {
-  console.log('Servidor rodando em http://localhost:' + porta)
-})
+if (require.main === module) {
+  app.listen(porta, () => {
+    console.log('Servidor rodando em http://localhost:' + porta)
+  })
+}
+
+module.exports = app

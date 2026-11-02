@@ -1,0 +1,71 @@
+<%- include('../partials/admin/admin-topo', { pagina: 'cadastros', titulo: 'Marcas, categorias e textos' }) %>
+<link rel="stylesheet" href="/css/pages/admin-cadastros.css">
+<div class="adm-pagehead">
+  <div><h1>Marcas, categorias e textos</h1><p>Consulte os cadastros e aproveite um texto como base para criar uma nova versão.</p></div>
+  <button class="adm-btn adm-btn--primary" type="button" id="novo-texto">Criar texto</button>
+</div>
+<% if (salvo || existente) { %><p class="adm-alert adm-alert--success" role="status"><%= existente ? 'O conteúdo já estava cadastrado. O texto existente foi reutilizado, sem criar uma repetição.' : 'Novo texto salvo na biblioteca. O original foi mantido.' %></p><% } %>
+<form class="adm-card adm-filters" method="get" action="/admin/cadastros">
+  <select class="adm-field" name="tipo" aria-label="O que deseja ver" onchange="this.form.submit()">
+    <% [['textos','Textos'],['marcas','Marcas'],['categorias','Categorias'],['subcategorias','Subcategorias']].forEach(function ([valor, rotulo]) { %><option value="<%= valor %>"<%= tipo === valor ? ' selected' : '' %>><%= rotulo %></option><% }) %>
+  </select>
+  <% if (tipo === 'textos') { %>
+    <select class="adm-field" name="texto_tipo" aria-label="Tipo de texto" onchange="this.form.submit()"><option value="">Todos os textos</option>
+      <% [['descricao','Descrições'],['especificacao','Especificações'],['instalacao','Instalações']].forEach(function ([valor,rotulo]) { %><option value="<%= valor %>"<%= textoTipo === valor ? ' selected' : '' %>><%= rotulo %></option><% }) %>
+    </select>
+  <% } %>
+  <input class="adm-field adm-field--search" name="q" type="search" maxlength="200" value="<%= q %>" placeholder="Buscar nome, conteúdo ou voltagem" aria-label="Buscar cadastros">
+  <button class="adm-btn" type="submit">Buscar</button><a class="adm-btn" href="/admin/cadastros?tipo=<%= tipo %>">Limpar busca</a>
+</form>
+<section class="adm-card admin-cadastros-editor" id="editor-texto" hidden>
+  <h2 id="editor-texto-titulo">Novo texto</h2>
+  <p>Altere o que precisar, como 127 V para 220 V. Salvar cria uma nova versão sem mudar o texto original.</p>
+  <form id="form-texto">
+    <label for="tipo-texto">Tipo</label><select class="adm-field" id="tipo-texto" required><option value="descricao">Descrição</option><option value="especificacao">Especificação</option><option value="instalacao">Instalação</option></select>
+    <label for="nome-texto">Título</label><input class="adm-field" id="nome-texto" maxlength="70" required>
+    <label for="conteudo-texto">Conteúdo</label><textarea class="adm-field" id="conteudo-texto" rows="6" required></textarea>
+    <div class="admin-cadastros-acoes"><button class="adm-btn adm-btn--primary" type="submit">Salvar novo texto</button><button class="adm-btn" type="button" id="cancelar-texto">Cancelar</button></div>
+    <p role="status" id="mensagem-texto"></p>
+  </form>
+</section>
+<% const rotulos = { descricao: 'Descrição', especificacao: 'Especificação', instalacao: 'Instalação' } %>
+<% if (tipo === 'textos') { %>
+<section class="adm-card admin-cadastros-secao" id="cadastros-textos">
+  <h2>Textos da biblioteca</h2><p>Textos de mesmo tipo, título e conteúdo não são cadastrados novamente. Títulos iguais com conteúdos diferentes podem representar versões como 127 V e 220 V.</p>
+  <div class="adm-tablewrap"><table class="adm-table"><thead><tr><th>Tipo</th><th>Título e conteúdo</th><th>Produtos vinculados</th><th>Ação</th></tr></thead><tbody>
+    <% if (!textos.length) { %><tr><td colspan="4">Nenhum texto encontrado.</td></tr><% } %>
+    <% textos.forEach(function (texto) { %>
+      <tr data-texto-base data-tipo="<%= texto.tipo %>"><td><%= rotulos[texto.tipo] %></td>
+        <td><strong data-nome><%= texto.nome %></strong><p class="admin-cadastros-resumo"><%= texto.texto.slice(0, 120) %><%= texto.texto.length > 120 ? '…' : '' %></p><details><summary>Ver conteúdo completo</summary><p class="admin-cadastros-conteudo" data-conteudo><%= texto.texto %></p></details></td>
+        <td><%= texto.usos %></td><td><button class="adm-btn adm-btn--sm" type="button" data-usar-base>Usar como base e editar</button></td>
+      </tr>
+    <% }) %>
+  </tbody></table></div>
+</section>
+<% } %>
+<% if (tipo === 'marcas') { %>
+<section class="adm-card admin-cadastros-secao" id="cadastros-marcas"><h2>Marcas</h2>
+  <div class="adm-tablewrap"><table class="adm-table"><thead><tr><th>Nome</th><th>Produtos</th></tr></thead><tbody>
+    <% if (!marcas.length) { %><tr><td colspan="2">Nenhuma marca encontrada.</td></tr><% } %>
+    <% marcas.forEach(function (marca) { %><tr><td><%= marca.nome %></td><td><%= marca.produtos %></td></tr><% }) %>
+  </tbody></table></div>
+</section>
+<% } %>
+<% if (tipo === 'categorias') { %>
+<section class="adm-card admin-cadastros-secao" id="cadastros-categorias"><h2>Categorias</h2>
+  <p>A categoria pode ser usada diretamente no produto. Cadastrar subcategorias é opcional.</p>
+  <div class="adm-tablewrap"><table class="adm-table"><thead><tr><th>Nome</th><th>Subcategorias</th><th>Produtos</th></tr></thead><tbody>
+    <% if (!categorias.length) { %><tr><td colspan="3">Nenhuma categoria encontrada.</td></tr><% } %>
+    <% categorias.forEach(function (categoria) { %><tr><td><%= categoria.nome %></td><td><%= categoria.subcategorias %></td><td><%= categoria.produtos %></td></tr><% }) %>
+  </tbody></table></div>
+</section>
+<% } %>
+<% if (tipo === 'subcategorias') { %>
+<section class="adm-card admin-cadastros-secao" id="cadastros-subcategorias"><h2>Subcategorias</h2>
+  <div class="adm-tablewrap"><table class="adm-table"><thead><tr><th>Categoria</th><th>Subcategoria</th><th>Produtos</th></tr></thead><tbody>
+    <% if (!subcategorias.length) { %><tr><td colspan="3">Nenhuma subcategoria encontrada.</td></tr><% } %>
+    <% subcategorias.forEach(function (subcategoria) { %><tr><td><%= subcategoria.categoria %></td><td><%= subcategoria.nome %></td><td><%= subcategoria.produtos %></td></tr><% }) %>
+  </tbody></table></div>
+</section>
+<% } %>
+<%- include('../partials/admin/admin-rodape', { scripts: ['/js/pages/admin-cadastros.js'] }) %>

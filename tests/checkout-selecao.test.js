@@ -15,11 +15,14 @@ const conexao = {
   release() {},
   async execute(sql, args = []) {
     sql = sql.trim().replace(/\s+/g, ' ')
+    if (sql.includes('GET_LOCK')) return [[{ obtida: 1 }]]
+    if (sql.includes('RELEASE_LOCK')) return [[{ liberada: 1 }]]
     if (sql.startsWith('SELECT id_usuario')) return [[{ id_usuario: 7 }]]
     if (sql.startsWith('SELECT id_pedido')) return [pedidos.filter(p => p.usuario_id === args[0] && p.status === 'carrinho')]
     if (sql.startsWith('SELECT id_forma_pagamento')) return [[{ id_forma_pagamento: 1, nome_pagamento: 'Pix' }]]
     if (sql.startsWith('SELECT pp.')) return [itens.filter(i => i.pedido_id === args[0]).map(i => ({ ...i, subtotal: (Number(i.preco_unitario) * i.quantidade).toFixed(2) }))]
     if (sql.startsWith('INSERT INTO pedido')) {
+      assert.ok(!pedidos.some(p => p.usuario_id === args[0] && p.status === 'carrinho'), 'Uma conta não pode ter dois carrinhos ativos')
       pedidos.push({ id_pedido: 2, usuario_id: args[0], status: 'carrinho' })
       return [{ insertId: 2 }]
     }
