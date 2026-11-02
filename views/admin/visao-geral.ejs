@@ -4,6 +4,7 @@
   const moeda = (v) => 'R$ ' + Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })
 %>
 
+<link rel="stylesheet" href="/css/pages/admin-gestao.css">
 <nav class="adm-breadcrumb" aria-label="Você está em">
   <a href="/admin">Administração</a>
   <span>Visão geral</span>
@@ -17,57 +18,32 @@
   <a class="adm-btn adm-btn--primary" href="/admin/produtos/novo">+ Cadastrar produto</a>
 </div>
 
-<section class="adm-kpis" aria-label="Indicadores">
-  <article class="adm-card adm-kpi">
-    <p class="adm-kpi__label">Pedidos hoje</p>
-    <p class="adm-kpi__value"><%= resumo.pedidosHoje %></p>
-    <p class="adm-kpi__hint"><%= resumo.pedidosAguardando %> aguardando envio</p>
-  </article>
-  <article class="adm-card adm-kpi">
-    <p class="adm-kpi__label">Faturamento do mês</p>
-    <p class="adm-kpi__value"><%= moeda(resumo.faturamentoMes) %></p>
-    <p class="adm-kpi__hint">Pedidos pagos</p>
-  </article>
-  <article class="adm-card adm-kpi">
-    <p class="adm-kpi__label">Produtos ativos</p>
-    <p class="adm-kpi__value"><%= resumo.produtosAtivos %></p>
-    <p class="adm-kpi__hint"><%= resumo.estoqueBaixo %> com estoque baixo</p>
-  </article>
-  <article class="adm-card adm-kpi adm-kpi--alert">
-    <p class="adm-kpi__label">Avaliações pendentes</p>
-    <p class="adm-kpi__value"><%= resumo.avaliacoesPendentes %></p>
-    <p class="adm-kpi__hint"><a href="/admin/avaliacoes?status=pendente">Moderar agora</a></p>
-  </article>
+<section class="adm-card admin-dashboard-financeiro" aria-labelledby="dashboard-faturamento">
+  <div class="admin-dashboard-financeiro__principal">
+    <h2 id="dashboard-faturamento">Faturamento</h2>
+    <p class="admin-dashboard-financeiro__valor"><%= moeda(financeiro.total) %></p>
+    <p class="admin-dashboard-financeiro__nota">Todo o período · Todos os status</p>
+    <p class="admin-dashboard-financeiro__nota">Inclui pedidos cancelados e carrinhos.</p>
+  </div>
+  <dl class="admin-dashboard-financeiro__status">
+    <% financeiro.status.forEach(function (item) { %>
+      <div>
+        <dt><%= item.nome %></dt>
+        <dd><%= moeda(item.total) %></dd>
+      </div>
+    <% }) %>
+  </dl>
 </section>
-
-<div class="adm-grid-2">
-  <section class="adm-card">
-    <header class="adm-card__head">
-      <h2>Últimos pedidos</h2>
-      <a href="/admin/pedidos">Ver todos</a>
-    </header>
-    <div class="adm-tablewrap">
-      <table class="adm-table">
-        <thead>
-          <tr><th>Pedido</th><th>Cliente</th><th>Status</th><th class="is-num">Total</th></tr>
-        </thead>
-        <tbody>
-          <% if (ultimosPedidos.length === 0) { %>
-            <tr><td colspan="4"><div class="adm-empty">Nenhum pedido ainda.</div></td></tr>
-          <% } %>
-          <% ultimosPedidos.forEach(function (p) { %>
-            <tr>
-              <td><a href="/admin/pedidos#pedido-<%= p.id %>"><strong>#<%= p.id %></strong></a></td>
-              <td><%= p.cliente %></td>
-              <td><span class="adm-badge adm-badge--<%= p.statusCor %>"><%= p.status %></span></td>
-              <td class="is-num"><%= moeda(p.total) %></td>
-            </tr>
-          <% }) %>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
+<div class="adm-grid-2 admin-dashboard-pedidos">
+  <% grupos.forEach(function (grupo) { %><%- include('../partials/admin/resumo-pedidos', { grupo, moeda }) %><% }) %>
+</div>
+<section class="adm-kpis admin-gestao-indicadores" aria-label="Indicadores">
+  <article class="adm-card adm-kpi"><p class="adm-kpi__label">Pedidos hoje</p><p class="adm-kpi__value"><%= resumo.pedidosHoje %></p><p class="adm-kpi__hint">Pedidos registrados, sem carrinhos</p></article>
+  <article class="adm-card adm-kpi"><p class="adm-kpi__label">Produtos ativos</p><p class="adm-kpi__value"><a href="/admin/produtos?status=ativo"><%= resumo.produtosAtivos %></a></p><p class="adm-kpi__hint">Disponíveis no catálogo</p></article>
+  <article class="adm-card adm-kpi"><p class="adm-kpi__label">Usuários ativos</p><p class="adm-kpi__value"><a href="/admin/usuarios?situacao=ativo"><%= resumo.usuariosAtivos %></a></p><p class="adm-kpi__hint">Contas com acesso liberado</p></article>
+  <article class="adm-card adm-kpi"><p class="adm-kpi__label">Estoque baixo</p><p class="adm-kpi__value"><a href="/admin/produtos?estoque=baixo&status=ativo"><%= resumo.estoqueBaixo %></a></p><p class="adm-kpi__hint">Produtos ativos com até 5 unidades</p></article>
+</section>
+<div class="admin-gestao-estoque">
   <section class="adm-card">
     <header class="adm-card__head">
       <h2>Estoque baixo</h2>

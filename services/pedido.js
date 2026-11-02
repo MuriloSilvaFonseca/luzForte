@@ -101,6 +101,10 @@ async function finalizarPedido(usuarioId, formaPagamentoId, selecao) {
     const total = totalItens(selecionados)
     // Finaliza o pedido existente e move somente os desmarcados para outro carrinho.
     // Tudo fica na mesma transação, preservando preços e quantidades do banco.
+    await conexao.execute(
+      "UPDATE pedido SET valor_produtos = ?, total = ?, forma_pagamento_id = ?, status = 'solicitado' WHERE id_pedido = ? AND usuario_id = ? AND status = 'carrinho'",
+      [total, total, formaPagamentoId, pedidoId, usuarioId]
+    )
     if (selecionados.length < itens.length) {
       const [novo] = await conexao.execute("INSERT INTO pedido (usuario_id, status) VALUES (?, 'carrinho')", [usuarioId])
       for (const item of itens.filter(item => !selecao.includes(item.produto_sku))) {
@@ -109,10 +113,7 @@ async function finalizarPedido(usuarioId, formaPagamentoId, selecao) {
       await conexao.execute('UPDATE pedido SET valor_produtos = (SELECT COALESCE(SUM(quantidade * preco_unitario), 0) FROM produto_pedido WHERE pedido_id = ?), total = valor_produtos WHERE id_pedido = ?', [novo.insertId, novo.insertId])
     }
     await conexao.execute('UPDATE produto_pedido SET subtotal = quantidade * preco_unitario WHERE pedido_id = ?', [pedidoId])
-    await conexao.execute(
-      "UPDATE pedido SET valor_produtos = ?, total = ?, forma_pagamento_id = ?, status = 'solicitado' WHERE id_pedido = ? AND usuario_id = ? AND status = 'carrinho'",
-      [total, total, formaPagamentoId, pedidoId, usuarioId]
-    )
+
 
     await conexao.commit()
     transacao = false

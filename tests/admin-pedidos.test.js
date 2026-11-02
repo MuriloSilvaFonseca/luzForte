@@ -5,7 +5,7 @@ const express = require('express')
 
 test('listagem administrativa de pedidos lê o banco com filtros e paginação', async t => {
   const consultas = []
-  const estados = ['carrinho', 'solicitado', 'aprovado', 'finalizado', 'cancelado']
+  const estados = ['solicitado', 'aprovado', 'finalizado', 'cancelado']
   let total
   let linhas
   let falharEm
@@ -37,7 +37,7 @@ test('listagem administrativa de pedidos lê o banco com filtros e paginação',
   const caminhoBanco = require.resolve('../config/database')
   require.cache[caminhoBanco] = {
     id: caminhoBanco, filename: caminhoBanco, loaded: true,
-    exports: { promise: () => ({ query: consultar }) }
+    exports: { promise: () => ({ execute: async (sql, valores) => { if (!sql.startsWith('SELECT acesso FROM usuario')) throw new Error('Consulta de acesso inesperada'); return [[{ acesso: valores[0] === 1 ? 'admin' : 'cliente' }]] }, query: consultar }) }
   }
   delete require.cache[require.resolve('../routes/admin-paineis')]
   const app = express()
@@ -45,7 +45,7 @@ test('listagem administrativa de pedidos lê o banco com filtros e paginação',
   app.set('views', path.join(__dirname, '../views'))
   app.use((req, res, next) => {
     const perfil = req.get('x-perfil-teste') || 'admin'
-    req.session = perfil === 'visitante' ? {} : { usuario: { id_usuario: 1, acesso: perfil } }
+    req.session = perfil === 'visitante' ? {} : { usuario: { id_usuario: perfil === 'admin' ? 1 : 99, acesso: perfil } }
     next()
   })
   app.use('/admin', require('../routes/admin-paineis'))
@@ -64,13 +64,12 @@ test('listagem administrativa de pedidos lê o banco com filtros e paginação',
   }
 
   try {
-    await t.test('listagem abre sem autenticação para visitantes e clientes', async () => {
+    await t.test('visitantes e clientes não acessam a listagem', async () => {
       for (const perfil of ['visitante', 'cliente']) {
         reiniciar()
         const resposta = await pedir('', perfil)
-        assert.equal(resposta.status, 200, perfil)
-        assert.match(await resposta.text(), /#9876/)
-        assert.equal(consultas.length, 3, perfil)
+        assert.equal(resposta.status, 403, perfil)
+        assert.equal(consultas.length, 0, perfil)
       }
     })
 
@@ -84,10 +83,12 @@ test('listagem administrativa de pedidos lê o banco com filtros e paginação',
       assert.match(html, /Pix &lt;do banco&gt;/)
       assert.match(html, /37,90/)
       assert.doesNotMatch(html, /Cliente <do banco>|Carlos Menezes|Ana Paula|Aguardando pagamento/)
-      assert.doesNotMatch(html, /href="\/admin\/pedidos\/9876"/)
+      assert.match(html, /href="\/admin\/pedidos\/9876"/)
       for (const status of estados) {
         assert.ok(links(html).some(link => link.pathname === '/admin/pedidos' && link.searchParams.get('status') === status), status)
       }
+      assert.match(listagem().sql, /p.status <> 'carrinho'/)
+      assert.doesNotMatch(html, />Carrinho</)
       assert.match(listagem().sql, /LEFT JOIN usuario/)
       assert.match(listagem().sql, /LEFT JOIN forma_pagamento/)
       assert.match(listagem().sql, /SUM\(pp\.quantidade\)/)
@@ -145,6 +146,20 @@ test('listagem administrativa de pedidos lê o banco com filtros e paginação',
         assert.ok(listagem().parametros.includes(status), status)
         assert.match(listagem().sql, /p\.status = \?/)
         assert.doesNotMatch(html, /Aguardando pagamento|>Pagos<|>Enviados<|>Entregues</)
+        const cores = { solicitado: 'yellow', aprovado: 'blue', finalizado: 'green', cancelado: 'red' }
+        assert.ok(html.includes('adm-badge--' + cores[status]))
+        assert.doesNotMatch(html, /<details|Novo status|Salvar status/)
+        if (status === 'solicitado' || status === 'aprovado') {
+          assert.match(html, /\/admin\/pedidos\/9876\/aprovar|\/admin\/pedidos\/9876\/retirar/)
+          assert.match(html, /data-action="\/admin\/pedidos\/9876\/cancelar"/)
+          assert.match(html, /name="motivo_cancelamento"/)
+          const acao = status === 'solicitado' ? 'aprovar' : 'retirar'
+          assert.ok(html.includes('action="/admin/pedidos/9876/' + acao + '"'))
+        } else {
+          assert.match(html, /Finalizado|Cancelado/)
+          assert.doesNotMatch(html, /action="\/admin\/pedidos\/9876\/(aprovar|retirar)"/)
+          assert.doesNotMatch(html, /admin-pedido-acoes/)
+        }
       }
     })
 

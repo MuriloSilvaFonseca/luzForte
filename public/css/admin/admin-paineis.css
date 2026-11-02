@@ -244,6 +244,7 @@
 }
 .adm-btn:hover { filter: brightness(.95); }
 .adm-btn--primary { background: var(--adm-navy-800); border-color: var(--adm-navy-800); color: #fff; }
+.adm-shell a.adm-btn--primary { color: #fff; }
 .adm-btn--accent { background: var(--adm-red); border-color: var(--adm-red); color: #fff; }
 .adm-btn--success { background: var(--adm-green); border-color: var(--adm-green); color: #fff; }
 .adm-btn--danger { background: #fff; border-color: #f0b7b2; color: var(--adm-red-dark); }
@@ -408,11 +409,11 @@
 .adm-btn:hover { text-decoration: none; }
 
 /* ---------- Badges por cor (usados nas views) ---------- */
-.adm-badge--green { background: var(--adm-green-bg); color: #216b31; border: 1px solid #b9dfc1; }
-.adm-badge--yellow { background: #fff7e6; color: #8a5a00; border: 1px solid #f0d99f; }
-.adm-badge--red { background: var(--adm-red-bg); color: #9f241b; border: 1px solid #f0b7b2; }
-.adm-badge--gray { background: #eef0f4; color: #4b5668; border: 1px solid #d7dbe2; }
-.adm-badge--blue { background: var(--adm-blue-bg); color: #2a5d99; border: 1px solid #c7dcf7; }
+.adm-badge.adm-badge--green { background: var(--adm-green-bg); color: #216b31; border: 1px solid #b9dfc1; }
+.adm-badge.adm-badge--yellow { background: #fff7e6; color: #8a5a00; border: 1px solid #f0d99f; }
+.adm-badge.adm-badge--red { background: var(--adm-red-bg); color: #9f241b; border: 1px solid #f0b7b2; }
+.adm-badge.adm-badge--gray { background: #eef0f4; color: #4b5668; border: 1px solid #d7dbe2; }
+.adm-badge.adm-badge--blue { background: var(--adm-blue-bg); color: #2a5d99; border: 1px solid #c7dcf7; }
 
 /* ---------- Tabelas: colunas especiais ---------- */
 .adm-table th.is-num,
@@ -577,7 +578,7 @@
 
 /* ---------- Responsivo ---------- */
 @media (max-width: 900px) {
-  .adm-shell, .admin-produto-layout { grid-template-columns: 1fr; }
+  .adm-shell, .admin-produto-layout { grid-template-columns: minmax(0, 1fr); }
   .adm-sidebar, .admin-produto-sidebar { padding: 14px 15px; }
   .adm-main, .admin-produto-conteudo { padding: 20px 16px 40px; }
   .adm-grid-2 { grid-template-columns: 1fr; }

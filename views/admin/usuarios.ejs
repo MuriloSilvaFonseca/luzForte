@@ -1,23 +1,17 @@
 <%- include('../partials/admin/admin-topo', { pagina: 'usuarios', titulo: 'Usuários' }) %>
 
 <%
-  const listaUsuarios = Array.isArray(usuarios) ? usuarios : []
-  const dadosFiltros = filtros || { q: '', perfil: '', situacao: '' }
   const perfis = {
     cliente: { rotulo: 'Cliente', cor: 'blue' },
-    admin: { rotulo: 'Administrador', cor: 'red' }
+    admin: { rotulo: 'Administrador', cor: 'yellow' }
+  }
+  const linkUsuarios = (pagina) => {
+    const parametros = new URLSearchParams({ ...filtros, pagina })
+    return '/admin/usuarios?' + parametros.toString()
   }
   const situacoes = {
     ativo: { rotulo: 'Ativo', cor: 'green' },
-    bloqueado: { rotulo: 'Bloqueado', cor: 'gray' }
-  }
-  const montarLinkPagina = function (numero) {
-    const parametros = new URLSearchParams()
-    if (dadosFiltros.q) parametros.set('q', dadosFiltros.q)
-    if (dadosFiltros.perfil) parametros.set('perfil', dadosFiltros.perfil)
-    if (dadosFiltros.situacao) parametros.set('situacao', dadosFiltros.situacao)
-    parametros.set('pagina', numero)
-    return '?' + parametros.toString()
+    desativado: { rotulo: 'Desativado', cor: 'red' }
   }
 %>
 
@@ -29,28 +23,26 @@
 <div class="adm-pagehead">
   <div>
     <h1>Usuários</h1>
-    <p><%= Number(total || 0) %> usuário<%= Number(total || 0) === 1 ? '' : 's' %> cadastrado<%= Number(total || 0) === 1 ? '' : 's' %>.</p>
+    <p><%= total %> usuário<%= total === 1 ? '' : 's' %> cadastrado<%= total === 1 ? '' : 's' %>.</p>
   </div>
 </div>
 
+<% if (salvo) { %><p class="adm-alert adm-alert--success" role="status">Situação da conta atualizada.</p><% } %>
 <form class="adm-card adm-filters" method="get" action="/admin/usuarios">
-  <input class="adm-field adm-field--search" type="search" name="q" value="<%= dadosFiltros.q || '' %>" placeholder="Buscar por nome ou e-mail">
+  <input class="adm-field adm-field--search" type="search" name="q" value="<%= filtros.q %>" placeholder="Buscar por nome ou e-mail">
   <select class="adm-field" name="perfil" aria-label="Perfil">
     <option value="">Todos os perfis</option>
     <% Object.keys(perfis).forEach(function (k) { %>
-      <option value="<%= k %>"<%= dadosFiltros.perfil === k ? ' selected' : '' %>><%= perfis[k].rotulo %></option>
+      <option value="<%= k %>"<%= filtros.perfil === k ? ' selected' : '' %>><%= perfis[k].rotulo %></option>
     <% }) %>
   </select>
   <select class="adm-field" name="situacao" aria-label="Situação">
     <option value="">Qualquer situação</option>
     <% Object.keys(situacoes).forEach(function (k) { %>
-      <option value="<%= k %>"<%= dadosFiltros.situacao === k ? ' selected' : '' %>><%= situacoes[k].rotulo %></option>
+      <option value="<%= k %>"<%= filtros.situacao === k ? ' selected' : '' %>><%= situacoes[k].rotulo %></option>
     <% }) %>
   </select>
   <button class="adm-btn" type="submit">Filtrar</button>
-  <% if (dadosFiltros.q || dadosFiltros.perfil || dadosFiltros.situacao) { %>
-    <a class="adm-btn adm-btn--sm" href="/admin/usuarios">Limpar</a>
-  <% } %>
 </form>
 
 <section class="adm-card">
@@ -68,10 +60,10 @@
         </tr>
       </thead>
       <tbody>
-        <% if (listaUsuarios.length === 0) { %>
+        <% if (usuarios.length === 0) { %>
           <tr><td colspan="7"><div class="adm-empty"><strong>Nenhum usuário encontrado</strong>Tente outro filtro.</div></td></tr>
         <% } %>
-        <% listaUsuarios.forEach(function (u) {
+        <% usuarios.forEach(function (u) {
           const pf = perfis[u.perfil] || perfis.cliente
           const sit = situacoes[u.situacao] || situacoes.ativo %>
           <tr>
@@ -98,7 +90,7 @@
                     <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9" cy="8" r="4"/><path d="M3 21v-2a6 6 0 0 1 6-6h2m6-1v8m-4-4h8"/></svg>
                   </button>
                 </form>
-              <% } else { %>
+              <% } else if (Number(u.id) !== Number(locals.usuario?.id_usuario)) { %>
                 <form method="post" action="/admin/usuarios/<%= u.id %>/perfil" style="display:inline">
                   <input type="hidden" name="perfil" value="cliente">
                   <button class="adm-btn adm-btn--sm adm-btn--icon adm-btn--icon-danger" type="submit"
@@ -110,7 +102,16 @@
               <a class="adm-btn adm-btn--sm adm-btn--icon adm-btn--icon-info" href="/admin/pedidos?usuario=<%= u.id %>&de=&ate=" aria-label="Ver histórico de pedidos de <%= u.nome %>" title="Histórico de pedidos">
                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5m4-1v5l3 2"/></svg>
               </a>
-              <span class="adm-prod__sub" title="ID do usuário">ID <%= u.id %></span>
+
+
+              <% if (u.perfil !== 'admin') { %>
+                <form method="post" action="/admin/usuarios/<%= u.id %>/ativo">
+                  <input type="hidden" name="ativo" value="<%= u.situacao === 'desativado' ? '1' : '0' %>">
+                  <button class="adm-btn adm-btn--sm<%= u.situacao === 'desativado' ? '' : ' adm-btn--danger' %>" type="submit">
+                    <%= u.situacao === 'desativado' ? 'Reativar conta' : 'Desativar conta' %>
+                  </button>
+                </form>
+              <% } else { %><span>Conta protegida</span><% } %>
             </td>
           </tr>
         <% }) %>
@@ -121,8 +122,8 @@
   <div class="adm-pagination">
     <span>Página <%= pagina %> de <%= totalPaginas %></span>
     <nav aria-label="Paginação">
-      <% if (pagina > 1) { %><a class="adm-btn adm-btn--sm" href="<%= montarLinkPagina(pagina - 1) %>">Anterior</a><% } %>
-      <% if (pagina < totalPaginas) { %><a class="adm-btn adm-btn--sm" href="<%= montarLinkPagina(pagina + 1) %>">Próxima</a><% } %>
+      <% if (pagina > 1) { %><a class="adm-btn adm-btn--sm" href="<%= linkUsuarios(pagina - 1) %>">Anterior</a><% } %>
+      <% if (pagina < totalPaginas) { %><a class="adm-btn adm-btn--sm" href="<%= linkUsuarios(pagina + 1) %>">Próxima</a><% } %>
     </nav>
   </div>
 </section>

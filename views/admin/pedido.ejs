@@ -1,0 +1,88 @@
+<%- include('../partials/admin/admin-topo', { pagina: 'pedidos', titulo: 'Pedido #' + pedido.id }) %>
+<link rel="stylesheet" href="/css/pages/admin-pedido.css">
+
+<%
+  const moeda = (valor) => 'R$ ' + Number(valor).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  const status = statusInfo[pedido.status]
+%>
+
+<nav class="adm-breadcrumb" aria-label="Você está em">
+  <a href="/admin">Administração</a>
+  <a href="/admin/pedidos">Pedidos</a>
+  <span>Pedido #<%= pedido.id %></span>
+</nav>
+
+<div class="adm-pagehead">
+  <div>
+    <h1>Pedido #<%= pedido.id %></h1>
+    <p>Criado em <%= pedido.data %></p>
+  </div>
+  <a class="adm-btn" href="/admin/pedidos">Voltar para pedidos</a>
+</div>
+
+<div class="adm-pedido">
+  <div class="adm-grid-2">
+    <section class="adm-card" aria-labelledby="pedido-cliente">
+      <header class="adm-card__head"><h2 id="pedido-cliente">Cliente</h2></header>
+      <div class="adm-card__body">
+        <dl class="adm-pedido__dados">
+          <div><dt>Nome</dt><dd><%= pedido.cliente || 'Cliente visitante' %></dd></div>
+          <div><dt>E-mail</dt><dd><%= pedido.email || 'Não informado' %></dd></div>
+          <div><dt>Telefone</dt><dd><%= pedido.telefone || 'Não informado' %></dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="adm-card" aria-labelledby="pedido-resumo">
+      <header class="adm-card__head"><h2 id="pedido-resumo">Resumo do pedido</h2></header>
+      <div class="adm-card__body">
+        <dl class="adm-pedido__dados">
+          <div><dt>Status</dt><dd><span class="adm-badge adm-badge--<%= status.cor %>"><%= status.rotulo %></span></dd></div>
+          <div><dt>Forma de pagamento</dt><dd><%= pedido.pagamento || 'Não informado' %></dd></div>
+          <div><dt>Valor dos produtos</dt><dd><%= moeda(pedido.valor_produtos) %></dd></div>
+          <div><dt>Total do pedido</dt><dd><strong><%= moeda(pedido.total) %></strong></dd></div>
+        </dl>
+      </div>
+    </section>
+  </div>
+
+  <section class="adm-card" aria-labelledby="pedido-itens">
+    <header class="adm-card__head"><h2 id="pedido-itens">Produtos do pedido</h2></header>
+    <div class="adm-tablewrap">
+      <table class="adm-table">
+        <thead>
+          <tr>
+            <th scope="col">Produto</th>
+            <th scope="col">SKU</th>
+            <th scope="col" class="is-num">Quantidade</th>
+            <th scope="col" class="is-num">Preço unitário</th>
+            <th scope="col" class="is-num">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (itens.length === 0) { %>
+            <tr><td colspan="5"><div class="adm-empty">Nenhum item registrado neste pedido.</div></td></tr>
+          <% } %>
+          <% itens.forEach(function (item) { %>
+            <tr>
+              <td><%= item.produto || 'Produto não disponível' %></td>
+              <td><%= item.sku %></td>
+              <td class="is-num"><%= item.quantidade %></td>
+              <td class="is-num"><%= moeda(item.preco_unitario) %></td>
+              <td class="is-num"><%= moeda(item.subtotal) %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="adm-card" aria-labelledby="pedido-observacoes">
+    <header class="adm-card__head"><h2 id="pedido-observacoes">Observações</h2></header>
+    <div class="adm-card__body">
+      <p class="adm-pedido__observacoes"><%= pedido.observacoes || 'Nenhuma observação registrada.' %></p>
+    </div>
+  </section>
+</div>
+
+<%- include('../partials/admin/admin-rodape') %>
