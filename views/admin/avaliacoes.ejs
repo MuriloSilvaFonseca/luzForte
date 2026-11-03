@@ -4,13 +4,13 @@
   const statusInfo = {
     pendente: { rotulo: 'Pendente', cor: 'yellow' },
     aprovada: { rotulo: 'Aprovada', cor: 'green' },
-    recusada: { rotulo: 'Recusada', cor: 'red' }
+    rejeitada: { rotulo: 'Recusada', cor: 'red' }
   }
   const abas = [
     { id: '', rotulo: 'Todas', n: contagens.todas },
     { id: 'pendente', rotulo: 'Pendentes', n: contagens.pendente },
     { id: 'aprovada', rotulo: 'Aprovadas', n: contagens.aprovada },
-    { id: 'recusada', rotulo: 'Recusadas', n: contagens.recusada },
+    { id: 'rejeitada', rotulo: 'Recusadas', n: contagens.rejeitada },
     { id: 'negativas', rotulo: 'Negativas sem resposta', n: contagens.negativasSemResposta }
   ]
   const estrelas = (n) => '★'.repeat(n) + '<span class="off">' + '★'.repeat(5 - n) + '</span>'
@@ -111,7 +111,7 @@
       <% if (a.titulo) { %><h3 class="rev__title"><%= a.titulo %></h3><% } %>
       <p class="rev__text"><%= a.texto %></p>
 
-      <% if (a.status === 'recusada' && a.motivoRecusa) { %>
+      <% if (a.status === 'rejeitada' && a.motivoRecusa) { %>
         <div class="rev__flag"><strong>Motivo da recusa:</strong> <%= a.motivoRecusa %></div>
       <% } %>
 
@@ -129,7 +129,7 @@
           </form>
         <% } %>
 
-        <% if (a.status !== 'recusada') { %>
+        <% if (a.status !== 'rejeitada') { %>
           <button class="adm-btn adm-btn--danger adm-btn--sm" type="button" data-abrir="recusar-<%= a.id %>">Recusar</button>
         <% } %>
 
@@ -140,7 +140,7 @@
         <% } %>
       </div>
 
-      <% if (a.status !== 'recusada') { %>
+      <% if (a.status !== 'rejeitada') { %>
         <form class="rev__form" id="recusar-<%= a.id %>" method="post" action="/admin/avaliacoes/<%= a.id %>/recusar">
           <label for="motivo-<%= a.id %>">Motivo da recusa</label>
           <select id="motivo-<%= a.id %>" name="motivo" required>
