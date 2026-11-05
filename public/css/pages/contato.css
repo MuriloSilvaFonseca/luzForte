@@ -1,1 +1,80 @@
-/* Contato Styles */
+/* Página de contato (mesmo visual da página "Como comprar") */
+.contato {
+  width: min(1000px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 48px 0 64px;
+  color: #263449;
+}
+
+.contato-intro {
+  max-width: 760px;
+  margin: 0 auto 28px;
+  text-align: center;
+}
+
+.contato-etiqueta {
+  margin-bottom: 8px;
+  color: #1a6be8;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.contato h1 {
+  margin-bottom: 12px;
+  color: #1e3f6d;
+  font-size: clamp(30px, 5vw, 42px);
+}
+
+.contato p { line-height: 1.6; }
+
+.contato-canais {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.contato-card {
+  padding: 26px;
+  border: 1px solid #e0e5eb;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(30, 63, 109, .06);
+}
+
+.contato-card h2 {
+  margin-bottom: 12px;
+  color: #1e3f6d;
+  font-size: 20px;
+}
+
+.contato-card a { color: #1a6be8; font-weight: 600; }
+.contato-card span { margin: 0 6px; color: #667085; }
+
+.contato-card--destaque { border-color: #b7d1fb; background: #f5f9ff; }
+
+.contato-botao {
+  display: inline-block;
+  margin-top: 14px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  background: #1e3f6d;
+  color: #fff !important;
+  text-decoration: none;
+}
+
+.contato-botao:hover { background: #15265c; }
+
+.contato-endereco { margin-top: 18px; }
+.contato-endereco address { margin-bottom: 12px; font-style: normal; line-height: 1.6; }
+.contato-endereco p + p { margin-top: 6px; }
+.contato-link { display: inline-block; margin-top: 12px; }
+
+.contato-voltar { margin-top: 24px; text-align: center; }
+.contato-voltar a { color: #1a6be8; font-weight: 700; }
+.contato-voltar span { margin: 0 8px; color: #667085; }
+
+@media (max-width: 640px) {
+  .contato { padding: 32px 0 44px; }
+  .contato-card { padding: 20px 16px; }
+}

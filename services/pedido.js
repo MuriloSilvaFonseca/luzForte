@@ -45,7 +45,8 @@ async function carregarCheckout(usuarioId, selecao) {
   if (!pedidos.length) return { itens: [], total: '0.00', formasPagamento }
 
   const [itens] = await conexao.execute(
-    `SELECT pp.produto_sku, p.titulo_produto, pp.quantidade, pp.preco_unitario, pp.quantidade * pp.preco_unitario AS subtotal, p.estoque_produto, p.ativo
+    // Preço atual do produto (o mesmo que será cobrado ao finalizar)
+    `SELECT pp.produto_sku, p.titulo_produto, pp.quantidade, p.preco_produto AS preco_unitario, pp.quantidade * p.preco_produto AS subtotal, p.estoque_produto, p.ativo
      FROM produto_pedido pp
      JOIN produto p ON p.sku = pp.produto_sku
      WHERE pp.pedido_id = ?
@@ -86,7 +87,7 @@ async function finalizarPedido(usuarioId, formaPagamentoId, selecao) {
 
     const pedidoId = pedidos[0].id_pedido
     const [itens] = await conexao.execute(
-      `SELECT pp.produto_sku, pp.quantidade, pp.preco_unitario, p.titulo_produto, p.estoque_produto, p.ativo
+      `SELECT pp.produto_sku, pp.quantidade, p.preco_produto AS preco_unitario, p.titulo_produto, p.estoque_produto, p.ativo
        FROM produto_pedido pp JOIN produto p ON p.sku = pp.produto_sku WHERE pp.pedido_id = ? ORDER BY pp.produto_sku FOR UPDATE`,
       [pedidoId]
     )
@@ -112,7 +113,11 @@ async function finalizarPedido(usuarioId, formaPagamentoId, selecao) {
       }
       await conexao.execute('UPDATE pedido SET valor_produtos = (SELECT COALESCE(SUM(quantidade * preco_unitario), 0) FROM produto_pedido WHERE pedido_id = ?), total = valor_produtos WHERE id_pedido = ?', [novo.insertId, novo.insertId])
     }
-    await conexao.execute('UPDATE produto_pedido SET subtotal = quantidade * preco_unitario WHERE pedido_id = ?', [pedidoId])
+    // Grava no pedido o preço atual de cada produto (o mesmo usado no total acima)
+    await conexao.execute(
+      `UPDATE produto_pedido pp JOIN produto p ON p.sku = pp.produto_sku
+       SET pp.preco_unitario = p.preco_produto, pp.subtotal = pp.quantidade * p.preco_produto
+       WHERE pp.pedido_id = ?`, [pedidoId])
 
 
     await conexao.commit()
@@ -141,7 +146,7 @@ async function buscarPedidoFinalizado(usuarioId, pedidoId) {
      FROM pedido p
      JOIN usuario u ON u.id_usuario = p.usuario_id
      LEFT JOIN forma_pagamento fp ON fp.id_forma_pagamento = p.forma_pagamento_id
-     WHERE p.id_pedido = ? AND p.usuario_id = ? AND p.status = 'solicitado'`,
+     WHERE p.id_pedido = ? AND p.usuario_id = ? AND p.status <> 'carrinho'`,
     [pedidoId, usuarioId]
   )
   if (!pedidos.length) return null

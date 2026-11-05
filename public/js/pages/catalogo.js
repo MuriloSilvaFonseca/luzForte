@@ -4,17 +4,25 @@ const escaparTexto = valor => String(valor).replace(/[&<>"']/g, caractere => ({
 }[caractere]));
 
 // ── Filtros ativos ──────────────────────────────────────────────
-const ROTULOS_FILTROS = { q: 'Busca', categoria: 'Categoria', marca: 'Marca' };
+const ROTULOS_FILTROS = { q: 'Busca', categoria: 'Categoria', subcategoria: 'Subcategoria', marca: 'Marca' };
 
-// Lê os filtros da URL. Categoria e marca chegam como id; o nome vem do radio marcado no EJS.
+// Nome que aparece na etiqueta. Categoria e subcategoria são <select>; marca é radio.
+function nomeDoFiltro(chave, valor) {
+  if (chave === 'q') return valor;
+  const opcao = document.querySelector(`select[name="${chave}"] option[value="${CSS.escape(valor)}"]`);
+  if (opcao) return opcao.textContent.trim();
+  const marcado = document.querySelector(`input[name="${chave}"]:checked`);
+  if (marcado && marcado.value) return marcado.closest('label').textContent.trim();
+  return valor;
+}
+
+// Lê os filtros da URL (categoria, subcategoria e marca chegam como id)
 function obterFiltrosAtivos() {
   const params = new URLSearchParams(window.location.search);
   return Object.keys(ROTULOS_FILTROS).flatMap(chave => {
     const valor = (params.get(chave) || '').trim();
     if (!valor) return [];
-    const marcado = chave === 'q' ? null : document.querySelector(`input[name="${chave}"]:checked`);
-    const nome = marcado && marcado.value ? marcado.closest('label').textContent.trim() : valor;
-    return [{ chave, rotulo: ROTULOS_FILTROS[chave], nome }];
+    return [{ chave, rotulo: ROTULOS_FILTROS[chave], nome: nomeDoFiltro(chave, valor) }];
   });
 }
 
@@ -41,7 +49,7 @@ function exibirFiltrosAtivos() {
 
     const remover = document.createElement('a');
     remover.className = 'filtro-chip-remover';
-    remover.href = urlSemFiltros([filtro.chave]);
+    remover.href = urlSemFiltros(filtro.chave === 'categoria' ? ['categoria', 'subcategoria'] : [filtro.chave]);
     remover.textContent = '✕';
     remover.setAttribute('aria-label', `Remover filtro ${filtro.rotulo}: ${filtro.nome}`);
 
@@ -90,12 +98,17 @@ function exibirProdutos(produtos) {
     card.className = 'product-card';
     const [reais, centavos] = Number(produto.preco_produto).toFixed(2).split('.');
     const nome = escaparTexto(produto.titulo_produto);
+    // Produto sem estoque: botão desabilitado, igual à home
+    const esgotado = Number(produto.estoque_produto) <= 0;
+    const botao = esgotado
+      ? '<button type="button" class="btn-cart" disabled>Esgotado</button>'
+      : `<button type="button" class="btn-cart" data-id="${produto.sku}">Adicionar ao carrinho</button>`;
     card.innerHTML = `
       <a href="/produto?id=${produto.sku}"><img src="${escaparTexto(window.imagemProdutoSegura(produto.imagem))}" alt="${nome}" loading="lazy"></a>
       <div class="product-info">
         <p class="product-name"><a href="/produto?id=${produto.sku}">${nome}</a></p>
         <h3>R$ ${reais}<span>,${centavos}</span></h3>
-        <button type="button" class="btn-cart" data-id="${produto.sku}">Adicionar ao carrinho</button>
+        ${botao}
       </div>
     `;
     card.querySelector('img').addEventListener('error', evento => {
@@ -108,7 +121,7 @@ function exibirProdutos(produtos) {
 
 async function adicionarPeloCatalogo(evento) {
   const botao = evento.target.closest('.btn-cart');
-  if (botao) await window.adicionarPeloBotao(botao, botao.dataset.id);
+  if (botao && !botao.disabled) await window.adicionarPeloBotao(botao, botao.dataset.id);
 }
 
 async function carregarProdutosReais() {
@@ -116,7 +129,7 @@ async function carregarProdutosReais() {
   lista.textContent = 'Carregando produtos...';
   try {
     const resposta = await fetch('/api/produtos' + window.location.search);
-    const dados = await resposta.json();
+    const dados = await resposta.json().catch(() => ({ erro: 'Não foi possível carregar os produtos. Tente novamente.' }));
     if (!resposta.ok) throw new Error(dados.erro);
     exibirProdutos(dados.produtos);
     document.querySelector('.prod-count').textContent = 'Produtos encontrados (' + dados.produtos.length + ')';
@@ -131,12 +144,6 @@ function initAccordions() {
   document.querySelectorAll(".filter-title").forEach((title) => {
     title.addEventListener("click", () => {
       title.classList.toggle("open");
-    });
-  });
-
-  document.querySelectorAll(".marca-parent").forEach((parent) => {
-    parent.addEventListener("click", () => {
-      parent.classList.toggle("open");
     });
   });
 }

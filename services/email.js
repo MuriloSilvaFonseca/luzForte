@@ -9,6 +9,10 @@
 // - O template precisa usar as variáveis {{to_email}}, {{nome}} e {{code}}
 
 async function enviarCodigoRedefinicao(email, nome, codigo) {
+  // Sem as chaves no .env não há como enviar: avisa claramente no terminal
+  if (!process.env.EMAILJS_SERVICE_ID || !process.env.EMAILJS_TEMPLATE_ID || !process.env.EMAILJS_PUBLIC_KEY) {
+    throw new Error('EmailJS não configurado: preencha as variáveis EMAILJS_* no .env para enviar o código.')
+  }
   const resposta = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

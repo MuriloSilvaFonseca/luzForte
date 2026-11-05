@@ -98,10 +98,12 @@ test('detalhes do pedido leem o MySQL com acesso de administrador', async t => {
       assert.match(html, /25,00/)
       assert.match(html, /Solicitado/)
       assert.match(html, /Voltar para pedidos/)
-      assert.equal(consultas.length, 2)
-      assert.ok(consultas.every(c => JSON.stringify(c.valores) === '[9876]' && !c.sql.includes('9876')))
-      assert.match(consultas[1].sql, /pp.preco_unitario, pp.subtotal/)
-      assert.doesNotMatch(consultas[1].sql, /p.preco_produto/)
+      // A contagem do selo de avaliações (menu do admin) não entra na conta
+      const doPedido = consultas.filter(c => !c.sql.includes('FROM avaliacao_produto'))
+      assert.equal(doPedido.length, 2)
+      assert.ok(doPedido.every(c => JSON.stringify(c.valores) === '[9876]' && !c.sql.includes('9876')))
+      assert.match(doPedido[1].sql, /pp.preco_unitario, pp.subtotal/)
+      assert.doesNotMatch(doPedido[1].sql, /p.preco_produto/)
     })
 
     await t.test('campos opcionais ausentes e pedido sem itens têm mensagens claras', async () => {

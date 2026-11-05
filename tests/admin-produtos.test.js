@@ -9,6 +9,7 @@ test('produtos e cadastros auxiliares usam banco simulado', async t => {
   let gravados = []
   let falha = ''
   const eventos = []
+  let estoqueBanco = 3
   async function query(sql, parametros = []) {
     sql = sql.trim().replace(/\s+/g, ' ')
     consultas.push({ sql, parametros })
@@ -21,7 +22,7 @@ test('produtos e cadastros auxiliares usam banco simulado', async t => {
       categoria_id: 3, subcategoria_id: 2, custo_produto: '10.00', preco_produto: '15.00', estoque_produto: 3,
       descricao: 'Primeiro texto', especificacao: '', instalacao: ''
     }]]
-    if (sql.startsWith('SELECT sku')) return [[{ sku: 123 }]]
+    if (sql.startsWith('SELECT sku')) return [[{ sku: 123, estoque_produto: estoqueBanco }]]
     if (sql.startsWith('SELECT ordem')) return [[{ ordem: 1, url: '/img/products/existente.png' }]]
     if (/^SELECT id_(descricao|especificacao|instalacao) AS id,/.test(sql)) return [[
       { id: 10, nome: 'Principal', texto: 'Primeiro texto' },
@@ -149,6 +150,27 @@ test('produtos e cadastros auxiliares usam banco simulado', async t => {
       assert.equal((await postar('/produtos/123/editar', dadosMultipart(produto, { ...detalhe, id: '11' }))).status, 302)
       assert.ok(gravados.some(c => c.sql.startsWith('UPDATE descricao SET nome_descricao') && c.parametros[2] === 11 && c.parametros[3] === 123))
       assert.ok(!gravados.some(c => c.sql.includes('imagem_produto')))
+    })
+    await t.test('edição aplica só a diferença do estoque e não apaga baixas feitas no meio', async () => {
+      // Admin abriu com 10 e digitou 12 (+2); nesse meio-tempo uma venda baixou o banco para 6 -> grava 8
+      reiniciar(); estoqueBanco = 6
+      assert.equal((await postar('/produtos/123/editar', dadosMultipart({ ...produto, estoque_produto: '12', estoque_original: '10' }))).status, 302)
+      const update = gravados.find(c => c.sql.startsWith('UPDATE produto SET titulo_produto'))
+      assert.equal(update.parametros[1], 8)
+      // Mudou só o preço (estoque igual ao original): mantém o 6 do banco, não volta para 10
+      reiniciar(); estoqueBanco = 6
+      assert.equal((await postar('/produtos/123/editar', dadosMultipart({ ...produto, preco_produto: '16.00', estoque_produto: '10', estoque_original: '10' }))).status, 302)
+      assert.equal(gravados.find(c => c.sql.startsWith('UPDATE produto SET titulo_produto')).parametros[1], 6)
+      // Tirar mais do que existe agora: não grava e mostra o estoque atual
+      reiniciar(); estoqueBanco = 1
+      const conflito = await postar('/produtos/123/editar', dadosMultipart({ ...produto, estoque_produto: '5', estoque_original: '10' }))
+      assert.equal(conflito.status, 409)
+      assert.match(await conflito.text(), /agora são 1 unidades/)
+      assert.deepEqual(gravados, [])
+      // Estoque em branco na edição é erro (antes virava 0)
+      reiniciar(); estoqueBanco = 3
+      assert.equal((await postar('/produtos/123/editar', dadosMultipart({ ...produto, estoque_produto: '' }))).status, 400)
+      assert.deepEqual(eventos, [])
     })
     await t.test('falha no adicional desfaz o produto e preserva os campos', async () => {
       reiniciar(); falha = 'INSERT INTO descricao'

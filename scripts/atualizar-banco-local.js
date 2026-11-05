@@ -1,6 +1,3 @@
-const fs = require('node:fs/promises')
-const path = require('node:path')
-
 async function atualizarBanco(banco) {
   async function adicionarColuna(tabela, nome, definicao) {
     const [colunas] = await banco.query('SHOW COLUMNS FROM ?? LIKE ?', [tabela, nome])
@@ -24,10 +21,23 @@ async function atualizarBanco(banco) {
     await banco.query('ALTER TABLE produto ADD CONSTRAINT fk_produto_categoria FOREIGN KEY (categoria_id) REFERENCES categoria (id_categoria) ON DELETE RESTRICT')
   }
 
-  const sql = await fs.readFile(path.join(__dirname, '../database/migracao_biblioteca_textos.sql'), 'utf8')
-  for (const comando of sql.replace(/^--.*$/gm, '').split(';')) {
-    if (comando.trim()) await banco.query(comando)
-  }
+  // Biblioteca de textos (mesmas tabelas de database/luzForte.sql). Não apaga textos existentes.
+  await banco.query(`CREATE TABLE IF NOT EXISTS modelo_texto (
+    id_modelo_texto INT NOT NULL AUTO_INCREMENT,
+    tipo ENUM('descricao', 'especificacao', 'instalacao') NOT NULL,
+    nome VARCHAR(70) NOT NULL,
+    texto TEXT NOT NULL,
+    PRIMARY KEY (id_modelo_texto)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci`)
+  await banco.query(`CREATE TABLE IF NOT EXISTS produto_modelo_texto (
+    produto_sku INT NOT NULL,
+    modelo_texto_id INT NOT NULL,
+    PRIMARY KEY (produto_sku, modelo_texto_id),
+    CONSTRAINT fk_produto_modelo_produto FOREIGN KEY (produto_sku)
+      REFERENCES produto (sku) ON DELETE CASCADE,
+    CONSTRAINT fk_produto_modelo_texto FOREIGN KEY (modelo_texto_id)
+      REFERENCES modelo_texto (id_modelo_texto) ON DELETE RESTRICT
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci`)
   await adicionarColuna('modelo_texto', 'assinatura', `BINARY(32)
     GENERATED ALWAYS AS (UNHEX(SHA2(CONCAT(TRIM(nome), CHAR(0), TRIM(REPLACE(REPLACE(texto, CHAR(13,10), CHAR(10)), CHAR(13), CHAR(10)))), 256))) STORED`)
   const [repetidos] = await banco.query('SELECT tipo, assinatura, COUNT(*) AS total FROM modelo_texto GROUP BY tipo, assinatura HAVING COUNT(*) > 1')

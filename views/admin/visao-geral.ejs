@@ -21,15 +21,19 @@
 <section class="adm-card admin-dashboard-financeiro" aria-labelledby="dashboard-faturamento">
   <div class="admin-dashboard-financeiro__principal">
     <h2 id="dashboard-faturamento">Faturamento</h2>
-    <p class="admin-dashboard-financeiro__valor"><%= moeda(financeiro.total) %></p>
-    <p class="admin-dashboard-financeiro__nota">Todo o período · Todos os status</p>
-    <p class="admin-dashboard-financeiro__nota">Inclui pedidos cancelados e carrinhos.</p>
+    <p class="admin-dashboard-financeiro__valor"><%= moeda(financeiro.faturamento) %></p>
+    <p class="admin-dashboard-financeiro__nota">Todo o período · Pedidos aprovados e retirados</p>
+    <p class="admin-dashboard-financeiro__nota">Solicitados, cancelados e carrinhos não entram no faturamento.</p>
   </div>
   <dl class="admin-dashboard-financeiro__status">
-    <% financeiro.status.forEach(function (item) { %>
+    <% financeiro.indicadores.forEach(function (item) { %>
       <div>
         <dt><%= item.nome %></dt>
-        <dd><%= moeda(item.total) %></dd>
+        <dd>
+          <% if (item.tipo === 'moeda') { %><%= moeda(item.valor) %>
+          <% } else if (item.tipo === 'porcentagem') { %><%= item.valor.toLocaleString('pt-BR', { maximumFractionDigits: 1 }) %>%
+          <% } else { %><%= item.valor %><% } %>
+        </dd>
       </div>
     <% }) %>
   </dl>

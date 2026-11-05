@@ -92,7 +92,7 @@ test('listagem administrativa de pedidos lê o banco com filtros e paginação',
       assert.match(listagem().sql, /LEFT JOIN usuario/)
       assert.match(listagem().sql, /LEFT JOIN forma_pagamento/)
       assert.match(listagem().sql, /SUM\(pp\.quantidade\)/)
-      assert.equal(consultas.length, 3)
+      assert.equal(consultas.filter(c => !c.sql.includes('FROM avaliacao_produto')).length, 3) // a contagem do selo de avaliações não entra na conta
     })
 
     await t.test('mostra alternativas para pedido sem cliente ou pagamento', async () => {

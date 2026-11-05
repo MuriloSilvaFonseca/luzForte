@@ -174,67 +174,35 @@
         </section>
         <% } %>
 
+        <%# Avaliações reais: só as aprovadas pelo admin. Sem nenhuma, a seção não aparece. %>
+        <% if (avaliacoesHome.length) { %>
         <section class="avaliacoes">
-
 
             <div class="section-title">
                 <h2>Avaliações de <span>Clientes</span></h2>
             </div>
 
             <div class="cards-avaliacao-principal">
-
+                <% avaliacoesHome.forEach(avaliacao => { %>
                 <div class="cards-avaliacao1">
                     <div class="test">
                         <div class="avatar">
                             <img src="/img/icons/userblack.png" alt="">
                         </div>
                         <div class="user-info">
-                            <h3>Nome usuario</h3>
-                            <div class="stars">★★★★★</div>
-                        </div>
-
-                    </div>
-
-                    <p class="review-text">
-                        "Produto chegou antes do prazo, embalado com muito cuidado.
-                        Qualidade excelente, vou comprar de novo!"
-                    </p>
-                </div>
-
-
-
-                <div class="cards-avaliacao1">
-                    <div class="test">
-                        <div class="avatar">
-                            <img src="/img/icons/userblack.png" alt="">
-                        </div>
-                        <div class="user-info">
-                            <h3>Nome usuario</h3>
-                            <div class="stars">★★★★★</div>
+                            <h3><%= avaliacao.primeiro_nome %></h3>
+                            <div class="stars" aria-label="Nota <%= avaliacao.nota %> de 5"><%= '★'.repeat(avaliacao.nota) + '☆'.repeat(5 - avaliacao.nota) %></div>
                         </div>
                     </div>
 
-                    <p class="review-text">
-                        "Melhor loja elétrica online! Preços competitivos e atendimento rápido. Super recomendo."
-                    </p>
+                    <p class="review-text">"<%= avaliacao.comentario %>"</p>
+                    <a class="review-produto" href="/produto?id=<%= avaliacao.sku %>"><%= avaliacao.titulo_produto %></a>
                 </div>
-                <div class="cards-avaliacao1">
-                    <div class="test">
-                        <div class="avatar">
-                            <img src="/img/icons/userblack.png" alt="">
-                        </div>
-                        <div class="user-info">
-                            <h3>Nome usuario</h3>
-                            <div class="stars">★★★★★</div>
-                        </div>
-                    </div>
-                    <p class="review-text">
-                        "Produto original e bem embalado. Demorou 2 dias a mais que o previsto, mas valeu a espera."
-                    </p>
-                </div>
-
+                <% }) %>
+            </div>
 
         </section>
+        <% } %>
 
     </div>
 

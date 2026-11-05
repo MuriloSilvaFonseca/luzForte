@@ -9,21 +9,32 @@ router.get('/', async (req, res) => {
     const [[hoje]] = await banco.query("SELECT COUNT(*) AS total FROM pedido WHERE status <> 'carrinho' AND data_criacao >= CURDATE() AND data_criacao < DATE_ADD(CURDATE(), INTERVAL 1 DAY)")
     const [[produtos]] = await banco.query("SELECT COALESCE(SUM(ativo = 'ativo'), 0) AS ativos, COALESCE(SUM(ativo = 'ativo' AND estoque_produto <= 5), 0) AS baixo FROM produto")
     const [[usuarios]] = await banco.query('SELECT COUNT(*) AS total FROM usuario WHERE ativo = 1')
-    const [[faturamento]] = await banco.query('SELECT COALESCE(SUM(total), 0) AS total FROM pedido')
+    // Regra do projeto: só é venda o pedido APROVADO ou FINALIZADO (retirado).
+    // Solicitados, cancelados e carrinhos não entram no faturamento nem no lucro.
+    const [[vendas]] = await banco.query(`SELECT COUNT(*) AS quantidade, COALESCE(SUM(total), 0) AS faturamento
+      FROM pedido WHERE status IN ('aprovado', 'finalizado')`)
+    // Custo = quantidade x custo do produto no momento da aprovação (custo_unitario).
+    // Pedidos aprovados antes dessa coluna ser preenchida usam o custo atual do produto.
+    const [[custo]] = await banco.query(`SELECT COALESCE(SUM(pp.quantidade * COALESCE(pp.custo_unitario, pr.custo_produto, 0)), 0) AS total
+      FROM produto_pedido pp
+      JOIN pedido pe ON pe.id_pedido = pp.pedido_id
+      LEFT JOIN produto pr ON pr.sku = pp.produto_sku
+      WHERE pe.status IN ('aprovado', 'finalizado')`)
     const [totais] = await banco.query('SELECT status, COUNT(*) AS quantidade, COALESCE(SUM(total), 0) AS total FROM pedido GROUP BY status')
+    const valorStatus = status => (totais.find(total => total.status === status) || { total: 0 }).total
+    const faturamento = Number(vendas.faturamento)
+    const lucro = faturamento - Number(custo.total)
     const financeiro = {
-      total: faturamento.total,
-      status: [
-        { chave: 'solicitado', nome: 'Solicitados' },
-        { chave: 'aprovado', nome: 'Aprovados' },
-        { chave: 'finalizado', nome: 'Finalizados' },
-        { chave: 'cancelado', nome: 'Cancelados' },
-        { chave: 'carrinho', nome: 'Carrinhos' }
+      faturamento,
+      vendas: Number(vendas.quantidade),
+      indicadores: [
+        { nome: 'Custo dos produtos', valor: Number(custo.total), tipo: 'moeda' },
+        { nome: 'Lucro bruto', valor: lucro, tipo: 'moeda' },
+        { nome: 'Margem', valor: faturamento ? (lucro / faturamento) * 100 : 0, tipo: 'porcentagem' },
+        { nome: 'Aguardando aprovação', valor: valorStatus('solicitado'), tipo: 'moeda' },
+        { nome: 'Cancelados', valor: valorStatus('cancelado'), tipo: 'moeda' },
+        { nome: 'Pedidos vendidos', valor: Number(vendas.quantidade), tipo: 'numero' }
       ]
-    }
-    for (const item of financeiro.status) {
-      const linha = totais.find(total => total.status === item.chave)
-      item.total = linha ? linha.total : 0
     }
     const grupos = []
     for (const status of ['solicitado', 'finalizado']) {

@@ -1,7 +1,5 @@
 <%- include("../partials/head", { tituloPagina: 'Carrinho' }) %>
 
-    <link rel="stylesheet" href="/css/components/header.css">
-    <link rel="stylesheet" href="/css/components/footer.css">
     <link rel="stylesheet" href="/css/pages/carrinho.css">
 
  
@@ -15,7 +13,9 @@
                     <input type="checkbox" id="checkTodos">
                     <label for="checkTodos">Todos os produtos</label>
                     <button type="button" id="esvaziarCarrinho" class="btnDel" hidden>
-                        <i class="ti ti-trash" aria-hidden="true"></i>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                            <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" />
+                        </svg>
                         <span>Esvaziar carrinho</span>
                     </button>
                 </div>
@@ -26,17 +26,17 @@
 
                 <div id="carrinhoVazio" class="carrinhoVazio" hidden>
                     <p class="carrinhoVazioTitulo">Seu carrinho está vazio.</p>
-    
+                    <a class="botaoCarrinhoVazio" href="/catalogo">Ver produtos</a>
                 </div>
                 <p class="orientacaoCarrinho">Desmarcar não remove o produto do carrinho.</p>
                 <div id="itensCarrinho"></div>
                 <template id="modeloItemCarrinho">
 <div class="produtos">
                     <div class="checkCarrinho">
-                        <input type="checkbox" id="prod1">
+                        <input type="checkbox" aria-label="Selecionar produto">
                     </div>
                     <div class="imagemCarrinho">
-                        <img src="/img/products/lampada.png" >
+                        <img src="/img/icons/icons8-caixa-128.png" alt="">
                     </div>
                     <div class="acoesCarrinho">
                         <span class="nomeProduto"></span>
@@ -46,9 +46,6 @@
                             <button class="btnQty" onclick="mudarQty(this, -1)">−</button>
                             <span class="qtyValor">1</span>
                             <button class="btnQty" onclick="mudarQty(this, 1)">+</button>
-                            <button class="btnFav" onclick="toggleFav(this)">
-                                <i class="ti ti-heart" style="color:#aaa"></i>
-                            </button>
                             <button type="button" class="btnDel">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
                                     <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" />
@@ -76,10 +73,6 @@
                         <span class="labelResumo">Subtotal (0 itens):</span>
                         <span class="valorResumo">R$ 0,00</span>
                     </div>
-                    <div class="linhaResumo">
-                        <span class="labelResumo">Desconto (R$):</span>
-                        <span class="descontoValor">R$ 0,00</span>
-                    </div>
                     <div class="linhaTotal">
                         <span class="labelTotal">Total selecionado (R$):</span>
                         <span class="valorTotal">R$ 0,00</span>
@@ -88,7 +81,9 @@
                         <button type="button" disabled>Continuar com a compra</button>
                     </div>
                     <div class="compraSegura">
-                        <i class="ti ti-lock" aria-hidden="true"></i>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                            <rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" />
+                        </svg>
                         <p class="legendaCompra">Você paga na retirada, direto na loja.</p>
                     </div>
                     <a class="linkComoComprar" href="/como-comprar">
@@ -96,14 +91,6 @@
                         <span>Como funciona a compra?</span>
                         <span class="linkComoComprarSeta" aria-hidden="true">&rarr;</span>
                     </a>
-                </div>
- 
-                <div class="cupomDesconto">
-                    <h2 class="textoCupom">Cupom de desconto:</h2>
-                    <hr class="linhaProduto">
-                    <h3 class="labelCupom">Insira aqui o cupom:</h3>
-                    <input type="text" placeholder="">
-                    <button class="botaoCarrinho">Aplicar desconto</button>
                 </div>
  
             </div>

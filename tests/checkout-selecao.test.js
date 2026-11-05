@@ -30,7 +30,8 @@ const conexao = {
       itens.find(i => i.pedido_id === args[1] && i.produto_sku === args[2]).pedido_id = args[0]
       return [{}]
     }
-    if (sql.startsWith('UPDATE produto_pedido SET subtotal')) {
+    // Grava o preço atual do produto no pedido (no simulado, preco_unitario já é o preço atual)
+    if (sql.startsWith('UPDATE produto_pedido pp JOIN produto')) {
       for (const item of itens.filter(i => i.pedido_id === args[0])) item.subtotal = (Number(item.preco_unitario) * item.quantidade).toFixed(2)
       return [{}]
     }

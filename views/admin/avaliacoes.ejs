@@ -67,14 +67,14 @@
 
 <form class="adm-card adm-filters" method="get" action="/admin/avaliacoes">
   <% if (filtros.status) { %><input type="hidden" name="status" value="<%= filtros.status %>"><% } %>
-  <input class="adm-field adm-field--search" type="search" name="q" value="<%= filtros.q %>" placeholder="Buscar no texto, cliente ou produto">
+  <input class="adm-field adm-field--search" type="search" name="q" value="<%= filtros.q %>" placeholder="Buscar no texto, cliente ou produto" aria-label="Buscar no texto, cliente ou produto">
   <select class="adm-field" name="nota" aria-label="Nota">
     <option value="">Todas as notas</option>
     <% [5, 4, 3, 2, 1].forEach(function (n) { %>
       <option value="<%= n %>"<%= String(filtros.nota) === String(n) ? ' selected' : '' %>><%= n %> estrela<%= n > 1 ? 's' : '' %></option>
     <% }) %>
   </select>
-  <input class="adm-field adm-field--sm" type="text" name="produto" value="<%= filtros.produto %>" placeholder="SKU do produto">
+  <input class="adm-field adm-field--sm" type="text" name="produto" value="<%= filtros.produto %>" placeholder="SKU do produto" aria-label="SKU do produto">
   <button class="adm-btn" type="submit">Filtrar</button>
 </form>
 

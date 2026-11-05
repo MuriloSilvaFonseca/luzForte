@@ -44,45 +44,6 @@
   text-align: center;
 }
 
-.google-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  width: 100%;
-  min-height: 46px;
-  margin: 12px 0;
-  padding: 10px 14px;
-  border: 1px solid #dadce0;
-  border-radius: 10px;
-  background: #fff;
-  color: #3c4043;
-  cursor: pointer;
-  font-size: 15px;
-}
-
-.google-btn:hover {
-  background: #f7f8f8;
-}
-
-.divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 18px 0 22px;
-  color: #9aa7bb;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.divider::before,
-.divider::after {
-  height: 1px;
-  flex: 1;
-  background: #e6e9ee;
-  content: '';
-}
-
 .field {
   display: block;
   margin-bottom: 17px;

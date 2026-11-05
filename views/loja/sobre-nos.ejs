@@ -1,6 +1,5 @@
     <%- include("../partials/head", { tituloPagina: 'Sobre nós' })  %>
 
-    <link rel="stylesheet" href="/css/base/reset.css">
     <link rel="stylesheet" href="/css/pages/sobre-nos.css">
 
     <%- include("../partials/header") %>
@@ -9,8 +8,8 @@
         <section class="sobreNosBackground sectionSobreNos">
                 <div class="alinhamentoSobreNosTexto">
                 <h1 class="tituloSobreNos">Energia e confiança</h1>
-                <h1 class=" tituloSobreNos vermelho alinhamentoVermelho">desde 2011</h1></h1>
-                <p class="legendaSobreNos">A LuzForte nasceu para oferecer materiais elétricos de qualidade com o atendimento próximo e humano que você merece com mais de 7 mil de clientes atendido .</p>
+                <h1 class=" tituloSobreNos vermelho alinhamentoVermelho">desde 2011</h1>
+                <p class="legendaSobreNos">A LuzForte nasceu para oferecer materiais elétricos de qualidade com o atendimento próximo e humano que você merece. Já são mais de 7 mil clientes atendidos.</p>
             </div>
         </section>
 
@@ -19,11 +18,11 @@
                 <div class="alinhamentoTextoNossaLoja">
                     <h3 class="tituloNossaLoja tituloSobreNos">Nossa loja</h3>
                     <p class="legendaNossaLoja legendaNossaLoja1">Fundada em 2011 na cidade de São João da Boa Vista, a LuzForte surgiu do sonho de dois irmãos eletricistas que queriam oferecer materiais de alta qualidade com preço justo e atendimento especializado.</p>
-                    <p class="legendaNossaLoja legendaNossaLoja2">Hoje, com mais de duas décadas de experiência, atendemos profissionais da elétrica, construtoras, empresas e consumidores finais em toda a região, tanto em nossas lojas físicas quanto pelo nosso e-commerce.</p>
+                    <p class="legendaNossaLoja legendaNossaLoja2">Hoje, com 15 anos de experiência, atendemos profissionais da elétrica, construtoras, empresas e consumidores finais em toda a região, tanto na nossa loja física quanto pelo nosso e-commerce.</p>
                 </div>     
 
                 <div class="alinhamentoImagemNossaLoja">
-                    <img src="/img/sobre-nos/fotoSobreNosFrenteLoja.jpeg">
+                    <img src="/img/sobre-nos/fotoSobreNosFrenteLoja.jpeg" alt="Fachada da loja LuzForte em São João da Boa Vista">
                 </div>
             </div>
         </section>
@@ -34,7 +33,7 @@
                 <div class="cardSobrePai">
                     <div class="cardSobreNosPai">
                             <div class="cardSobreNosFilho">
-                                <div class="iconeSobreNos"><img src="/img/icons/arrow.png"></div>
+                                <div class="iconeSobreNos"><img src="/img/icons/arrow.png" alt=""></div>
                                 <div class="textoCardSobreNosPai">
                                     <h4 class="tituloCardSobreNos">Qualidade</h4>
                                     <p class="legendaCardSobreNos">Produtos certificados das melhores marcas do mercado</p>
@@ -42,26 +41,26 @@
                             </div>
 
                             <div class="cardSobreNosFilho">
-                                <div class="iconeSobreNos"><img src="/img/icons/handshake.png"></div>
+                                <div class="iconeSobreNos"><img src="/img/icons/handshake.png" alt=""></div>
                                 <div class="textoCardSobreNosPai">
-                                    <h4 class="tituloCardSobreNos">Qualidade</h4>
-                                    <p class="legendaCardSobreNos">Produtos certificados das melhores marcas do mercado</p>
+                                    <h4 class="tituloCardSobreNos">Atendimento próximo</h4>
+                                    <p class="legendaCardSobreNos">Equipe que conhece o cliente pelo nome e ajuda a escolher o material certo</p>
                                 </div>
                             </div>
 
                             <div class="cardSobreNosFilho">
-                                <div class="iconeSobreNos"><img src="/img/icons/controlling.png"></div>
+                                <div class="iconeSobreNos"><img src="/img/icons/controlling.png" alt=""></div>
                                 <div class="textoCardSobreNosPai">
-                                    <h4 class="tituloCardSobreNos">Qualidade</h4>
-                                    <p class="legendaCardSobreNos">Produtos certificados das melhores marcas do mercado</p>
+                                    <h4 class="tituloCardSobreNos">Preço justo</h4>
+                                    <p class="legendaCardSobreNos">Valores competitivos para o profissional e para quem está reformando a casa</p>
                                 </div>
                             </div>
 
                             <div class="cardSobreNosFilho">
-                                <div class="iconeSobreNos"><img src="/img/icons/edit.png"></div>
+                                <div class="iconeSobreNos"><img src="/img/icons/edit.png" alt=""></div>
                                 <div class="textoCardSobreNosPai">
-                                    <h4 class="tituloCardSobreNos">Qualidade</h4>
-                                    <p class="legendaCardSobreNos">Produtos certificados das melhores marcas do mercado</p>
+                                    <h4 class="tituloCardSobreNos">Orientação técnica</h4>
+                                    <p class="legendaCardSobreNos">Dicas de quem entende de elétrica para a sua instalação ficar segura</p>
                                 </div>
                             </div>
                     </div>
@@ -72,9 +71,9 @@
         <section class="falarConoscoPai sectionSobreNos">
             <div class="alinhamentoFalarConosco">
                 <h2 class="tituloFalarConosco">Pronto para falar com a <span class="vermelho">gente?</span></h2>
-                <p class="legendaFalarConosco">Visite-nos na nossa loja fisica ou compre conosco por aqui!</p>
+                <p class="legendaFalarConosco">Visite-nos na nossa loja física ou compre conosco por aqui!</p>
                 <div class="botaoSobreNosPai">
-                    <a class="verProdutosSobreNos botaoSobreNos" href="/">Ver produtos</a>
+                    <a class="verProdutosSobreNos botaoSobreNos" href="/catalogo">Ver produtos</a>
                     <% if (whatsappLoja) { %>
                         <a class="falarConoscoSobreNos botaoSobreNos"
                            href="https://wa.me/<%= whatsappLoja %>?text=<%= encodeURIComponent('Olá, vim pelo site da LuzForte') %>"
