@@ -39,13 +39,34 @@ router.get('/', (req, res) => {
     LIMIT 4
   `
 
+  // Últimas avaliações aprovadas pelo admin (nota mais alta primeiro).
+  // Mostra só o primeiro nome do cliente, para não expor o nome completo.
+  const sqlAvaliacoes = `
+    SELECT a.nota, a.comentario, p.sku, p.titulo_produto,
+           SUBSTRING_INDEX(u.nome_usuario, ' ', 1) AS primeiro_nome
+    FROM avaliacao_produto a
+    JOIN usuario u ON u.id_usuario = a.usuario_id
+    JOIN produto p ON p.sku = a.produto_sku
+    WHERE a.status = 'aprovada' AND p.ativo = 'ativo'
+    ORDER BY a.nota DESC, a.data_criacao DESC
+    LIMIT 3
+  `
+
   conexao.query(sqlMaisVendidos, (erro, maisVendidos) => {
     if (erro) {
       // Se o banco falhar, a home abre mesmo assim, só sem os produtos
       console.log(erro)
-      return res.render('loja/home', { maisVendidos: [], erroProdutos: true })
+      return res.render('loja/home', { maisVendidos: [], erroProdutos: true, avaliacoesHome: [] })
     }
-    res.render('loja/home', { maisVendidos, erroProdutos: false })
+
+    conexao.query(sqlAvaliacoes, (erroAvaliacoes, avaliacoesHome) => {
+      if (erroAvaliacoes) {
+        // Sem as avaliações a home continua funcionando; a seção só não aparece
+        console.log(erroAvaliacoes)
+        avaliacoesHome = []
+      }
+      res.render('loja/home', { maisVendidos, erroProdutos: false, avaliacoesHome })
+    })
   })
 })
 
@@ -102,8 +123,9 @@ router.get('/checkout', userEstaLogado, async (req, res) => {
       const pedidoFinalizado = await buscarPedidoFinalizado(req.session.usuario.id_usuario, pedidoId)
       if (!pedidoFinalizado) return res.status(404).send('Pedido não encontrado.')
 
-      // Link do WhatsApp com a mensagem do pedido pronta (null se WHATSAPP_LOJA não estiver no .env)
-      const linkWhatsApp = montarLinkWhatsApp(pedidoFinalizado)
+      // Link do WhatsApp com a mensagem do pedido pronta (null se WHATSAPP_LOJA não estiver no .env).
+      // Só faz sentido enquanto o pedido aguarda a loja; depois, a página só mostra a situação.
+      const linkWhatsApp = pedidoFinalizado.status === 'solicitado' ? montarLinkWhatsApp(pedidoFinalizado) : null
 
       return res.render('loja/checkout', { pedidoFinalizado, linkWhatsApp })
     }

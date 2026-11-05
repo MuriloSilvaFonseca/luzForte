@@ -59,7 +59,9 @@
     margin: auto;
     display: flex;
     justify-content: space-around;
-    width: 1250px;
+    gap: 24px;
+    width: 100%;
+    max-width: 1250px;
     padding-top: 40px;
 }
 .nossaLoja{
@@ -68,12 +70,13 @@
     max-height: 750px;
 }
 .alinhamentoTextoNossaLoja{
-    width: 580px;
+    flex: 0 1 580px;
+    min-width: 0;
     margin-right: 20px;
 }
 .alinhamentoTextoNossaLoja p{
     margin-top: 35px;
-    width: 572px;
+    max-width: 572px;
 }
 .tituloNossaLoja{
     font-size: 40px;
@@ -88,14 +91,17 @@
     color: rgba(104, 104, 104, 1);
 }
 .alinhamentoImagemNossaLoja{
+    flex: 0 1 608px;
+    min-width: 0;
     margin: auto;
 }
 /* .corprovisoria{
     background-color: grey;
 } */
 .alinhamentoImagemNossaLoja img{
-    width: 608px;
-    height: 581px;
+    width: 100%;
+    max-width: 608px;
+    height: auto;
     border-radius: 15px;
 }
 
@@ -111,7 +117,9 @@
     height: 600px;
 }
 .alinhamentoSobreNos{
-    width: 1200px;
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 16px;
     margin: 55px auto;
 }
 .cardSobrePai{
@@ -130,13 +138,15 @@
 .cardSobreNosPai{
     margin: auto;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    flex-wrap: wrap;
     gap: 25px;
 }
 .cardSobreNosFilho{
     border: 1px color rgba(209, 208, 208, 1);
     background-color: rgba(255, 255, 255, 1);
-    width: 280px;
+    flex: 1 1 220px;
+    max-width: 280px;
     height: 268px;
     border-radius: 15px; 
     padding: 15px;  

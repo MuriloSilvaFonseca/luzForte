@@ -30,7 +30,7 @@
 </div>
 
 <form class="adm-card adm-filters" method="get" action="/admin/produtos">
-  <input class="adm-field adm-field--search" type="search" name="q" value="<%= filtros.q %>" placeholder="Buscar por nome, SKU ou EAN">
+  <input class="adm-field adm-field--search" type="search" name="q" value="<%= filtros.q %>" placeholder="Buscar por nome, SKU ou EAN" aria-label="Buscar por nome, SKU ou EAN">
   <select class="adm-field" name="status" aria-label="Status">
     <option value="">Todos os status</option>
     <% Object.keys(statusInfo).forEach(function (s) { %>
@@ -83,7 +83,8 @@
             <td>
               <div class="adm-prod">
                 <% if (p.imagem) { %>
-                  <img class="adm-prod__img" src="<%= p.imagem %>" alt="" loading="lazy">
+                  <img class="adm-prod__img" src="<%= p.imagem %>" alt="" loading="lazy"
+                  onerror="this.onerror=null; this.src='/img/icons/icons8-caixa-128.png'">
                 <% } else { %>
                   <span class="adm-prod__img" aria-hidden="true"></span>
                 <% } %>

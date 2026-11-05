@@ -21,7 +21,7 @@ test('página do carrinho: R$ 3,90, seleção, quantidade, remoção e contador'
   const modais = []
   const chamadas = []
   const ids = Object.fromEntries(['mensagemCarrinho', 'itensCarrinho', 'checkTodos', 'avisoSelecaoCarrinho', 'carrinhoVazio', 'esvaziarCarrinho'].map(id => [id, new Elemento()]))
-  const seletores = Object.fromEntries(['.labelResumo', '.valorResumo', '.descontoValor', '.valorTotal', '.cupomDesconto .botaoCarrinho', '.cart-badge', '.botaoCarrinhoFinalizar button'].map(seletor => [seletor, new Elemento()]))
+  const seletores = Object.fromEntries(['.labelResumo', '.valorResumo', '.valorTotal', '.cart-badge', '.botaoCarrinhoFinalizar button'].map(seletor => [seletor, new Elemento()]))
   ids.modeloItemCarrinho = { content: { cloneNode() {
     const card = new Elemento()
     const partes = Object.fromEntries(['.nomeProduto', '.badgeCategoria', '.qtyValor', '.precoAtual', '.precoUn', '.precoOff', 'img', '.checkCarrinho input', '.btnDel', '.avisoEstoqueCarrinho', '.btnQty[onclick*="-1"]', '.btnQty[onclick="mudarQty(this, 1)"]'].map(seletor => [seletor, new Elemento()]))

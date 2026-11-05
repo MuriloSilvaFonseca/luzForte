@@ -217,6 +217,16 @@ resumo.replaceChildren(
     texto.textContent = a.comentario || '';
 
     item.append(topo, texto);
+
+    // Resposta pública que o admin escreveu em /admin/avaliacoes
+    if (a.resposta) {
+      const resposta = document.createElement('p');
+      resposta.className = 'avaliacao_resposta_produto';
+      const titulo = document.createElement('strong');
+      titulo.textContent = 'Resposta da LuzForte: ';
+      resposta.append(titulo, document.createTextNode(a.resposta));
+      item.appendChild(resposta);
+    }
     listaEl.appendChild(item);
   });
 }
@@ -280,7 +290,7 @@ async function carregarProduto() {
     const id = new URLSearchParams(window.location.search).get('id');
     if (!id || !/^\d+$/.test(id)) throw new Error('Produto não encontrado.');
     const response = await fetch('/api/produtos/' + encodeURIComponent(id));
-    const data = await response.json();
+    const data = await response.json().catch(() => ({ erro: 'Não foi possível carregar o produto.' }));
     if (!response.ok) throw new Error(data.erro);
     const registro = data.produto;
     const produto = {
@@ -288,7 +298,7 @@ async function carregarProduto() {
       precoAtual: Number(registro.preco_produto), precoAntigo: Number(registro.preco_produto),
       estoque: registro.estoque_produto + ' em estoque',
       estoqueDisponivel: Number(registro.estoque_produto),
-      avaliacao: { nota: Math.round(Number(data.avaliacao.media)), totalAvaliacoes: data.avaliacao.quantidade },
+      avaliacao: { nota: Number(data.avaliacao.media), totalAvaliacoes: data.avaliacao.quantidade },
       imagens: data.imagens.map(imagem => imagem.url),
       categoria: registro.categoria, idCategoria: registro.id_categoria,
       descricoes: data.descricoes, especificacoes: data.especificacoes, instalacoes: data.instalacoes
@@ -302,45 +312,6 @@ carregarRelacionados(produto);
     const nome = document.getElementById("productName");
     if (nome) nome.textContent = "Produto não encontrado";
   }
-}
-
-function renderizarResumo(media, total) {
-  const resumo = document.getElementById('avaliacoesResumo')
-  if (!resumo) return
-
-  const nota = document.createElement('p')
-  nota.textContent = `${Number(media).toFixed(1)}/5`
-
-  const qtd = document.createElement('span')
-  qtd.textContent = `(${total} ${total === 1 ? 'avaliação' : 'avaliações'})`
-
-  resumo.replaceChildren(nota, criarEstrelas(media), qtd)
-}
-
-function renderizarLista(avaliacoes) {
-  const lista = document.getElementById('avaliacoesLista')
-  if (!lista) return
-
-  if (!avaliacoes.length) {
-    lista.textContent = 'Este produto ainda não tem avaliações.'
-    return
-  }
-
-  lista.replaceChildren(...avaliacoes.map(a => {
-    const item = document.createElement('article')
-
-    const cabecalho = document.createElement('p')
-    cabecalho.replaceChildren(
-      criarEstrelas(a.nota),
-      document.createTextNode(` · ${a.nome} · ${a.data}`)
-    )
-
-    const texto = document.createElement('p')
-    texto.textContent = a.comentario
-
-    item.append(cabecalho, texto)
-    return item
-}))
 }
 
 function changeImage(index) {
@@ -447,9 +418,17 @@ if (formAvaliar) {
         contador.textContent = `${texto.value.length}/${texto.maxLength}`;
     });
 
-    // Depois do envio, a rota volta para a página com ?avaliado=1
-    if (new URLSearchParams(location.search).get('avaliado') === '1') {
-        document.getElementById('avaliacaoMensagem').hidden = false;
-        formAvaliar.reset();
+    // Depois do envio, a rota volta para a página com ?avaliado=<resultado>
+    const resultadoAvaliacao = new URLSearchParams(location.search).get('avaliado');
+    const mensagensAvaliacao = {
+        repetida: 'Você já avaliou este produto.',
+        invalida: 'Escolha uma nota e escreva um comentário entre 10 e 500 caracteres.',
+        erro: 'Não foi possível enviar sua avaliação agora. Tente novamente.'
+    };
+    if (resultadoAvaliacao) {
+        const aviso = document.getElementById('avaliacaoMensagem');
+        if (mensagensAvaliacao[resultadoAvaliacao]) aviso.textContent = mensagensAvaliacao[resultadoAvaliacao];
+        aviso.hidden = false;
+        if (resultadoAvaliacao === '1') formAvaliar.reset();
     }
 }

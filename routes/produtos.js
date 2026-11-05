@@ -62,7 +62,7 @@ router.get('/:sku', async (req, res) => {
       banco.execute('SELECT nome_instalacao, texto_instalacao FROM instalacao WHERE produto_sku = ?', [sku]),
       banco.execute("SELECT COUNT(*) AS quantidade, COALESCE(AVG(nota), 0) AS media FROM avaliacao_produto WHERE produto_sku = ? AND status = 'aprovada'", [sku]),
       banco.execute("SELECT nota, COUNT(*) AS qtd FROM avaliacao_produto WHERE produto_sku = ? AND status = 'aprovada' GROUP BY nota", [sku]),
-      banco.execute(`SELECT a.nota, a.comentario, a.data_criacao, u.nome_usuario
+      banco.execute(`SELECT a.nota, a.comentario, a.data_criacao, a.resposta, u.nome_usuario
                      FROM avaliacao_produto a
                      JOIN usuario u ON u.id_usuario = a.usuario_id
                      WHERE a.produto_sku = ? AND a.status = 'aprovada'

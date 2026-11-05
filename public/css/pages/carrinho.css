@@ -200,16 +200,6 @@ body {
     color: #1a1a1a;
 }
 
-.btnFav {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 18px;
-    padding: 0;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-}
 
 .btnDel {
     display: inline-flex;
@@ -270,8 +260,7 @@ body {
     gap: 16px;
 }
 
-.resumoProduto,
-.cupomDesconto {
+.resumoProduto {
     background: #fff;
     border-radius: 12px;
     border: 0.5px solid #e0e0d8;
@@ -309,11 +298,6 @@ body {
     font-weight: 500;
 }
 
-.descontoValor {
-    font-size: 13px;
-    color: #0fa050;
-    font-weight: 500;
-}
 
 .linhaTotal {
     display: flex;
@@ -333,11 +317,7 @@ body {
     font-weight: 700;
     color: #1a1a1a;
 }
-.botaoCarrinho{
-    margin-top: 10px;
-}
-.botaoCarrinhoFinalizar button,
-.cupomDesconto .botaoCarrinho {
+.botaoCarrinhoFinalizar button {
     width: 100%;
     background: #1a6be8;
     color: #fff;
@@ -350,8 +330,7 @@ body {
     transition: background 0.15s;
 }
 
-.botaoCarrinhoFinalizar button:hover,
-.cupomDesconto .botaoCarrinho:hover {
+.botaoCarrinhoFinalizar button:hover {
     background: #1456c2;
 }
 
@@ -368,10 +347,6 @@ body {
     margin-top: 10px;
 }
 
-.compraSegura i {
-    font-size: 15px;
-    color: #888;
-}
 
 .legendaCompra {
     font-size: 12px;
@@ -432,37 +407,9 @@ body {
     transform: translateX(3px);
 }
 
-/*cupom de desconto  */
-.textoCupom {
-    font-size: 14px;
-    font-weight: 500;
-    color: #1a1a1a;
-    margin-bottom: 4px;
-}
 
-.labelCupom {
-    font-size: 13px;
-    font-weight: 400;
-    color: #888;
-    margin-bottom: 8px;
-}
 
-.cupomDesconto input[type="text"] {
-    width: 100%;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 9px 12px;
-    font-size: 13px;
-    margin-bottom: 5px;
-    outline: none;
-    transition: border 0.15s;
-    font-family: inherit;
-}
 
-.cupomDesconto input[type="text"]:focus {
-    border-color: #1a6be8;
-
-}
 
 .alinhamentoCarrinho input[type="checkbox"] {
     width: 17px;
@@ -471,11 +418,18 @@ body {
     accent-color: #1a6be8;
 }
 
-.mensagemCupom {
-  font-size: 12px;
-  margin-bottom: 8px;
-  font-weight: 500;
+/* Botão "Ver produtos" do carrinho vazio */
+.botaoCarrinhoVazio {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    background: #1a6be8;
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
 }
- 
-.erroCupom   { color: #e24b4a; }
-.sucessoCupom { color: #0fa050; }
+
+.botaoCarrinhoVazio:hover {
+    background: #1456c2;
+}

@@ -40,7 +40,7 @@
 <form class="adm-card adm-filters" method="get" action="/admin/pedidos">
   <% if (filtros.status) { %><input type="hidden" name="status" value="<%= filtros.status %>"><% } %>
   <% if (filtros.usuario) { %><input type="hidden" name="usuario" value="<%= filtros.usuario %>"><% } %>
-  <input class="adm-field adm-field--search" type="search" name="q" value="<%= filtros.q %>" placeholder="Buscar por nº do pedido ou cliente">
+  <input class="adm-field adm-field--search" type="search" name="q" value="<%= filtros.q %>" placeholder="Buscar por nº do pedido ou cliente" aria-label="Buscar por nº do pedido ou cliente">
   <input class="adm-field" type="date" name="de" value="<%= filtros.de %>" aria-label="Data inicial">
   <input class="adm-field" type="date" name="ate" value="<%= filtros.ate %>" aria-label="Data final">
   <button class="adm-btn" type="submit">Filtrar</button>

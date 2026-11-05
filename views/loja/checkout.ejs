@@ -13,13 +13,25 @@
         <section class="checkout-card checkout-confirmacao" id="confirmacao-pedido"
                  data-pedido="<%= pedidoFinalizado.id_pedido %>"
                  data-link-whatsapp="<%= locals.linkWhatsApp || '' %>">
+            <%
+              // Texto de cada situação: o link desta página continua válido depois que a loja aprova
+              const situacoes = {
+                solicitado: 'Aguardando aprovação da loja',
+                aprovado: 'Aprovado: pode retirar na loja',
+                finalizado: 'Retirado na loja',
+                cancelado: 'Cancelado'
+              }
+              const aguardando = pedidoFinalizado.status === 'solicitado'
+            %>
             <p class="checkout-selo">Pedido enviado</p>
             <h1>Obrigado pela sua compra!</h1>
             <p>Seu pedido <strong>#<%= pedidoFinalizado.id_pedido %></strong> foi registrado.</p>
-            <p>Status: <strong>Aguardando aprovação da loja</strong></p>
+            <p>Status: <strong><%= situacoes[pedidoFinalizado.status] || pedidoFinalizado.status %></strong></p>
             <p>Forma de pagamento: <strong><%= pedidoFinalizado.nome_pagamento %></strong></p>
             <p class="checkout-total">Total: <%= Number(pedidoFinalizado.total).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) %></p>
+            <% if (aguardando) { %>
             <p class="checkout-aviso">Seu pedido ainda precisa ser aprovado pela loja. Envie a mensagem pelo WhatsApp e aguarde nossa confirmação. Depois, retire e pague na loja.</p>
+            <% } %>
             <div class="checkout-retirada">
                 <h2>Retirada e pagamento</h2>
                 <p><strong>Endereço:</strong> R. Quatorze de Julho, 880 – Vila Oriental, São João da Boa Vista – SP.</p>

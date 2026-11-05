@@ -42,6 +42,13 @@ const connection = {
       itens.push({ pedido_id: args[0], produto_sku: args[1], quantidade: args[2], preco_unitario: args[3], subtotal: (args[4] * args[5]).toFixed(2) })
       return [{}]
     }
+    if (sql.startsWith('UPDATE produto_pedido pp JOIN produto')) {
+      // Sincroniza com o preço atual do produto (no banco simulado o 1001 custa 10.00)
+      for (const i of itens.filter(i => i.pedido_id === args[0] && i.produto_sku === 1001)) {
+        i.preco_unitario = '10.00'; i.subtotal = (i.quantidade * 10).toFixed(2)
+      }
+      return [{}]
+    }
     if (sql.startsWith('UPDATE produto_pedido')) {
       const item = itens.find(i => i.pedido_id === args[2] && i.produto_sku === args[3])
       item.quantidade = args[0]; item.subtotal = (args[1] * item.preco_unitario).toFixed(2)

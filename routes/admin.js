@@ -8,6 +8,7 @@ const { userEstaLogado, userAdmin } = require('../middlewares/auth')
 const router = express.Router()
 
 router.use(userEstaLogado, userAdmin)
+router.use(require('../middlewares/avaliacoes-pendentes'))
 router.use(require('./admin-textos'))
 router.use(require('./admin-cadastros'))
 
@@ -360,7 +361,11 @@ router.post(['/produtos/novo', '/produtos/:sku/editar'], analisarFormularioMulti
     if (corpo[campo] !== undefined && typeof corpo[campo] !== 'string') formatoInvalido = true
     valores[campo] = typeof corpo[campo] === 'string' ? corpo[campo].trim() : ''
   }
-  if (!valores.estoque_produto) valores.estoque_produto = '0'
+  // Produto novo com estoque em branco começa com 0. Na edição, campo vazio é erro
+  // (antes virava 0 e apagava o estoque sem o admin perceber).
+  if (!valores.estoque_produto && !editando) valores.estoque_produto = '0'
+  // Estoque que estava na tela quando o admin abriu a edição (campo escondido do formulário)
+  valores.estoque_original = typeof corpo.estoque_original === 'string' ? corpo.estoque_original.trim() : ''
   const modelosEnviados = corpo.modelos === undefined ? [] : Array.isArray(corpo.modelos) ? corpo.modelos : [corpo.modelos]
   if (modelosEnviados.some(id => typeof id !== 'string' || !inteiroValido(id, 1))) formatoInvalido = true
   valores.modelos = [...new Set(modelosEnviados.filter(id => typeof id === 'string' && inteiroValido(id, 1)))]
@@ -453,10 +458,24 @@ router.post(['/produtos/novo', '/produtos/:sku/editar'], analisarFormularioMulti
       valores.GTIN_EAN || null, Number(valores.marca_id), Number(valores.categoria_id), valores.subcategoria_id ? Number(valores.subcategoria_id) : null
     ]
     if (editando) {
-      const [produtos] = await conexaoBanco.query('SELECT sku FROM produto WHERE sku = ? FOR UPDATE', [skuNumero])
+      const [produtos] = await conexaoBanco.query('SELECT sku, estoque_produto FROM produto WHERE sku = ? FOR UPDATE', [skuNumero])
       if (!produtos.length) {
         await conexaoBanco.rollback()
         return res.status(404).send('Produto não encontrado.')
+      }
+      // O estoque pode ter mudado enquanto o admin editava (ex.: um pedido foi aprovado).
+      // Em vez de gravar o número da tela por cima, aplicamos só a DIFERENÇA que o admin fez.
+      // Ex.: abriu com 10, digitou 12 (+2); nesse meio-tempo uma venda baixou para 6 -> fica 8.
+      const estoqueAtual = Number(produtos[0].estoque_produto)
+      if (inteiroValido(valores.estoque_original, 0) && Number.isSafeInteger(estoqueAtual)) {
+        const novoEstoque = estoqueAtual + (Number(valores.estoque_produto) - Number(valores.estoque_original))
+        if (novoEstoque < 0) {
+          const erroEstoque = new Error('O estoque mudou enquanto você editava (agora são ' + estoqueAtual + ' unidades). Confira o valor e salve de novo.')
+          erroEstoque.status = 409
+          erroEstoque.estoqueAtual = estoqueAtual
+          throw erroEstoque
+        }
+        valoresProduto[1] = novoEstoque
       }
       const [imagens] = await conexaoBanco.query(
         'SELECT ordem, url FROM imagem_produto WHERE produto_sku = ? ORDER BY ordem FOR UPDATE',
@@ -542,6 +561,12 @@ router.post(['/produtos/novo', '/produtos/:sku/editar'], analisarFormularioMulti
     if (falha.status === 400) {
       status = 400
       erro = falha.message
+    } else if (falha.status === 409) {
+      // Mostra o formulário de novo já com o estoque atual do banco
+      status = 409
+      erro = falha.message
+      valores.estoque_produto = String(falha.estoqueAtual)
+      valores.estoque_original = String(falha.estoqueAtual)
     } else if (falha.code === 'ER_DUP_ENTRY') {
       status = 400
       erro = 'Esse SKU ou código EAN já está cadastrado.'

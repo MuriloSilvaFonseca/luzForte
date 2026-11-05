@@ -1,10 +1,54 @@
 <%- include("../partials/head", { tituloPagina: 'Contato' }) %>
-    <link rel="stylesheet" href="/css/pages/contato.css">
+<link rel="stylesheet" href="/css/pages/contato.css">
+<%- include("../partials/header") %>
 
-    <%- include("../partials/header") %>
-
-
+<main class="contato">
+  <section class="contato-intro">
+    <p class="contato-etiqueta">Fale com a gente</p>
     <h1>Contato</h1>
+    <p>Tire dúvidas sobre produtos, acompanhe um pedido ou peça um orçamento. Nossa equipe atende pelos canais abaixo.</p>
+  </section>
 
-    
+  <section class="contato-canais" aria-label="Canais de atendimento">
+    <% if (whatsappLoja) { %>
+      <article class="contato-card contato-card--destaque">
+        <h2>WhatsApp</h2>
+        <p>O jeito mais rápido de falar com a loja e combinar a retirada do seu pedido.</p>
+        <a class="contato-botao" href="https://wa.me/<%= whatsappLoja %>?text=<%= encodeURIComponent('Olá, vim pelo site da LuzForte') %>"
+          target="_blank" rel="noopener noreferrer">Conversar no WhatsApp</a>
+      </article>
+    <% } %>
+
+    <article class="contato-card">
+      <h2>Telefone</h2>
+      <p><a href="tel:+551936231726">(19) 3623-1726</a></p>
+    </article>
+
+    <article class="contato-card">
+      <h2>E-mail</h2>
+      <p><a href="mailto:luzforte2011@hotmail.com">luzforte2011@hotmail.com</a></p>
+    </article>
+
+    <article class="contato-card">
+      <h2>Redes sociais</h2>
+      <p>
+        <a href="https://www.instagram.com/luzforte_/" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <span aria-hidden="true">·</span>
+        <a href="https://www.facebook.com/luzforte2011" target="_blank" rel="noopener noreferrer">Facebook</a>
+      </p>
+    </article>
+  </section>
+
+  <section class="contato-card contato-endereco" aria-labelledby="endereco-titulo">
+    <h2 id="endereco-titulo">Endereço e horário</h2>
+    <address>R. Quatorze de Julho, 880 – Vila Oriental<br>São João da Boa Vista – SP</address>
+    <p><strong>Horário:</strong> segunda a sexta, das 7h às 18h; sábado, das 7h30 às 12h.</p>
+    <p>Domingos e feriados: consulte a loja antes de vir.</p>
+    <a class="contato-link" href="https://www.google.com/maps/search/?api=1&query=<%= encodeURIComponent('R. Quatorze de Julho, 880, São João da Boa Vista - SP') %>"
+      target="_blank" rel="noopener noreferrer">Ver no mapa</a>
+  </section>
+
+  <p class="contato-voltar"><a href="/como-comprar">Saiba como comprar</a> <span>ou</span> <a href="/catalogo">veja nossos produtos</a></p>
+</main>
+
 <%- include("../partials/footer") %>

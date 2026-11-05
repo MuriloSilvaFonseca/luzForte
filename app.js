@@ -1,24 +1,34 @@
 require('dotenv').config()
 
+const criptografia = require('node:crypto')
 const express = require('express')
 const sessao = require('express-session')
 const rotasLoja = require('./routes/loja')
 const rotasAutenticacao = require('./routes/auth')
 const rotasProdutosAdmin = require('./routes/admin')
 const rotasAdmin = require('./routes/admin-paineis')
-// Neon (futuro): exige DATABASE_URL no .env.
-// const produtosApi = require('./routes/api-produtos')
 const app = express()
 const porta = Number(process.env.PORT || 3000)
 
 app.use(express.urlencoded({ extended: true, limit: '1mb' }))
 
+// O SESSION_SECRET assina o cookie de login. Se o .env não tiver um, sorteamos um aleatório
+// a cada vez que o servidor sobe: tudo funciona, mas quem estiver logado sai ao reiniciar.
+// Não usamos um valor fixo aqui porque ele ficaria público no GitHub.
+let segredoSessao = process.env.SESSION_SECRET
+if (!segredoSessao) {
+  segredoSessao = criptografia.randomBytes(32).toString('hex')
+  console.warn('SESSION_SECRET não definido no .env: usando um segredo temporário (os logins caem ao reiniciar).')
+}
+
 app.use( sessao({
-  secret: process.env.SESSION_SECRET,
+  secret: segredoSessao,
   resave: false,
   saveUninitialized: false,
   rolling: true,
-  cookie: { maxAge: 1000 * 60 * 60 * 0.5 }
+  // sameSite 'lax': o navegador não envia o cookie de login em formulários vindos de OUTROS sites.
+  // Protege contra CSRF (um site malicioso enviando um POST para o painel com o admin logado).
+  cookie: { maxAge: 1000 * 60 * 60 * 0.5, httpOnly: true, sameSite: 'lax' }
 }))
 
 app.use((req, res, next) => {
@@ -44,7 +54,6 @@ app.use(require('./middlewares/navbar'))
 app.use('/', rotasLoja)
 app.use('/', rotasAutenticacao)
 app.use('/', require('./routes/conta'))
-// app.use('/', produtosApi)
 app.use('/', require('./routes/avaliacao'))
 app.use('/admin', rotasProdutosAdmin)
 app.use('/admin', rotasAdmin)
@@ -64,11 +73,30 @@ app.use((req, res) => {
 app.use((erro, req, res, next) => {
   console.error('Erro inesperado:', erro)
   if (res.headersSent) return next(erro)
-  res.status(500).render('loja/erro', {
+
+  // Erros de requisição inválida (ex.: formulário grande demais) mantêm o código 4xx
+  const status = erro.status >= 400 && erro.status < 500 ? erro.status : 500
+
+  // Alguns erros acontecem antes dos middlewares que preparam o header;
+  // sem estes valores padrão, a própria página de erro quebraria.
+  res.locals.usuario = res.locals.usuario || null
+  res.locals.whatsappLoja = res.locals.whatsappLoja || null
+  res.locals.navbarCategorias = res.locals.navbarCategorias || []
+  res.locals.navbarPrincipais = res.locals.navbarPrincipais || []
+  res.locals.navbarIndisponivel = res.locals.navbarIndisponivel || false
+
+  res.status(status).render('loja/erro', {
     tituloPagina: 'Erro no servidor',
-    codigo: '500',
-    titulo: 'Tivemos um problema por aqui',
+    codigo: String(status),
+    titulo: status === 500 ? 'Tivemos um problema por aqui' : 'Não foi possível processar o pedido',
     mensagem: 'Não foi possível concluir sua solicitação agora. Tente novamente em instantes.'
+  }, (erroPagina, html) => {
+    // Se até a página de erro falhar, responde em texto simples (nunca mostra o stack trace)
+    if (erroPagina) {
+      console.error('Falha ao montar a página de erro:', erroPagina)
+      return res.type('text').send('Erro no servidor. Tente novamente em instantes.')
+    }
+    res.send(html)
   })
 })
 

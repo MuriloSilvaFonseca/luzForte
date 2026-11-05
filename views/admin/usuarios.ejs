@@ -29,7 +29,7 @@
 
 <% if (salvo) { %><p class="adm-alert adm-alert--success" role="status">Situação da conta atualizada.</p><% } %>
 <form class="adm-card adm-filters" method="get" action="/admin/usuarios">
-  <input class="adm-field adm-field--search" type="search" name="q" value="<%= filtros.q %>" placeholder="Buscar por nome ou e-mail">
+  <input class="adm-field adm-field--search" type="search" name="q" value="<%= filtros.q %>" placeholder="Buscar por nome ou e-mail" aria-label="Buscar por nome ou e-mail">
   <select class="adm-field" name="perfil" aria-label="Perfil">
     <option value="">Todos os perfis</option>
     <% Object.keys(perfis).forEach(function (k) { %>

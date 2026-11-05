@@ -39,3 +39,9 @@ CLAUDE.local.md
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Imagens enviadas pelo painel admin (ficam só na máquina de quem enviou)
+public/img/products/produto-*
+
+# Rascunhos gerados pelo Claude fora do projeto
+Claude outputs/

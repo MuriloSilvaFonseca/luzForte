@@ -36,6 +36,21 @@ router.post('/registro', (req, res) => {
     return renderizarRegistro(res, 'Preencha todos os campos', valores)
   }
 
+  if (nomeUsuario.length > 200) {
+    return renderizarRegistro(res, 'O nome pode ter no máximo 200 caracteres', valores)
+  }
+
+  // Formato simples de e-mail: algo@algo.algo, sem espaços
+  if (emailUsuario.length > 255 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailUsuario)) {
+    return renderizarRegistro(res, 'Informe um e-mail válido', valores)
+  }
+
+  // Telefone com DDD: 10 ou 11 números (aceita digitar com parênteses, espaço e traço)
+  const numerosTelefone = telefoneUsuario.replace(/\D/g, '')
+  if (numerosTelefone.length < 10 || numerosTelefone.length > 11) {
+    return renderizarRegistro(res, 'Informe o telefone com DDD (10 ou 11 números)', valores)
+  }
+
   if (senha.length < 8) {
     return renderizarRegistro(res, 'A senha precisa ter no mínimo 8 caracteres', valores)
   }
@@ -80,6 +95,41 @@ router.post('/registro', (req, res) => {
   })
 })
 
+// ---------------------------------------------------------------------------
+// LIMITE DE TENTATIVAS NO LOGIN
+// Depois de 5 senhas erradas para o mesmo e-mail (vindas do mesmo IP), o login
+// fica bloqueado por 15 minutos. Isso impede alguém de testar milhares de senhas.
+// Fica guardado na memória do servidor (zera quando o servidor reinicia).
+// ---------------------------------------------------------------------------
+const MAX_ERROS_LOGIN = 5
+const MINUTOS_BLOQUEIO_LOGIN = 15
+const errosLogin = new Map()
+
+function chaveLogin(req, email) {
+  return email.trim().toLowerCase() + '|' + req.ip
+}
+
+function loginBloqueado(chave) {
+  const registro = errosLogin.get(chave)
+  if (!registro) return false
+  if (Date.now() - registro.inicio > MINUTOS_BLOQUEIO_LOGIN * 60 * 1000) {
+    errosLogin.delete(chave)
+    return false
+  }
+  return registro.erros >= MAX_ERROS_LOGIN
+}
+
+function registrarErroLogin(chave) {
+  const registro = errosLogin.get(chave)
+  if (!registro || Date.now() - registro.inicio > MINUTOS_BLOQUEIO_LOGIN * 60 * 1000) {
+    errosLogin.set(chave, { erros: 1, inicio: Date.now() })
+  } else {
+    registro.erros++
+  }
+  // Evita a lista crescer sem limite
+  if (errosLogin.size > 10000) errosLogin.clear()
+}
+
 router.get('/login', (req, res) => {
   if (req.session.usuario) {
     if (req.session.usuario.acesso === 'admin') return res.redirect('/admin')
@@ -99,6 +149,11 @@ router.post('/login', (req, res) => {
     return res.status(400).render('auth/login', { erro: 'Informe e-mail e senha.' })
   }
 
+  const chave = chaveLogin(req, email)
+  if (loginBloqueado(chave)) {
+    return res.status(429).render('auth/login', { erro: 'Muitas tentativas erradas. Aguarde ' + MINUTOS_BLOQUEIO_LOGIN + ' minutos e tente de novo.' })
+  }
+
   const sql = 'SELECT id_usuario, nome_usuario, acesso, senha, ativo FROM usuario WHERE email = ? LIMIT 1'
 
   // Busca a conta pelo e-mail, como no cadastro.
@@ -110,6 +165,7 @@ router.post('/login', (req, res) => {
 
     const usuario = usuarios[0]
     if (!usuario || Number(usuario.ativo) !== 1) {
+      registrarErroLogin(chave)
       return res.status(401).render('auth/login', { erro: 'E-mail ou senha inválidos.' })
     }
 
@@ -121,8 +177,10 @@ router.post('/login', (req, res) => {
       }
 
       if (!senhaValida) {
+        registrarErroLogin(chave)
         return res.status(401).render('auth/login', { erro: 'E-mail ou senha inválidos.' })
       }
+      errosLogin.delete(chave)
 
       // Guarda o token do carrinho do visitante ANTES de recriar a sessão:
       // o regenerate apaga tudo o que estava na sessão antiga.
@@ -265,9 +323,11 @@ router.post('/esqueci-senha', (req, res) => {
           return telaRedefinicao(res, 'email', { erro: 'Não foi possível continuar. Tente novamente.' })
         }
 
+        // Envia sem esperar a resposta do EmailJS: assim a tela demora o mesmo tempo
+        // com ou sem conta cadastrada (pelo tempo não dá para descobrir quem tem conta)
         enviarCodigoRedefinicao(email, usuario.nome_usuario, codigo)
           .catch(erroEmail => console.log(erroEmail.message)) // a falha fica no terminal
-          .then(() => res.redirect('/esqueci-senha'))
+        res.redirect('/esqueci-senha')
       })
     })
   })
@@ -286,30 +346,34 @@ router.post('/esqueci-senha/codigo', (req, res) => {
     return telaRedefinicao(res, 'codigo', { erro: mensagemInvalido })
   }
 
-  const sql = 'SELECT codigo_hash, tentativas, (expira_em > NOW()) AS dentro_do_prazo FROM redefinicao_senha WHERE usuario_id = ?'
-  conexao.query(sql, [processo.usuarioId], (erro, linhas) => {
+  // Primeiro GASTA uma tentativa, num único comando. Se várias requisições chegarem ao mesmo
+  // tempo, o banco conta uma por uma: ninguém consegue testar mais de 5 códigos.
+  const sqlTentativa = `UPDATE redefinicao_senha SET tentativas = tentativas + 1
+    WHERE usuario_id = ? AND tentativas < ? AND expira_em > NOW()`
+  conexao.query(sqlTentativa, [processo.usuarioId, MAX_TENTATIVAS], (erro, resultado) => {
     if (erro) {
       console.log(erro)
       return telaRedefinicao(res, 'codigo', { erro: 'Não foi possível continuar. Tente novamente.' })
     }
 
-    const registro = linhas[0]
-    if (!registro || !registro.dentro_do_prazo || registro.tentativas >= MAX_TENTATIVAS) {
+    // Nenhuma linha alterada: não existe código, expirou ou acabaram as tentativas
+    if (resultado.affectedRows === 0) {
       return telaRedefinicao(res, 'codigo', { erro: mensagemInvalido + ' Peça um novo código.' })
     }
 
-    if (registro.codigo_hash !== hashCodigo(codigo)) {
-      // Errou: conta a tentativa
-      conexao.query('UPDATE redefinicao_senha SET tentativas = tentativas + 1 WHERE usuario_id = ?', [processo.usuarioId], (erro2) => {
-        if (erro2) console.log(erro2)
-        telaRedefinicao(res, 'codigo', { erro: mensagemInvalido })
-      })
-      return
-    }
+    conexao.query('SELECT codigo_hash FROM redefinicao_senha WHERE usuario_id = ?', [processo.usuarioId], (erro2, linhas) => {
+      if (erro2) {
+        console.log(erro2)
+        return telaRedefinicao(res, 'codigo', { erro: 'Não foi possível continuar. Tente novamente.' })
+      }
+      if (!linhas.length || linhas[0].codigo_hash !== hashCodigo(codigo)) {
+        return telaRedefinicao(res, 'codigo', { erro: mensagemInvalido })
+      }
 
-    // Acertou: libera a etapa da nova senha
-    processo.autorizado = true
-    res.redirect('/esqueci-senha')
+      // Acertou: libera a etapa da nova senha
+      processo.autorizado = true
+      res.redirect('/esqueci-senha')
+    })
   })
 })
 

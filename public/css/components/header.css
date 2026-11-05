@@ -134,6 +134,8 @@
 
 .search-input {
     flex: 1;
+    /* espaço interno no lugar dos espaços que existiam dentro do placeholder */
+    padding: 0 14px;
     border: none;
     border-radius: 6px 0 0 6px;
     max-height: 40px;

@@ -1,18 +1,19 @@
 -- LuzForte: dados fictícios para praticar consultas (MySQL 8).
--- Compatível com o schema completo de database/Luz_ForteDB.sql.
+-- Compatível com o schema completo de database/luzForte.sql.
 -- Execute APENAS em um banco de testes com as tabelas vazias já criadas.
 -- Execute uma única vez: os IDs são fixos e uma repetição gera duplicidades.
 -- Este arquivo não apaga dados nem altera a estrutura.
 -- Se houver erro durante a execução, interrompa e execute ROLLBACK;
 -- antes de tentar novamente. Não prossiga até o COMMIT após um erro.
--- ATENÇÃO: o dump original contém DROP TABLE e apaga dados ao ser executado.
--- Usuários usam um marcador inválido para login, NÃO uma senha real/hash bcrypt.
--- São apenas dados para SELECT; gere hashes com bcrypt na aplicação para login.
--- Caminhos de imagens são exemplos; os arquivos não estão incluídos.
+-- ATENÇÃO: database/luzForte.sql contém DROP TABLE e apaga dados ao ser executado.
+-- Usuários 1 a 8 usam um marcador inválido para login, NÃO uma senha real/hash bcrypt.
+-- O usuário 9 (teste@gmail.com) é o admin de demonstração: a senha está salva
+-- só como hash bcrypt. Troque a senha dele em qualquer banco que não seja de teste.
+-- Imagens: fotos ilustrativas em public/img/products/ (só alguns produtos têm foto).
 -- Estoque representa o saldo atual, após as vendas já confirmadas.
 -- Neste conjunto: solicitado = pendente; aprovado = confirmado;
 -- finalizado = retirado. A definição definitiva desses status cabe à equipe.
--- Carrinho fica no navegador: não criamos pedidos no status carrinho.
+-- O seed não cria pedidos no status carrinho (o carrinho é criado pela aplicação).
 USE luz_forte;
 SET NAMES utf8mb4;
 START TRANSACTION;
@@ -61,7 +62,9 @@ INSERT INTO usuario (id_usuario, nome_usuario, senha, data_criacao, email, acess
 (5, 'Diego Costa', '!LOGIN_DESABILITADO_SEED!', '2026-08-05 10:00:00', 'usuario5@example.com', 'cliente', '19000000005'),
 (6, 'Elisa Pereira', '!LOGIN_DESABILITADO_SEED!', '2026-08-06 10:00:00', 'usuario6@example.com', 'cliente', '19000000006'),
 (7, 'Felipe Rocha', '!LOGIN_DESABILITADO_SEED!', '2026-08-07 10:00:00', 'usuario7@example.com', 'cliente', '19000000007'),
-(8, 'Gabriela Lima', '!LOGIN_DESABILITADO_SEED!', '2026-08-08 10:00:00', 'usuario8@example.com', 'cliente', '19000000008');
+(8, 'Gabriela Lima', '!LOGIN_DESABILITADO_SEED!', '2026-08-08 10:00:00', 'usuario8@example.com', 'cliente', '19000000008'),
+-- Admin de demonstração: login funciona (senha guardada como hash bcrypt)
+(9, 'Admin Demonstração', '$2b$10$S3c0Yvj57A1LZQrqzqEhuO4WOIIEnMhVEnPm.PgIF3RPr93SbSUFG', '2026-08-01 09:00:00', 'teste@gmail.com', 'admin', '19000000009');
 
 -- produto
 INSERT INTO produto (sku, titulo_produto, estoque_produto, preco_produto, custo_produto, ativo, GTIN_EAN, marca_id, categoria_id, subcategoria_id) VALUES
@@ -110,18 +113,15 @@ INSERT INTO especificacao (id_especificacao, nome_especificacao, texto_especific
 (12, 'Cor', 'Branca', 1010);
 
 -- imagem_produto
+-- Fotos ilustrativas que estão em public/img/products/. Produtos sem foto
+-- (1003 e 1008 a 1012) mostram o ícone padrão de caixa na loja.
 INSERT INTO imagem_produto (id_imagem_produto, ordem, url, produto_sku) VALUES
-(1, 1, '/img/products/produto-1001.jpg', 1001),
-(2, 1, '/img/products/produto-1002.jpg', 1002),
-(3, 1, '/img/products/produto-1003.jpg', 1003),
-(4, 1, '/img/products/produto-1004.jpg', 1004),
-(5, 1, '/img/products/produto-1005.jpg', 1005),
-(6, 1, '/img/products/produto-1006.jpg', 1006),
-(7, 1, '/img/products/produto-1007.jpg', 1007),
-(8, 1, '/img/products/produto-1008.jpg', 1008),
-(9, 1, '/img/products/produto-1009.jpg', 1009),
-(10, 1, '/img/products/produto-1010.jpg', 1010),
-(11, 2, '/img/products/produto-1001-detalhe.jpg', 1001);
+(1, 1, '/img/products/lampada-led.png', 1001),
+(2, 1, '/img/products/lampada-led.png', 1002),
+(3, 1, '/img/products/cabo-azul.png', 1004),
+(4, 1, '/img/products/cabos-coloridos.png', 1005),
+(5, 1, '/img/products/disjuntor.png', 1006),
+(6, 1, '/img/products/disjuntor.png', 1007);
 
 -- instalacao
 INSERT INTO instalacao (id_instalacao, nome_instalacao, texto_instalacao, produto_sku) VALUES

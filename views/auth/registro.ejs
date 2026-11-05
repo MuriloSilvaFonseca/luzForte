@@ -7,7 +7,6 @@
     <link rel="icon" type="image/png" href="/img/faviconLuzForte.png">
     <link rel="stylesheet" href="/css/base/reset.css">
     <link rel="stylesheet" href="/css/pages/registro.css">
-    <link rel="stylesheet" href="/css/components/messages.css">
     <link rel="stylesheet" href="/css/components/footer.css">
     <script src="/js/pages/auth-forms.js" defer></script>
     
@@ -23,15 +22,9 @@
         <div class="cadastro-container">
          <a class="cadastro-voltar" href="/login" aria-label="Voltar"><img src="/img/icons/de-volta.png" alt="Voltar"></a>
             <h1>Criar nova conta</h1>
-            <button class="google-btn" type="button">
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" height="20"
-                        alt="Google" />
-                    Continuar com o Google
-                </button>
-            <div class="divider"><span>OU</span></div>
 
             <form class="cadastro-form" action="/registro" method="post">
-                <% if (typeof erro !== 'undefined') { %>
+                <% if (typeof erro !== 'undefined' && erro) { %>
                     <p class="form-error" role="alert"><%= erro %></p>
                 <% } %>
                 <label class="field">
@@ -49,22 +42,22 @@
                     <input type="tel" name="telefone" placeholder="(00) 00000-0000" autocomplete="tel-national" inputmode="numeric" maxlength="15" data-mascara="telefone" value="<%= valoresRegistro.telefone || '' %>" required>
                 </label>
 
-                <label class="field password-field">
-                    <span class="field-label">Senha*</span>
+                <div class="field password-field">
+                    <label class="field-label" for="registro-senha">Senha*</label>
                     <div class="password-row">
-                        <input type="password" name="senha" placeholder="Mínimo 8 caracteres" autocomplete="new-password" minlength="8" required>
+                        <input type="password" id="registro-senha" name="senha" placeholder="Mínimo 8 caracteres" autocomplete="new-password" minlength="8" required>
                         <button type="button" class="show-pass" aria-label="Mostrar senha" aria-pressed="false"><img src="/img/icons/olho-fechado.png" alt=""></button>
                     </div>
                     <small class="hint">Sua senha deve ter no mínimo 8 caracteres</small>
-                </label>
+                </div>
 
-                <label class="field password-field">
-                    <span class="field-label">Confirmar Senha*</span>
+                <div class="field password-field">
+                    <label class="field-label" for="registro-confirmar-senha">Confirmar Senha*</label>
                     <div class="password-row">
-                        <input type="password" name="confirm_senha" placeholder="Digite a senha novamente" autocomplete="new-password" minlength="8" required>
+                        <input type="password" id="registro-confirmar-senha" name="confirm_senha" placeholder="Digite a senha novamente" autocomplete="new-password" minlength="8" required>
                         <button type="button" class="show-pass" aria-label="Mostrar senha" aria-pressed="false"><img src="/img/icons/olho-fechado.png" alt=""></button>
                     </div>
-                </label>
+                </div>
 
                 <button class="btn-cta" type="submit">Criar conta</button>
 

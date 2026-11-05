@@ -12,7 +12,6 @@ function atualizarResumoCarrinho() {
   const centavos = itens.reduce((total, item) => total + Math.round(Number(item.subtotal) * 100), 0)
   document.querySelector('.labelResumo').textContent = `Subtotal (${itens.reduce((n, item) => n + item.quantidade, 0)} itens):`
   document.querySelector('.valorResumo').textContent = reaisCarrinho(centavos / 100)
-  document.querySelector('.descontoValor').textContent = reaisCarrinho(0)
   document.querySelector('.valorTotal').textContent = reaisCarrinho(centavos / 100)
   document.getElementById('avisoSelecaoCarrinho').textContent = itensCarrinho.length && !itens.length
     ? 'Nenhum produto selecionado. Selecione ao menos um produto para continuar.'
@@ -122,11 +121,6 @@ function mudarQty(botao, delta) {
   if (!item || item.quantidade + delta < 1 || (delta > 0 && (item.ativo !== 'ativo' || item.quantidade + delta > Number(item.estoque_produto)))) return
   return modificarCarrinho('/itens/' + sku, 'PATCH', { quantidade: item.quantidade + delta })
 }
-function toggleFav(botao) {
-  const ativo = botao.dataset.ativo === 'true'
-  botao.dataset.ativo = String(!ativo)
-  botao.querySelector('i').className = ativo ? 'ti ti-heart' : 'ti ti-heart-filled'
-}
 document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('esvaziarCarrinho').addEventListener('click', esvaziarCarrinho)
   document.getElementById('checkTodos').addEventListener('change', evento => {
@@ -135,9 +129,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       else selecionadosCarrinho.delete(item.produto_sku)
     })
     exibirCarrinho({ itens: itensCarrinho })
-  })
-  document.querySelector('.cupomDesconto .botaoCarrinho').addEventListener('click', () => {
-    mensagemCarrinho('Cupons ainda não estão disponíveis. Os valores exibidos são os registrados no carrinho.')
   })
   document.querySelector('.botaoCarrinhoFinalizar button').addEventListener('click', () => {
     if (carrinhoOcupado || confirmandoRemocao) return

@@ -153,6 +153,11 @@
       <div class="admin-produto-campo">
         <label class="admin-produto-label" for="estoque-produto">Estoque (unidades)</label>
         <input class="admin-produto-input" id="estoque-produto" name="estoque_produto" type="number" min="0" max="2147483647" step="1" value="<%= valoresFormulario.estoque_produto ?? '0' %>">
+        <% if (emEdicao) { %>
+          <%# Estoque de quando a tela abriu: o servidor aplica só a diferença que o admin digitar %>
+          <input type="hidden" name="estoque_original" value="<%= valoresFormulario.estoque_original ?? valoresFormulario.estoque_produto %>">
+          <p class="admin-produto-ajuda">Se uma venda baixar o estoque enquanto você edita, o sistema aplica só a sua alteração sobre o valor atualizado.</p>
+        <% } %>
       </div>
     </div>
   </section>
@@ -239,7 +244,8 @@
         <div class="admin-produto-imagens-atuais">
           <% valoresFormulario.imagens.forEach(function (imagem) { %>
             <figure class="admin-produto-imagem-atual">
-              <img src="<%= imagem.url %>" alt="Imagem <%= imagem.ordem %> de <%= valoresFormulario.titulo_produto || 'produto' %>" loading="lazy">
+              <img src="<%= imagem.url %>" alt="Imagem <%= imagem.ordem %> de <%= valoresFormulario.titulo_produto || 'produto' %>" loading="lazy"
+                  onerror="this.onerror=null; this.src='/img/icons/icons8-caixa-128.png'">
               <figcaption>Imagem <%= imagem.ordem %></figcaption>
             </figure>
           <% }) %>

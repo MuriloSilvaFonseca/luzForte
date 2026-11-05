@@ -58,6 +58,16 @@ async function adicionarItem(conexao, proprietario, pedidoId, sku, quantidade) {
   return pedidoId
 }
 
+// O carrinho sempre usa o preço ATUAL do produto: se o admin mudar o preço,
+// o cliente vê e paga o valor novo (antes ficava congelado no preço de quando adicionou).
+async function atualizarPrecos(conexao, pedidoId) {
+  await conexao.execute(
+    `UPDATE produto_pedido pp JOIN produto p ON p.sku = pp.produto_sku
+     SET pp.preco_unitario = p.preco_produto, pp.subtotal = pp.quantidade * p.preco_produto
+     WHERE pp.pedido_id = ? AND pp.preco_unitario <> p.preco_produto`,
+    [pedidoId])
+}
+
 async function modificarItem(conexao, pedidoId, operacao, sku, quantidade) {
   if (!pedidoId) throw erroCarrinho(404, 'Carrinho não encontrado.')
   const [itens] = await conexao.execute('SELECT quantidade FROM produto_pedido WHERE pedido_id = ? AND produto_sku = ?', [pedidoId, sku])
@@ -112,7 +122,8 @@ async function executarCarrinho(identidade, operacao, dados = {}) {
     } else if (operacao !== 'listar') {
       await modificarItem(conexao, pedidoId, operacao, dados.sku, dados.quantidade)
     }
-    if (pedidoId && operacao !== 'listar') {
+    if (pedidoId) {
+      await atualizarPrecos(conexao, pedidoId)
       await conexao.execute(`UPDATE pedido SET valor_produtos = (SELECT COALESCE(SUM(subtotal), 0) FROM produto_pedido WHERE pedido_id = ?), total = valor_produtos WHERE id_pedido = ? AND ${proprietario.filtro} AND status = 'carrinho'`, [pedidoId, pedidoId, proprietario.valor])
     }
     const resultado = await consultarCarrinho(conexao, proprietario, pedidoId)
@@ -194,8 +205,15 @@ async function transferirCarrinhoVisitante(usuarioId, tokenVisitante) {
             [pedidoUsuario, item.produto_sku])
 
           if (jaExiste.length > 0) {
-            // Mesmo produto nos dois carrinhos: soma as quantidades
-            await definirQuantidade(conexao, pedidoUsuario, item.produto_sku, jaExiste[0].quantidade + item.quantidade)
+            // Mesmo produto nos dois carrinhos: soma as quantidades, limitando ao estoque.
+            // Antes, se a soma passasse do estoque, dava erro e o carrinho do visitante se perdia.
+            const [produtos] = await conexao.execute(
+              "SELECT estoque_produto FROM produto WHERE sku = ? AND ativo = 'ativo' FOR UPDATE", [item.produto_sku])
+            const estoque = produtos.length ? Number(produtos[0].estoque_produto) : 0
+            const quantidade = Math.min(jaExiste[0].quantidade + item.quantidade, estoque)
+            if (quantidade > jaExiste[0].quantidade) {
+              await definirQuantidade(conexao, pedidoUsuario, item.produto_sku, quantidade)
+            }
           } else {
             // Produto só no carrinho do visitante: move a linha para o carrinho do usuário
             await conexao.execute(
@@ -207,7 +225,8 @@ async function transferirCarrinhoVisitante(usuarioId, tokenVisitante) {
         // O carrinho do visitante não é mais usado (os itens restantes saem junto: ON DELETE CASCADE)
         await conexao.execute('DELETE FROM pedido WHERE id_pedido = ?', [pedidoVisitante])
 
-        // Recalcula o valor do carrinho do usuário
+        // Recalcula o valor do carrinho do usuário (com os preços atuais)
+        await atualizarPrecos(conexao, pedidoUsuario)
         await conexao.execute(
           "UPDATE pedido SET valor_produtos = (SELECT COALESCE(SUM(subtotal), 0) FROM produto_pedido WHERE pedido_id = ?), total = valor_produtos WHERE id_pedido = ? AND usuario_id = ? AND status = 'carrinho'",
           [pedidoUsuario, pedidoUsuario, usuarioId])

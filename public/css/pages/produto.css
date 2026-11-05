@@ -874,3 +874,15 @@
     grid-template-columns:repeat(2, 1fr);
   }
 }
+
+/* Resposta da loja abaixo da avaliação do cliente */
+.avaliacao_resposta_produto {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-left: 3px solid #1a6be8;
+  border-radius: 6px;
+  background: #f5f9ff;
+  color: #263449;
+  font-size: 14px;
+  line-height: 1.5;
+}

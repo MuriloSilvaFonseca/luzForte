@@ -1,10 +1,11 @@
 const express = require('express')
 const conexao = require('../config/database')
 const { userEstaLogado, userAdmin } = require('../middlewares/auth')
-const { statusInfo } = require('../services/status-pedido')
+const { statusInfo, transicoes } = require('../services/status-pedido')
 const router = express.Router()
 
 router.use(userEstaLogado, userAdmin)
+router.use(require('../middlewares/avaliacoes-pendentes'))
 router.use(require('./admin-gestao'))
 
 const POR_PAGINA = 10
@@ -166,10 +167,6 @@ router.post('/pedidos/:id/cancelar', async (req, res) => {
   await mudarStatusPedido(req, res, 'cancelado', req.body && req.body.motivo_cancelamento)
 })
 
-router.post('/pedidos/:id/finalizar', async (req, res) => {
-  await mudarStatusPedido(req, res, 'finalizado')
-})
-
 router.post('/pedidos/:id/retirar', async (req, res) => {
   await mudarStatusPedido(req, res, 'finalizado')
 })
@@ -211,9 +208,8 @@ async function mudarStatusPedido(req, res, novoStatus, motivoCancelamento, statu
       transacaoAberta = false
       return res.status(409).send('O status mudou. Recarregue os pedidos.')
     }
-    const mudancaPermitida =
-      (statusAtual === 'solicitado' && ['aprovado', 'cancelado'].includes(novoStatus)) ||
-      (statusAtual === 'aprovado' && ['finalizado', 'cancelado'].includes(novoStatus))
+    // Mudanças permitidas ficam em services/status-pedido.js (solicitado -> aprovado/cancelado; aprovado -> finalizado/cancelado)
+    const mudancaPermitida = (transicoes[statusAtual] || []).includes(novoStatus)
     if (!mudancaPermitida) {
       await conexao.rollback()
       transacaoAberta = false
@@ -228,7 +224,7 @@ async function mudarStatusPedido(req, res, novoStatus, motivoCancelamento, statu
 
       for (const item of itens) {
         const [[produto]] = await conexao.execute(
-          'SELECT estoque_produto FROM produto WHERE sku = ? FOR UPDATE',
+          'SELECT estoque_produto, custo_produto FROM produto WHERE sku = ? FOR UPDATE',
           [item.produto_sku]
         )
         if (!produto || Number(produto.estoque_produto) < Number(item.quantidade)) {
@@ -236,11 +232,31 @@ async function mudarStatusPedido(req, res, novoStatus, motivoCancelamento, statu
           transacaoAberta = false
           return res.status(409).send('Não há estoque suficiente para aprovar este pedido.')
         }
+        item.custo = produto.custo_produto
       }
 
       for (const item of itens) {
         await conexao.execute(
           'UPDATE produto SET estoque_produto = estoque_produto - ? WHERE sku = ?',
+          [item.quantidade, item.produto_sku]
+        )
+        // Guarda o custo do momento da venda: o lucro não muda se o custo do produto mudar depois
+        await conexao.execute(
+          'UPDATE produto_pedido SET custo_unitario = ? WHERE pedido_id = ? AND produto_sku = ?',
+          [item.custo, id, item.produto_sku]
+        )
+      }
+    }
+
+    // Pedido aprovado já tinha baixado o estoque: ao cancelar, as unidades voltam para a loja
+    if (novoStatus === 'cancelado' && statusAtual === 'aprovado') {
+      const [itens] = await conexao.execute(
+        'SELECT produto_sku, quantidade FROM produto_pedido WHERE pedido_id = ? FOR UPDATE',
+        [id]
+      )
+      for (const item of itens) {
+        await conexao.execute(
+          'UPDATE produto SET estoque_produto = estoque_produto + ? WHERE sku = ?',
           [item.quantidade, item.produto_sku]
         )
       }
@@ -278,27 +294,39 @@ router.post('/usuarios/:id/perfil', async (req, res, next) => {
     return res.redirect('/admin/usuarios')
   }
 
+  // O admin não muda o próprio perfil (evita se rebaixar sem querer e perder o acesso)
+  if (id === Number(req.session.usuario.id_usuario)) {
+    return res.status(403).send('Você não pode alterar o próprio perfil.')
+  }
+
+  let banco
+  let transacaoAberta = false
   try {
-    await conexao.promise().execute(
-      'UPDATE usuario SET acesso = ? WHERE id_usuario = ?',
-      [novoPerfil, id]
-    )
+    banco = await conexao.promise().getConnection()
+    await banco.beginTransaction()
+    transacaoAberta = true
+    // Trava as contas de admin ativas: duas mudanças ao mesmo tempo não conseguem
+    // deixar a loja sem nenhum administrador
+    const [admins] = await banco.execute(
+      "SELECT id_usuario FROM usuario WHERE acesso = 'admin' AND ativo = 1 FOR UPDATE")
+    const rebaixandoAdmin = novoPerfil === 'cliente' && admins.some(a => Number(a.id_usuario) === id)
+    if (rebaixandoAdmin && admins.length <= 1) {
+      await banco.rollback()
+      transacaoAberta = false
+      return res.status(409).send('A loja precisa ter pelo menos um administrador ativo.')
+    }
+    await banco.execute('UPDATE usuario SET acesso = ? WHERE id_usuario = ?', [novoPerfil, id])
+    await banco.commit()
+    transacaoAberta = false
     res.redirect('/admin/usuarios')
   } catch (erro) {
+    if (transacaoAberta) {
+      try { await banco.rollback() } catch (_) {}
+    }
     next(erro)
+  } finally {
+    if (banco) banco.release()
   }
-})
-
-router.use(async (req, res, next) => {
-  res.locals.avaliacoesPendentes = 0
-  try {
-    const [[linha]] = await conexao.promise().query(
-      "SELECT COUNT(*) AS n FROM avaliacao_produto WHERE status = 'pendente'")
-    res.locals.avaliacoesPendentes = Number(linha.n)
-  } catch (erro) {
-    console.error('Falha ao contar avaliações pendentes:', erro.code || erro.message)
-  }
-  next()
 })
 
 const STATUS_AVALIACAO = ['pendente', 'aprovada', 'rejeitada']
